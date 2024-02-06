@@ -4,7 +4,6 @@ import msgspec
 from datetime import date, timedelta
 from polygon import RESTClient
 
-
 client = RESTClient(api_key="_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
 today = date.today()
 refdayfive = today - timedelta(days = 5)
@@ -55,16 +54,22 @@ class History:
     @staticmethod
     def Five_Min(instrument):
         aggs = []
-        for a in client.list_aggs(ticker=instrument, multiplier=5, timespan="minute", from_=refdayfive, to=today, limit=50000):
-            History.five.append(a.low)
+        response = requests.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+str(refdayfive)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+        resp = response.json()
+        for item in resp['results']:
+            aggs.append(item['l'])
+        History.five = aggs
         History.lenfive = len(History.five)
         return(History.five)
 
     @staticmethod
     def Fifteen_Min(instrument):
         aggs = []
-        for a in client.list_aggs(ticker=instrument, multiplier=15, timespan="minute", from_=refdayfifteen, to=today, limit=50000):
-            History.fifteen.append(a.low)
+        response = requests.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+str(refdayfifteen)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+        resp = response.json()
+        for item in resp['results']:
+            aggs.append(item['l'])
+        History.fifteen = aggs
         History.lenfifteen = len(History.fifteen)
         return(History.fifteen)
 
@@ -72,55 +77,69 @@ class History:
     @staticmethod
     def Thirty_Min(instrument):
         aggs = []
-        for a in client.list_aggs(ticker=instrument, multiplier=30, timespan="minute", from_=refdaythirty, to=today, limit=50000):
-            History.thirty.append(a.low)
+        response = requests.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+str(refdaythirty)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+        resp = response.json()
+        for item in resp['results']:
+            aggs.append(item['l'])
+        History.thirty = aggs
         History.lenthirty = len(History.thirty)
         return(History.thirty)
+        
 
     @staticmethod
     def One_Hour(instrument):
         aggs = []
-        for a in client.list_aggs(ticker=instrument, multiplier=1, timespan="hour", from_=refdayhour, to=today, limit=50000):
-            History.hour.append(a.low)
+        response = requests.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+str(refdayhour)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+        resp = response.json()
+        for item in resp['results']:
+            aggs.append(item['l'])
+        History.hour = aggs
         History.lenhour = len(History.hour)
         return(History.hour)
 
     @staticmethod
     def Two_Hour(instrument):
         aggs = []
-        for a in client.list_aggs(ticker=instrument, multiplier=2, timespan="hour", from_=refdaytwohour, to=today, limit=50000):
-            History.twohour.append(a.low)
+        response = requests.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+str(refdaytwohour)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+        resp = response.json()
+        for item in resp['results']:
+            aggs.append(item['l'])
+        History.twohour = aggs
         History.lentwohour = len(History.twohour)
         return(History.twohour)
-    
 
     @staticmethod
     def Four_Hour(instrument):
         aggs = []
-        for a in client.list_aggs(ticker=instrument, multiplier=4, timespan="hour", from_=refdayfourhour, to=today, limit=50000):
-            History.fourhour.append(a.low)
+        response = requests.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+str(refdayfourhour)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+        resp = response.json()
+        for item in resp['results']:
+            aggs.append(item['l'])
+        History.fourhour = aggs
         History.lenfourhour = len(History.fourhour)
         return(History.fourhour)
-    
 
     @staticmethod
     def Daily(instrument):
-        close = []
         aggs = []
-        for a in client.list_aggs(ticker=instrument, multiplier=1, timespan="day", from_=refdaydaily, to=today, limit=50000):
-            History.daily.append(a.low)
+        response = requests.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+str(refdaydaily)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+        resp = response.json()
+        for item in resp['results']:
+            aggs.append(item['l'])
+        History.daily = aggs
         History.lendaily = len(History.daily)
         return(History.daily)
     
     @staticmethod
     def Weekly(instrument):
-        close = []
         aggs = []
-        for a in client.list_aggs(ticker=instrument, multiplier=1, timespan="week", from_=refdayweekly, to=today, limit=50000):
-            History.weekly.append(a.low)
+        response = requests.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+str(refdayweekly)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+        resp = response.json()
+        for item in resp['results']:
+            aggs.append(item['l'])
+        History.weekly = aggs
         History.lenweekly = len(History.weekly)
         return(History.weekly)
-
 
     @staticmethod 
     def Equalizer(instrument):
@@ -163,6 +182,8 @@ class History:
         History.fourhour = listofitems[5]
         History.daily = listofitems[6]
         History.weekly = listofitems[7]
+
+
 
 
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
