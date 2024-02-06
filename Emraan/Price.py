@@ -2,7 +2,6 @@ import requests
 import LivePrice
 import json
 import msgspec
-import httpx
 
 accinfo = []
 with open('accinfo.json', 'rb') as accinf:
@@ -30,13 +29,24 @@ class Prices:
         accountID = str(accinfo[0])
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
-        query = {"count": 1, "granularity": "M1"}
-        resp = httpx.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
-        pricelist = list(resp.json()['candles'][0]['mid'].values())
-        price = pricelist[3]
+        query = {"count":  1, "granularity": "M1"}
+        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        resp = str(response.content)
+        listofnums = resp.split(':')
+        numlist = listofnums[-1]
+        placeholder = numlist
+        secondplaceholder = []
+        finalstr = ""
+        numlisttwo = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.']
+        for char in numlist:
+            if (char in numlisttwo):
+                secondplaceholder.append(char)
+        for val in secondplaceholder:
+            finalstr += val
+        price = float(finalstr)
         dict[instrument] = {"Price": 0}
         dict[instrument]["Price"] = price
-        
+        response.close()
 
     @staticmethod
     def database():
@@ -57,7 +67,15 @@ def loop(inst):
         outfile.close()
         Prices.control(inst)
 
+
+def drop(inst):
+    dict = {"instrument": str(inst)}
+    dict_as_json = json.dumps(dict)
+    with open("instrum.json", "w+") as outfile:
+        outfile.truncate()
+        outfile.write(dict_as_json)
+        outfile.close()
+
+
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
-
-Prices.priceswitcher("EUR_USD")
