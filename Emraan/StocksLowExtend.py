@@ -2,7 +2,7 @@ import requests
 import json
 import msgspec
 from datetime import date, timedelta
-from polygon import *
+from polygon import RESTClient
 
 client = RESTClient(api_key="_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
 today = date.today()

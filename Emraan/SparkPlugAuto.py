@@ -68,7 +68,7 @@ class Auto:
             inst2 = open('Data.json', 'rb')
             instrum = msgspec.json.decode(inst2.read(), type=object)                
             instrumen = next(iter(instrum))
-            print(instrumen)
+            
             if len(instrumen) > 1:
                  break
         datainst = next(iter(instrum))
@@ -76,7 +76,7 @@ class Auto:
             inst2 = open('High.json', 'rb')
             instrum = msgspec.json.decode(inst2.read(), type=object)                
             instrumen = next(iter(instrum))
-            print(instrumen)
+            
             if len(instrumen) > 1:
                  break
         highinst = next(iter(instrum))
@@ -84,7 +84,7 @@ class Auto:
             inst2 = open('Low.json', 'rb')
             instrum = msgspec.json.decode(inst2.read(), type=object)                
             instrumen = next(iter(instrum))
-            print(instrumen)
+            
             if len(instrumen) > 1:
                  break
         lowinst = next(iter(instrum))
@@ -92,7 +92,7 @@ class Auto:
             inst2 = open('Open.json', 'rb')
             instrum = msgspec.json.decode(inst2.read(), type=object)                
             instrumen = next(iter(instrum))
-            print(instrumen)
+            
             if len(instrumen) > 1:
                  break
             
@@ -101,7 +101,7 @@ class Auto:
             inst2 = open('DataExtend.json', 'rb')
             instrum = msgspec.json.decode(inst2.read(), type=object)                
             instrumen = next(iter(instrum))
-            print(instrumen)
+            
             if len(instrumen) > 1:
                  break
            
@@ -110,7 +110,7 @@ class Auto:
             inst2 = open('HighExtend.json', 'rb')
             instrum = msgspec.json.decode(inst2.read(), type=object)                
             instrumen = next(iter(instrum))
-            print(instrumen)
+            
             if len(instrumen) > 1:
                  break
         highextendinst = next(iter(instrum))
@@ -118,7 +118,7 @@ class Auto:
             inst2 = open('LowExtend.json', 'rb')
             instrum = msgspec.json.decode(inst2.read(), type=object)                
             instrumen = next(iter(instrum))
-            print(instrumen)
+            
             if len(instrumen) > 1:
                  break
         lowextendinst = next(iter(instrum))
@@ -126,7 +126,7 @@ class Auto:
             inst2 = open('OpenExtend.json', 'rb')
             instrum = msgspec.json.decode(inst2.read(), type=object)                
             instrumen = next(iter(instrum))
-            print(instrumen)
+            
             if len(instrumen) > 1:
                  break
         openextendinst = next(iter(instrum))
