@@ -1,5 +1,6 @@
 import threading
 import Piston
+import Pistontwo
 import PistonStocks
 
 
@@ -8,6 +9,7 @@ if __name__ == "__main__":
     #server = Server(Piston.borjan())
     #server.serve()
     threading.Thread(target=Piston.borjan).start()
+    threading.Thread(target=Pistontwo.borjan).start()
     threading.Thread(target=PistonStocks.borjan).start()
 
 
