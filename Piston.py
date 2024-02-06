@@ -153,7 +153,7 @@ def borjan():
     threads = []
     with open('not instruments.json', 'w') as nots:
         nots.write(json.dumps(notinst))
-    with open('instrumentsthree.json', 'rb') as insts:
+    with open('instruments.json', 'rb') as insts:
             instrum = msgspec.json.decode(insts.read(), type=object)
             info = instrum['instruments']
             Starters.instrument_bank = info
