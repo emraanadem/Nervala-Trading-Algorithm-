@@ -32,7 +32,8 @@ class Prices:
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1, "granularity": "M1"}
         resp = httpx.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
-        price = float(list(resp.json()['candles'][0]['mid'].values())[3])
+        pricelist = list(resp.json()['candles'][0]['mid'].values())
+        price = pricelist[3]
         dict[instrument] = {"Price": 0}
         dict[instrument]["Price"] = price
         
