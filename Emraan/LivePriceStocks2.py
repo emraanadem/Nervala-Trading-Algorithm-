@@ -6,7 +6,7 @@ import json
 import msgspec
 i = 0
 
-async def caller():
+def caller():
     i = 0
     while i == 0:
         try:
@@ -17,16 +17,11 @@ async def caller():
                  break
         except json.decoder.JSONDecodeError:
              q = 0
-    while i == 0:
-        start = time.time()
-        try:
-            PriceStocks.loop(instrument)
-            time.sleep(.25)
-            break
-        except Exception as error:
-            print(error)
-        end = time.time()
-        ## print(end-start)
+    
+    PriceStocks.loop(instrument)
+
+
+
 
 def controlbox():
-    asyncio.run(caller())
+    caller()

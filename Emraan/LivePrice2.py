@@ -6,7 +6,7 @@ import json
 import msgspec
 i = 0
 
-async def caller():
+def caller():
     i = 0
     while i == 0:
         with open('instrument.json', 'rb') as accinf:
@@ -15,15 +15,7 @@ async def caller():
         if len(instrument) > 1:
             break
         
-    while i == 0:
-        start = time.time()
-        Price.loop(instrument)
-        time.sleep(.25)
-        break
-        end = time.time()
-        ## print(end-start)
+    Price.loop(instrument)
 
 def controlbox():
-    asyncio.run(caller())
-
-controlbox()
+    caller()
