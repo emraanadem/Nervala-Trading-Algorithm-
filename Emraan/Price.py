@@ -68,7 +68,6 @@ def loop(inst):
         outfile.close()
         Prices.control(inst)
 
-print(Prices.priceswitcher("AUD_USD"))
 
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
