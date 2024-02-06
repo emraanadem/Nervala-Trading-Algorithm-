@@ -2,6 +2,7 @@ import requests
 import LivePrice
 import json
 import msgspec
+import httpx
 
 accinfo = []
 with open('accinfo.json', 'rb') as accinf:
@@ -30,12 +31,11 @@ class Prices:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1, "granularity": "M1"}
-        print(instrument)
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
-        price = float(list(response.json()['candles'][0]['mid'].values())[3])
+        resp = httpx.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        price = float(list(resp.json()['candles'][0]['mid'].values())[3])
         dict[instrument] = {"Price": 0}
         dict[instrument]["Price"] = price
-        response.close()
+        
 
     @staticmethod
     def database():
@@ -59,3 +59,4 @@ def loop(inst):
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
 
+Prices.priceswitcher("EUR_USD")
