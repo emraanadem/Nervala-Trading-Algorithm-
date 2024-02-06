@@ -100,7 +100,7 @@ class Starters:
 # git clone https://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@github.com/emraanadem/Project_Sampi.git
 # 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
 #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
-@app.route("/")
+#@app.route("/")
 def homepage():
     return Starters.begin()
 
