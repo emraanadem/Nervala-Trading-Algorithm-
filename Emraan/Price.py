@@ -43,6 +43,7 @@ class Prices:
                 secondplaceholder.append(char)
         for val in secondplaceholder:
             finalstr += val
+        print(numlist, finalstr)
         price = float(finalstr)
         dict[instrument] = {"Price": 0}
         dict[instrument]["Price"] = price
@@ -67,15 +68,7 @@ def loop(inst):
         outfile.close()
         Prices.control(inst)
 
-
-def drop(inst):
-    dict = {"instrument": str(inst)}
-    dict_as_json = json.dumps(dict)
-    with open("instrum.json", "w+") as outfile:
-        outfile.truncate()
-        outfile.write(dict_as_json)
-        outfile.close()
-
+print(Prices.priceswitcher("AUD_USD"))
 
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
