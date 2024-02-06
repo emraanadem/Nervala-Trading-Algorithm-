@@ -32,7 +32,7 @@ class Starters:
         import pathlib
         path = str(pathlib.Path(__file__).parent.resolve())
         acclist = []
-        with open(path + '/accounts2.txt', 'r') as infor:
+        with open(path + '/accounts.txt', 'r') as infor:
             datas = list(csv.reader(infor, delimiter = ' '))
             for row in datas:
                 Starters.accinfo.append([str(row[0]), str(row[1])])
@@ -114,7 +114,7 @@ def borjan():
     threads = []
     with open('not instruments.json', 'w') as nots:
         nots.write(json.dumps(notinst))
-    with open('instrumentsthree.json', 'rb') as insts:
+    with open('instruments.json', 'rb') as insts:
             instrum = msgspec.json.decode(insts.read(), type=object)
             info = instrum['instruments']
             Starters.instrument_bank = info

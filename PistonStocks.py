@@ -76,17 +76,6 @@ class Starters:
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
                 inst.write(json.dumps(dict))
-            initnum = 0
-            for num in range(0, int(len(Starters.instrument_bank)/5)+1):
-                if(len(Starters.instrument_bank) < 7):
-                    acclist = Starters.accinfo[num]
-                    with open(pathtwo + '/accinfo.json', 'w') as inst:
-                        inst.write(json.dumps(acclist))
-                elif((Starters.instrument_bank.index(val) < num*6) and (Starters.instrument_bank.index(val) >= initnum)):
-                    acclist = Starters.accinfo[num-1]
-                    with open(pathtwo + '/accinfo.json', 'w') as inst:
-                        inst.write(json.dumps(acclist))
-                    initnum = num
         else:
             os.mkdir(pathtwo)
             orig_path = str(pathlib.Path(__file__).parent.resolve()) + "/Emraan"
@@ -104,17 +93,7 @@ class Starters:
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
                 inst.write(json.dumps(dict))
-            initnum = 0
-            for num in range(0, int(len(Starters.instrument_bank)/5)+1):
-                if(len(Starters.instrument_bank) < 7):
-                    acclist = Starters.accinfo[num]
-                    with open(pathtwo + '/accinfo.json', 'w') as inst:
-                        inst.write(json.dumps(acclist))
-                elif((Starters.instrument_bank.index(val) < num*6) and (Starters.instrument_bank.index(val) >= initnum)):
-                    acclist = Starters.accinfo[num-1]
-                    with open(pathtwo + '/accinfo.json', 'w') as inst:
-                        inst.write(json.dumps(acclist))
-                    initnum = num
+           
         import pathlib
         path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         #path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
