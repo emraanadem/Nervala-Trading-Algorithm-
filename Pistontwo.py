@@ -1,7 +1,6 @@
 import pathlib
 import os
 import msgspec
-import math
 import time
 from timeloop import Timeloop
 import subprocess
@@ -20,22 +19,28 @@ from datetime import date
 class Starters:
     
     instrument_bank = []
-    instrument_list = []
     banktwo = []
     current_val = ''
     current_dir = os.getcwd()
     accinfo = []
     paths = []
     importantinfo = []
+    impinfo = []
+    evenmoreimpinfo = []
+
+
+    def accinfoloader():
+         rowid = 0
+         with open('accounts2.txt', 'r') as infor:
+            datas = list(csv.reader(infor, delimiter = ' '))
+            for row in datas:
+                Starters.accinfo.append([str(row[0]), str(row[1]),rowid])
+                rowid+=1
+            
 
     def begin(val):
         import pathlib
         path = str(pathlib.Path(__file__).parent.resolve())
-        acclist = []
-        with open(path + '/accounts2.txt', 'r') as infor:
-            datas = list(csv.reader(infor, delimiter = ' '))
-            for row in datas:
-                Starters.accinfo.append([str(row[0]), str(row[1])])
         redo = True
         Starters.current_val = val
         pathtwo = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
@@ -45,14 +50,13 @@ class Starters:
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
                 inst.write(json.dumps(dict))
-            if Starters.instrument_bank.index(val) > len(Starters.accinfo):
-                indexaccinfo = math.abs(len(Starters.accinfo) - Starters.instrument_bank.index(val))
-                with open(pathtwo + '/accinfo.json', 'w') as instt:
-                        instt.write(json.dumps(Starters.accinfo[indexaccinfo]))
-            else:
-                indexaccinfo = Starters.instrument_bank.index(val)
-                with open(pathtwo + '/accinfo.json', 'w') as instt:
-                        instt.write(json.dumps(Starters.accinfo[indexaccinfo]))
+            for val in Starters.accinfo:
+                for vals in Starters.impinfo:
+                    if val[2] == vals[1]:
+                        Starters.evenmoreimpinfo.append([val[0],val[1],vals[0]])
+                        with open(pathtwo + '/accinfo.json', 'w') as inst:
+                                inst.write(json.dumps(val[0],val[1]))
+                        Starters.evenmoreimpinfo = []
         else:
             os.mkdir(pathtwo)
             orig_path = str(pathlib.Path(__file__).parent.resolve()) + "/Emraan"
@@ -70,14 +74,12 @@ class Starters:
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
                 inst.write(json.dumps(dict))
-            if Starters.instrument_bank.index(val) > len(Starters.accinfo):
-                indexaccinfo = math.abs(len(Starters.accinfo) - Starters.instrument_bank.index(val))
-                with open(pathtwo + '/accinfo.json', 'w') as instt:
-                        instt.write(json.dumps(Starters.accinfo[indexaccinfo]))
-            else:
-                indexaccinfo = Starters.instrument_bank.index(val)
-                with open(pathtwo + '/accinfo.json', 'w') as instt:
-                        instt.write(json.dumps(Starters.accinfo[indexaccinfo]))
+            for val in Starters.accinfo:
+                for vals in Starters.impinfo:
+                    if val[2] == vals[1]:
+                        Starters.evenmoreimpinfo.append([val[0],val[1],vals[0]])
+                        with open(pathtwo + '/accinfo.json', 'w') as inst:
+                                inst.write(json.dump([val[0],val[1]], inst))
         import pathlib
         path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         #path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
@@ -93,8 +95,7 @@ class Starters:
             if current_val in Starters.banktwo:
                 Starters.banktwo.remove(current_val)
         except Exception as error:
-            print(error)
-
+            q = 0
     def initiator(path, current_val):
         subprocess.Popen('cd ' + path + ';' + 'python3 pythoner' + current_val + ".py", shell = True)
 # git clone https://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@github.com/emraanadem/Project_Sampi.git
@@ -104,42 +105,43 @@ class Starters:
 def homepage():
     return Starters.begin()
 
+    
+
 def borjan():
     #from waitress import serve
     #app.run(host="0.0.0.0", port=4073, use_reloader = False)
-    notinst = {}
-    notinst['insts'] = []
-    notssss = {}
-    notssss['instruments'] = []
     threads = []
-    with open('not instruments.json', 'w') as nots:
-        nots.write(json.dumps(notinst))
+    placeholder = []
+    rowid = 0
+    Starters.accinfoloader()
     with open('instrumentsthree.json', 'rb') as insts:
             instrum = msgspec.json.decode(insts.read(), type=object)
             info = instrum['instruments']
             Starters.instrument_bank = info
-    with open('avoidinst.json', 'w+') as instss:
-            instss.write(json.dumps(notssss))
+            for val in info:
+                placeholder = [val, rowid]
+                Starters.impinfo.append(placeholder)
+                rowid+=1
+                if rowid == 24:
+                    rowid = 0
+            
+
     threadsss = []
     for val in Starters.instrument_bank:
-        if val not in Starters.instrument_list:
             t = threading.Thread(target=Starters.begin, args = [val])
             t.start()
             threadsss.append(t)
     for thread in threadsss:
         thread.join()
     pointer = 0
-    k = 10
     while pointer < len(Starters.instrument_bank):
-        threads = []
-        for num in range(0, 100):
-            if pointer < len(Starters.importantinfo):  
-                try:
-                    t = threading.Thread(target=Starters.starting, args = [Starters.importantinfo[pointer][0], Starters.importantinfo[pointer][1]])
-                    t.start()
-                    threads.append([t, Starters.importantinfo[pointer][1]])
-                    pointer += 1
-                except Exception as error:
-                    print(error)
-        for threads in threads:
-            threads[0].join()
+        threads = [] 
+        try:
+            t = threading.Thread(target=Starters.starting, args = [Starters.importantinfo[pointer][0], Starters.importantinfo[pointer][1]])
+            t.start()
+            threads.append([t, Starters.importantinfo[pointer][1]])
+            pointer += 1
+        except Exception as error:
+            q = 0 
+    for threads in threads:
+        threads[0].join()
