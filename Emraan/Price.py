@@ -43,7 +43,6 @@ class Prices:
                 secondplaceholder.append(char)
         for val in secondplaceholder:
             finalstr += val
-        print(numlist, finalstr)
         price = float(finalstr)
         dict[instrument] = {"Price": 0}
         dict[instrument]["Price"] = price
