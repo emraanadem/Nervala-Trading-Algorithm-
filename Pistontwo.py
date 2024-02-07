@@ -1,22 +1,11 @@
 import os
 import msgspec
-import time
-from timeloop import Timeloop
 import subprocess
 import threading
 import json
 import shutil
 import csv
-import time
-from datetime import timedelta
-from flask import *
-from datetime import date
 
-today = date.today()
-
-app = Flask(__name__)
-
-tl = Timeloop()
 
 class Starters:
 
@@ -35,7 +24,7 @@ class Starters:
         import pathlib
         path = str(pathlib.Path(__file__).parent.resolve())
         acclist = []
-        with open(path + '/accounts.txt', 'r') as infor:
+        with open(path + '/accounts2.txt', 'r') as infor:
             datas = list(csv.reader(infor, delimiter = ' '))
             rowid = 0
             for row in datas:

@@ -11,6 +11,13 @@ accinf.close()
 with open("instrument.json", 'rb') as inst:
     instrum = msgspec.json.decode(inst.read())  
     instrument = instrum['instrument']
+
+
+with open("instrumentstwo.json", 'rb') as inst:
+    instrum = msgspec.json.decode(inst.read())  
+    instrument = instrum['instrument']
+
+
     
 dict = {}
 
@@ -20,10 +27,9 @@ class Prices:
 
     @staticmethod
     def control(instrument):
-        Prices.priceswitcher(instrument)
+        Prices.pricehub(instrument)
         Prices.database()
     
-
     @staticmethod
     def priceswitcher(instrument):
         accountID = str(accinfo[0])
@@ -35,20 +41,29 @@ class Prices:
         listofnums = resp.split(':')
         numlist = listofnums[-1]
         placeholder = numlist
-        secondplaceholder = []
-        finalstr = ""
-        numlisttwo = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.']
-        for char in numlist:
-            if (char in numlisttwo):
-                secondplaceholder.append(char)
-        for val in secondplaceholder:
-            finalstr += val
-        print(instrument, str(finalstr))
-        if float(finalstr) > 0:
-            price = float(finalstr)
-            dict[instrument] = {"Price": 0}
-            dict[instrument]["Price"] = price
         response.close()
+        return placeholder
+        
+
+    @staticmethod
+    def pricehub(instrument):
+        i = 0
+        periodcount = 0
+        numlisttwo = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.']
+        while i == 0:
+            placeholder = ""
+            number = Prices.priceswitcher(instrument)
+            for char in number:
+                if char in numlisttwo:
+                    placeholder += char
+                if char == ".":
+                    periodcount +=1
+            if periodcount < 2:
+                break
+        price = float(placeholder)
+        dict[instrument] = {"Price": 0}
+        dict[instrument]["Price"] = price
+        return price
 
     @staticmethod
     def database():
@@ -67,7 +82,8 @@ def loop(inst):
         outfile.truncate()
         outfile.write(dict_as_json)
         outfile.close()
-        Prices.control(inst)
+    Prices.control(inst)
+
 
 
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
