@@ -13,11 +13,6 @@ with open("instrument.json", 'rb') as inst:
     instrument = instrum['instrument']
 
 
-with open("instrumentstwo.json", 'rb') as inst:
-    instrum = msgspec.json.decode(inst.read())  
-    instrument = instrum['instrument']
-
-
     
 dict = {}
 
