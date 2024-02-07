@@ -43,7 +43,10 @@ class Prices:
                 secondplaceholder.append(char)
         for val in secondplaceholder:
             finalstr += val
-        price = float(finalstr)
+        try:
+            price = float(finalstr)
+        except ValueError as error:
+            print(error, finalstr)
         dict[instrument] = {"Price": 0}
         dict[instrument]["Price"] = price
         response.close()

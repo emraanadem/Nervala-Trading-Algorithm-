@@ -83,7 +83,6 @@ class Starters:
                                 json.dump([valss[0],valss[1]], inst)
                         Starters.evenmoreimpinfo = []
         import pathlib
-        print(val)
         path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         #path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         Starters.importantinfo.append([path, val])
