@@ -49,7 +49,7 @@ class Starters:
             dict = {}
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
-                inst.write(str(json.dump(dict), inst))
+                inst.write(str(json.dump(dict, inst)))
             for val in Starters.accinfo:
                 for vals in Starters.impinfo:
                     if val[2] == vals[1]:
