@@ -49,13 +49,13 @@ class Starters:
             dict = {}
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
-                inst.write(json.dumps(dict))
+                inst.write(str(json.dump(dict), inst))
             for val in Starters.accinfo:
                 for vals in Starters.impinfo:
                     if val[2] == vals[1]:
                         Starters.evenmoreimpinfo.append([val[0],val[1],vals[0]])
                         with open(pathtwo + '/accinfo.json', 'w') as inst:
-                                inst.write(json.dump([val[0],val[1]], inst))
+                                inst.write(str(json.dump([val[0],val[1]], inst)))
                         Starters.evenmoreimpinfo = []
         else:
             os.mkdir(pathtwo)
@@ -73,13 +73,13 @@ class Starters:
             dict = {}
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
-                inst.write(json.dumps(dict))
+                inst.write(str(json.dump(dict, inst)))
             for val in Starters.accinfo:
                 for vals in Starters.impinfo:
                     if val[2] == vals[1]:
                         Starters.evenmoreimpinfo.append([val[0],val[1],vals[0]])
                         with open(pathtwo + '/accinfo.json', 'w') as inst:
-                                inst.write(json.dump([val[0],val[1]], inst))
+                                inst.write(str(json.dump([val[0],val[1]], inst)))
         import pathlib
         path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         #path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
