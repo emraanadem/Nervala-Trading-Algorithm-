@@ -63,12 +63,12 @@ class Auto:
         Motor2Extend2.controller()
         Motor3Extend2.controller()
         Motor5Extend2.controller()
-        i = 0
         while i == 0:
             inst2 = open('Data.json', 'r')
             instrum = json.load(inst2)              
             instrumen = next(iter(instrum))  
-            
+            print(instrumen)
+            i =1
             if len(instrumen) > 1:
                  break
         datainst = next(iter(instrum))

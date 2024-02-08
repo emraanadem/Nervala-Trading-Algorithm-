@@ -49,8 +49,8 @@ def loop(inst):
                 outfile.write(dict_as_json)
             outfile.close()
             Prices.q += 1
-    with open("instrument.json", 'rb') as inst:
-        instrum = msgspec.json.decode(inst.read())  
+    with open("instrument.json", 'r') as inst:
+        intrum = json.load(inst)
         instrument = instrum['instrument']  
         Prices.control(instrument)
 
