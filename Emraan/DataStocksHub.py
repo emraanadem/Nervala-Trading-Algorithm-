@@ -33,8 +33,8 @@ def controlbox():
     i = 0
     while i == 0:
         try:
-            with open('instrument.json', 'rb') as accinf:
-                instrum = msgspec.json.decode(accinf.read())
+            with open('instrument.json', 'r') as accinf:
+                instrum = json.load(accinf)
             instrument = instrum['instrument']
             if len(instrument) > 1:
                 break

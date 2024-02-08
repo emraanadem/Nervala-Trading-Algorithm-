@@ -6,8 +6,8 @@ import Transmission
 import time
 
 accinfo = []
-with open("instrument.json", 'rb') as inst:
-    instrum = msgspec.json.decode(inst.read(), type=object)  
+with open("instrument.json", 'r') as inst:
+    instrum = json.load(inst)
     instrument = instrum['instrument']
     
 class Auto:
@@ -65,67 +65,67 @@ class Auto:
         Motor5Extend2.controller()
         i = 0
         while i == 0:
-            inst2 = open('Data.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('Data.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             
             if len(instrumen) > 1:
                  break
         datainst = next(iter(instrum))
         while i == 0:
-            inst2 = open('High.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('High.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             
             if len(instrumen) > 1:
                  break
         highinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('Low.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('Low.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             
             if len(instrumen) > 1:
                  break
         lowinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('Open.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('Open.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             
             if len(instrumen) > 1:
                  break
             
         openinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('DataExtend.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('DataExtend.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             
             if len(instrumen) > 1:
                  break
            
         dataextendinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('HighExtend.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('HighExtend.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             
             if len(instrumen) > 1:
                  break
         highextendinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('LowExtend.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('LowExtend.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             
             if len(instrumen) > 1:
                  break
         lowextendinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('OpenExtend.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('OpenExtend.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             
             if len(instrumen) > 1:
                  break

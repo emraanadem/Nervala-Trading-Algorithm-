@@ -1,5 +1,1 @@
-{"instruments": ["DECK", "WMT", "LLY", "ETN", "CAT", "MSFT", "AAPL", "AMZN", "GOOG", "NVDA", "META", "BRK-B", "TSM",
-"TSLA", "AVGO", "V", "NVO", "JPM", "UNH", "MA", "XOM", "JNJ", "PG", "HD", "ASML", "TCEHY", "MRK", "ORCL", "COST",
-"ABBV", "CVX", "CVS", "AMD", "ADBE", "CRM", "TM", "BAC", "KO", "NFLX", "PEP", "ACN", "MCD", "TMO", "NVS", "SAP", "SHEL", "CSCO",
-"AZN", "LIN", "ABT", "TMUS", "DHR", "BABA", "INTC", "CMCSA", "INTU", "DIS", "VZ", "WFC", "AMGN", "IBM", "PDD", "QCOM", "NOW", "RTX",
-"BHP", "NKE", "PFE", "UNP", "TTE", "HSBC", "AXP", "GE", "TXN", "PM", "SPGI", "MS", "UBER", "AMAT", "HDB", "RY", "ISRG", "IDEXY"]}
+{"instruments": ["MSFT", "AAPL", "AMZN", "GOOG", "NVDA", "META", "BRK-B"]}

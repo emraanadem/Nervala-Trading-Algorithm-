@@ -4,12 +4,12 @@ import json
 import msgspec
 
 accinfo = []
-with open('accinfo.json', 'rb') as accinf:
-    accinfo = msgspec.json.decode(accinf.read())
+with open('accinfo.json', 'r') as accinf:
+    accinfo = json.loads(accinf.read())
 accinf.close()
 
-with open("instrument.json", 'rb') as inst:
-    instrum = msgspec.json.decode(inst.read())  
+with open("instrument.json", 'r') as inst:
+    instrum = json.load(inst)
     instrument = instrum['instrument']
 
 

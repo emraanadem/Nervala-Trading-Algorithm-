@@ -5,6 +5,8 @@ import ast
 import threading
 from subprocess import Popen, PIPE
 
+
+
 class Auto:
     
     inst = ''
@@ -28,12 +30,11 @@ class Auto:
     def controll():
         dict = {}
         instrument = ''
-        decoder = msgspec.json.Decoder
         dict['instrument list'] = Auto.instrument_bank
         with open('inst_list.json', 'w') as inst:
             json.dump(dict, inst)
-        with open('instrument.json', 'rb') as accinf:
-            instrum = msgspec.json.decode(accinf.read())
+        with open('instrument.json', 'r') as accinf:
+            instrum = json.load(accinf)
             instrument = str(instrum['instrument'])
             Auto.inst = instrument
         import Motor42, Motor32, Motor22, Motor12, Motor52, Motor1Extend2, Motor2Extend2, Motor3Extend2, Motor5Extend2
@@ -48,58 +49,58 @@ class Auto:
         Motor5Extend2.controller()
         i = 0
         while i == 0:
-            inst2 = open('Data.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
+            inst2 = open('Data.json', 'r')
+            instrum = json.load(inst2)              
             instrumen = next(iter(instrum))
             if len(instrumen) > 1:
                  break
         datainst = next(iter(instrum))
         while i == 0:
-            inst2 = open('High.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
+            inst2 = open('High.json', 'r')
+            instrum = json.load(inst2)              
             instrumen = next(iter(instrum))
             if len(instrumen) > 1:
                  break
         highinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('Low.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('Low.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             if len(instrumen) > 1:
                  break
         lowinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('Open.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('Open.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             if len(instrumen) > 1:
                  break
         openinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('DataExtend.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('DataExtend.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             if len(instrumen) > 1:
                  break
         dataextendinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('HighExtend.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('HighExtend.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             if len(instrumen) > 1:
                  break
         highextendinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('LowExtend.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('LowExtend.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             if len(instrumen) > 1:
                  break
         lowextendinst = next(iter(instrum))
         while i == 0:
-            inst2 = open('OpenExtend.json', 'rb')
-            instrum = msgspec.json.decode(inst2.read(), type=object)                
-            instrumen = next(iter(instrum))
+            inst2 = open('OpenExtend.json', 'r')
+            instrum = json.load(inst2)              
+            instrumen = next(iter(instrum))  
             if len(instrumen) > 1:
                  break
         openextendinst = next(iter(instrum))
@@ -128,6 +129,3 @@ Auto.controll()
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
         
-
-# /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
-# have been included with this distribution. */

@@ -13,8 +13,8 @@ refdaydaily = today - timedelta(days=1062.5)
 refdayweekly = today - timedelta(days=5115)
 
 accinfo = []
-with open('accinfo.json', 'rb') as accinf:
-    accinfo = msgspec.json.decode(accinf.read())
+with open('accinfo.json', 'r') as accinf:
+    accinfo = json.loads(accinf.read())
 accinf.close()
 
 class History:
