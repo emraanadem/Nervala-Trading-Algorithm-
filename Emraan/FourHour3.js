@@ -490,7 +490,7 @@ class Four_Hour_Functions{
         return dataspecific
     }
 /** load historical prices from json file */
-    static HistoryAssigner(){
+   static HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
         let raw = fs.readFileSync('Data.json')
         let rawtwo = fs.readFileSync('High.json')
@@ -498,51 +498,36 @@ class Four_Hour_Functions{
         let rawfour = fs.readFileSync('DataExtend.json')
         let rawfive= fs.readFileSync('HighExtend.json')
         let rawsix = fs.readFileSync('LowExtend.json')
-        let dataspecific = undefined
         try{
-            while (dataspecific === undefined){
-                let data = JSON.parse(raw)
-                dataspecific = data[instrument]['Four_Hour']
+            let data = JSON.parse(raw)
+            let dataspecific = data[instrument]['Four_Hour']
             Four_Hour_Functions.priceHist = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
+        }catch (error) {}
         try{
-            while (dataspecific === undefined){
-                let data = JSON.parse(rawtwo)
-                dataspecific = data[instrument]['Four_Hour']
+            let data = JSON.parse(rawtwo)
+            let dataspecific = data[instrument]['Four_Hour']
             Four_Hour_Functions.highs = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
+        }catch (error) {}
         try{
-            while (dataspecific === undefined){
-                let data = JSON.parse(rawthree)
-                dataspecific = data[instrument]['Four_Hour']
+            let data = JSON.parse(rawthree)
+            let dataspecific = data[instrument]['Four_Hour']
             Four_Hour_Functions.lows = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
-        
+        }catch (error) {}
         try{
-            while (dataspecific === undefined){
-                let data = JSON.parse(rawfour)
-                dataspecific = data[instrument]['Four_Hour']
+            let data = JSON.parse(rawfour)
+            let dataspecific = data[instrument]['Four_Hour']
             Four_Hour_Functions.extendHist = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
-        
+        }catch (error) {}
         try{
-            while (dataspecific === undefined){
-                let data = JSON.parse(rawfive)
-                dataspecific = data[instrument]['Four_Hour']
+            let data = JSON.parse(rawfive)
+            let dataspecific = data[instrument]['Four_Hour']
             Four_Hour_Functions.extendHigh = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
-        
+        }catch (error) {}
         try{
-            while (dataspecific === undefined){
             let data = JSON.parse(rawsix)
-            dataspecific = data[instrument]['Four_Hour']
+            let dataspecific = data[instrument]['Four_Hour']
             Four_Hour_Functions.extendLow = dataspecific
-        }}catch (error) {}
+        }catch (error) {}
         let lens = []
         lens.push(Four_Hour_Functions.priceHist.length)
         lens.push(Four_Hour_Functions.highs.length)
@@ -583,7 +568,8 @@ class Four_Hour_Functions{
                 if (items == Four_Hour_Functions.extendHigh){
                     for(let item = 0; item < (Four_Hour_Functions.extendHigh.length - minlens); item++){
                         Four_Hour_Functions.extendHigh.splice(0,1)
-                    }}}}}}}
+                    }}}}}}
+        }
         
 /** load price from json file */
     static ValueAssigner(){
@@ -1356,27 +1342,21 @@ class Daily_Functions{
         let raw = fs.readFileSync('Data.json')
         let rawtwo = fs.readFileSync('High.json')
         let rawthree = fs.readFileSync('Low.json')
-        let dataspecific = undefined
         try{
-            while (dataspecific === undefined){
-                let data = JSON.parse(raw)
-                dataspecific = data[instrument]['Daily']
+            let data = JSON.parse(raw)
+            let dataspecific = data[instrument]['Daily']
             Daily_Functions.priceHist = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
+        }catch (error) {}
         try{
-            while (dataspecific === undefined){
-                let data = JSON.parse(rawtwo)
-                let dataspecific = data[instrument]['Daily']
+            let data = JSON.parse(rawtwo)
+            let dataspecific = data[instrument]['Daily']
             Daily_Functions.highs = dataspecific
-            }}catch (error) {}
-            dataspecific = undefined
+        }catch (error) {}
         try{
-            while (dataspecific === undefined){
-                let data = JSON.parse(rawthree)
-                let dataspecific = data[instrument]['Daily']
+            let data = JSON.parse(rawthree)
+            let dataspecific = data[instrument]['Daily']
             Daily_Functions.lows = dataspecific
-            }}catch (error) {}
+        }catch (error) {}
         let lens = []
         lens.push(Daily_Functions.priceHist.length)
         lens.push(Daily_Functions.highs.length)
@@ -1566,27 +1546,21 @@ class Weekly_Functions{
         let raw = fs.readFileSync('Data.json')
         let rawtwo = fs.readFileSync('High.json')
         let rawthree = fs.readFileSync('Low.json')
-        let dataspecific = undefined
         try{
-            while (dataspecific === undefined){           
-                let data = JSON.parse(raw)
-                dataspecific = data[instrument]['Weekly']
+            let data = JSON.parse(raw)
+            let dataspecific = data[instrument]['Weekly']
             Weekly_Functions.priceHist = dataspecific
-        }}catch (error) {}
-        ataspecific = undefined
+        }catch (error) {}
         try{
-        while (dataspecific === undefined){
             let data = JSON.parse(rawtwo)
-            dataspecific = data[instrument]['Weekly']
+            let dataspecific = data[instrument]['Weekly']
             Weekly_Functions.highs = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
+        }catch (error) {}
         try{
-            while (dataspecific === undefined){            
-                let data = JSON.parse(rawthree)
-                let dataspecific = data[instrument]['Weekly']
+            let data = JSON.parse(rawthree)
+            let dataspecific = data[instrument]['Weekly']
             Weekly_Functions.lows = dataspecific
-        }}catch (error) {}
+        }catch (error) {}
         let lens = []
         lens.push(Weekly_Functions.priceHist.length)
         lens.push(Weekly_Functions.highs.length)
@@ -1756,27 +1730,22 @@ class One_Hour_Functions{
         let raw = fs.readFileSync('Data.json')
         let rawtwo = fs.readFileSync('High.json')
         let rawthree = fs.readFileSync('Low.json')
-        let dataspecific = undefined
         try{
-            while(dataspecific === undefined){
-                let data = JSON.parse(raw)
-                dataspecific = data[instrument]['One_Hour']
-                One_Hour_Functions.priceHist = dataspecific
-        }}catch (error) {}
+            let data = JSON.parse(raw)
+            let dataspecific = data[instrument]['One_Hour']
+            One_Hour_Functions.priceHist = dataspecific
+        }catch (error) {}
         try{
-
-            while(dataspecific === undefined){
-                let data = JSON.parse(rawtwo)
-                dataspecific = data[instrument]['One_Hour']
-                One_Hour_Functions.highs = dataspecific
-        }}catch (error) {}
+            let data = JSON.parse(rawtwo)
+            let dataspecific = data[instrument]['One_Hour']
+            One_Hour_Functions.highs = dataspecific
+        }catch (error) {}
         try{
-            while(dataspecific === undefined){
-                let data = JSON.parse(rawthree)
-                dataspecific = data[instrument]['One_Hour']
+            let data = JSON.parse(rawthree)
+            let dataspecific = data[instrument]['One_Hour']
             One_Hour_Functions.lows = dataspecific
-        }}catch (error) {}
-        let lens = []  
+        }catch (error) {}
+        let lens = []
         lens.push(One_Hour_Functions.priceHist.length)
         lens.push(One_Hour_Functions.highs.length)
         lens.push(One_Hour_Functions.lows.length)
@@ -1884,27 +1853,21 @@ class Thirty_Min_Functions{
         let raw = fs.readFileSync('Data.json')
         let rawtwo = fs.readFileSync('High.json')
         let rawthree = fs.readFileSync('Low.json')
-        let dataspecific = undefined
         try{
-            while(dataspecific === undefined){
             let data = JSON.parse(raw)
-            dataspecific = data[instrument]['Thirty_Min']
+            let dataspecific = data[instrument]['Thirty_Min']
             Thirty_Min_Functions.priceHist = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
+        }catch (error) {}
         try{
-            while(dataspecific === undefined){
             let data = JSON.parse(rawtwo)
-            dataspecific = data[instrument]['Thirty_Min']
+            let dataspecific = data[instrument]['Thirty_Min']
             Thirty_Min_Functions.highs = dataspecific
-        }}catch (error) {}
-        dataspecific = undefined
+        }catch (error) {}
         try{
-            while(dataspecific === undefined){
             let data = JSON.parse(rawthree)
-            dataspecific = data[instrument]['Thirty_Min']
+            let dataspecific = data[instrument]['Thirty_Min']
             Thirty_Min_Functions.lows = dataspecific
-        }}catch (error) {}
+        }catch (error) {}
         let lens = []
         lens.push(Thirty_Min_Functions.priceHist.length)
         lens.push(Thirty_Min_Functions.highs.length)
@@ -2047,22 +2010,20 @@ class Fifteen_Min_Functions{
         let raw = fs.readFileSync('Data.json')
         let rawtwo = fs.readFileSync('High.json')
         let rawthree = fs.readFileSync('Low.json')
-        let dataspecific = undefined
-        try{while (dataspecific === undefined){
+        try{
             let data = JSON.parse(raw)
             let dataspecific = data[instrument]['Fifteen_Min']
             Fifteen_Min_Functions.priceHist = dataspecific
-        }}catch (error) {}
-        try{while(dataspecific === undefined){
+        }catch (error) {}
+        try{
             let data = JSON.parse(rawtwo)
             let dataspecific = data[instrument]['Fifteen_Min']
             Fifteen_Min_Functions.highs = dataspecific
-        }}catch (error) {}
-        try{while(dataspecific === undefined){
+        }catch (error) {}
+        try{
             let data = JSON.parse(rawthree)
             let dataspecific = data[instrument]['Fifteen_Min']
             Fifteen_Min_Functions.lows = dataspecific
-        }
         }catch (error) {}
         let lens = []
         lens.push(Fifteen_Min_Functions.priceHist.length)

@@ -67,8 +67,6 @@ class Auto:
             inst2 = open('Data.json', 'r')
             instrum = json.load(inst2)              
             instrumen = next(iter(instrum))  
-            print(instrumen)
-            i =1
             if len(instrumen) > 1:
                  break
         datainst = next(iter(instrum))
@@ -130,27 +128,15 @@ class Auto:
             if len(instrumen) > 1:
                  break
         openextendinst = next(iter(instrum))
-        while i == 0:
+        i = True
+        while i:
             if (instrument == datainst and instrument == highinst and instrument == lowinst 
             and instrument == dataextendinst and instrument == highextendinst and instrument == lowextendinst 
             and instrument == openinst and instrument == openextendinst):
                 print('Successfully Loading Program for ' + instrument + ': ')
-                print('\n')
-                os.system('node Daily3.js')
-                print('\n')
-                os.system('node FifteenMin3.js')
-                print('\n')
-                os.system('node FourHour3.js')
-                print('\n')
-                os.system('node OneHour3.js')
-                print('\n')
-                os.system('node ThirtyMin3.js')
-                print('\n')
-                os.system('node TwoHour3.js')
-                print('\n')
-                os.system('node Weekly3.js')
+                os.system('node FifteenMin3.js; node ThirtyMin3.js; node OneHour3.js; node TwoHour3.js; node FourHour3.js; node Daily3.js; node Weekly3.js')
                 os.kill
-                break
+                i = False
 
 
 class Automatically:
