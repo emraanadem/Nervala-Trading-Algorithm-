@@ -134,7 +134,9 @@ class Auto:
             and instrument == dataextendinst and instrument == highextendinst and instrument == lowextendinst 
             and instrument == openinst and instrument == openextendinst):
                 print('Successfully Loading Program for ' + instrument + ': ')
+                print('\n')
                 os.system('node FifteenMin3.js; node ThirtyMin3.js; node OneHour3.js; node TwoHour3.js; node FourHour3.js; node Daily3.js; node Weekly3.js')
+                print('\n')
                 os.kill
                 i = False
 
