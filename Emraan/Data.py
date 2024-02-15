@@ -7,13 +7,17 @@ with open('accinfo.json', 'r') as accinf:
     accinfo = json.loads(accinf.read())
 accinf.close()
 
+session = requests.Session()
 
 class History:
     
     @staticmethod
     def control(instrument):
-        History.Five_Min(instrument)
-        History.Fifteen_Min(instrument)
+        import threading
+        threading.Thread(target=History.Five_Min, args = [instrument])
+        threading.Thread(target=History.Fifteen_Min, args = [instrument])
+        threading.Thread(target=History.Thirty_Min, args = [instrument])
+
         History.Thirty_Min(instrument)
         History.One_Hour(instrument)
         History.Two_Hour(instrument)
@@ -27,7 +31,7 @@ class History:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1000, "granularity": "M5"}
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        response = session.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
         resp = response.json()['candles']
         values = []
         length = len(resp)
@@ -42,7 +46,7 @@ class History:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1000, "granularity": "M15"}
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        response = session.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
         resp = response.json()['candles']
         values = []
         length = len(resp)
@@ -57,7 +61,7 @@ class History:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1000, "granularity": "M30"}
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        response = session.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
         resp = response.json()['candles']
         values = []
         length = len(resp)
@@ -72,7 +76,7 @@ class History:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1000, "granularity": "H1"}
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        response = session.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
         resp = response.json()['candles']
         values = []
         length = len(resp)
@@ -87,7 +91,7 @@ class History:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1000, "granularity": "H2"}
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        response = session.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
         resp = response.json()['candles']
         values = []
         length = len(resp)
@@ -102,7 +106,7 @@ class History:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1000, "granularity": "H4"}
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        response = session.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
         resp = response.json()['candles']
         values = []
         length = len(resp)
@@ -117,7 +121,7 @@ class History:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1000, "granularity": "D"}
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        response = session.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
         resp = response.json()['candles']
         values = []
         length = len(resp)
@@ -132,7 +136,7 @@ class History:
         token = str(accinfo[1])
         header = {"Authorization": "Bearer "+token}
         query = {"count": 1000, "granularity": "W"}
-        response = requests.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
+        response = session.get("https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles", headers = header, params = query)
         resp = response.json()['candles']
         values = []
         length = len(resp)
