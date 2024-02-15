@@ -333,7 +333,6 @@ class Four_Hour_Nexus{
     }
     /** main control method, takes control of the entire program and serves as the brain */
     static controlMain(){
-        Four_Hour_Functions.rejecinit()
         Four_Hour_Functions.HistoryAssigner()
         Four_Hour_Functions.ValueAssigner()
         Four_Hour_Functions.stoploss()
@@ -374,7 +373,6 @@ class Four_Hour_Nexus{
             Four_Hour_Nexus.tstoplosscheck()
             Four_Hour_Nexus.tstoplosscont()
             Four_Hour_Nexus.takeProfitSell()}
-        Four_Hour_Functions.rejecsave()
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 

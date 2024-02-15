@@ -334,8 +334,6 @@ class One_Hour_Nexus{
     }
     /** main control method, takes control of the entire program and serves as the brain */
     static controlMain(){
-        One_Hour_Functions.rejecinit()
-        Four_Hour_Functions.rejecinit()
         One_Hour_Functions.HistoryAssigner()
         One_Hour_Functions.ValueAssigner()
         One_Hour_Functions.getPrice()
@@ -373,8 +371,6 @@ class One_Hour_Nexus{
             One_Hour_Nexus.tstoplosscheck()
             One_Hour_Nexus.tstoplosscont()
             One_Hour_Nexus.takeProfitSell()}
-        One_Hour_Functions.rejecsave()
-        Four_Hour_Functions.rejecsave()
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
