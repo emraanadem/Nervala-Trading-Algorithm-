@@ -336,6 +336,8 @@ class Fifteen_Min_Nexus{
     }
     /** main control method, takes control of the entire program and serves as the brain */
     static controlMain(){
+        Four_Hour_Functions.rejecinit()
+        Fifteen_Min_Functions.rejecinit()
         Fifteen_Min_Functions.HistoryAssigner()
         Fifteen_Min_Functions.ValueAssigner()
         Fifteen_Min_Functions.stoploss()
@@ -376,7 +378,8 @@ class Fifteen_Min_Nexus{
             Fifteen_Min_Nexus.tstoplosscheck()
             Fifteen_Min_Nexus.tstoplosscont()
             Fifteen_Min_Nexus.takeProfitSell()}
-
+        Four_Hour_Functions.rejecsave()
+        Fifteen_Min_Functions.rejecsave()
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
@@ -1537,7 +1540,7 @@ class Four_Hour_Functions{
         }
         let raw = fs.readFileSync('./Rejection_Archive/'+String(instrument)+'.json')
         Four_Hour_Functions.timeperiods = JSON.parse(raw)
-        Four_Hour_Functions.rejectionzones = JSON.parse(raw)['Four_Hour']
+        Four_Hour_Functions.cont = JSON.parse(raw)['Four_Hour']
     }
     /** Rejection Zone Saver */
     static rejecsave(){

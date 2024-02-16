@@ -315,6 +315,7 @@ class Weekly_Nexus{
 
     /** main control method, takes control of the entire program and serves as the brain */
     static controlMain(){
+        Weekly_Functions.rejecinit()
         Weekly_Functions.HistoryAssigner()
         Weekly_Functions.ValueAssigner()
         Weekly_Functions.stoploss()
@@ -354,6 +355,7 @@ class Weekly_Nexus{
             Weekly_Nexus.tstoplosscheck()
             Weekly_Nexus.tstoplosscont()
             Weekly_Nexus.takeProfitSell()}
+        Weekly_Functions.rejecsave()
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 

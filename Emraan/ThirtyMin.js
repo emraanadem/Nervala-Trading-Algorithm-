@@ -333,6 +333,8 @@ class Thirty_Min_Nexus{
     }
     /** main control method, takes control of the entire program and serves as the brain */
     static controlMain(){
+        Thirty_Min_Functions.rejecinit()
+        Four_Hour_Functions.rejecinit()
         Thirty_Min_Functions.HistoryAssigner()
         Thirty_Min_Functions.ValueAssigner()
         Thirty_Min_Functions.stoploss()
@@ -373,6 +375,8 @@ class Thirty_Min_Nexus{
             Thirty_Min_Nexus.tstoplosscheck()
             Thirty_Min_Nexus.tstoplosscont()
             Thirty_Min_Nexus.takeProfitSell()}
+        Thirty_Min_Functions.rejecsave()
+        Four_Hour_Functions.rejecsave()
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 

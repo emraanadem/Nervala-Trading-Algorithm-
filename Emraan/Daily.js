@@ -324,6 +324,7 @@ class Daily_Nexus{
     }
     /** main control method, takes control of the entire program and serves as the brain */
     static controlMain(){
+        Daily_Functions.rejecinit()
         Daily_Functions.HistoryAssigner()
         Daily_Functions.ValueAssigner()
         Daily_Functions.stoploss()
@@ -364,6 +365,7 @@ class Daily_Nexus{
             Daily_Nexus.tstoplosscheck()
             Daily_Nexus.tstoplosscont()
             Daily_Nexus.takeProfitSell()}
+        Daily_Functions.rejecsave()
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
