@@ -298,11 +298,11 @@ class Thirty_Min_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static controlSmallerPeriod(){
+    static async controlSmallerPeriod(){
         /*Confirm Trend w/ indicators and price movement*/
-        Fifteen_Min_Functions.HistoryAssigner()
-        Five_Min_Functions.HistoryAssigner()
-        Four_Hour_Functions.HistoryAssigner()
+        await Fifteen_Min_Functions.HistoryAssigner()
+        await Five_Min_Functions.HistoryAssigner()
+        await Four_Hour_Functions.HistoryAssigner()
         Thirty_Min_Functions.stoploss()
         Thirty_Min_Functions.tpvariation()
         let buy = false
@@ -322,12 +322,12 @@ class Thirty_Min_Nexus{
         return [buy, sell]
     }
     /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-    static controlBiggerPeriod(){
+    static async controlBiggerPeriod(){
         /*Price Zones*/
         Four_Hour_Functions.ValueAssigner()
         One_Hour_Functions.ValueAssigner()
-        Four_Hour_Functions.HistoryAssigner()
-        One_Hour_Functions.HistoryAssigner()
+        await Four_Hour_Functions.HistoryAssigner()
+        await One_Hour_Functions.HistoryAssigner()
         Four_Hour_Functions.priceZones()
         One_Hour_Functions.priceZones()
         let h = new Array();
@@ -338,10 +338,10 @@ class Thirty_Min_Nexus{
         Thirty_Min_Nexus.finlevs.concat(totallevs)
     }
     /** main control method, takes control of the entire program and serves as the brain */
-    static controlMain(){
+    static async controlMain(){
         Thirty_Min_Functions.rejecinit()
         Four_Hour_Functions.rejecinit()
-        Thirty_Min_Functions.HistoryAssigner()
+        await Thirty_Min_Functions.HistoryAssigner()
         Thirty_Min_Functions.ValueAssigner()
         Thirty_Min_Functions.stoploss()
         Thirty_Min_Functions.getPrice()
