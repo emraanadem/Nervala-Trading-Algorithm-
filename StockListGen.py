@@ -5,15 +5,7 @@ lists = prueba['instruments']
 f = open('instrumentstwo.json')
 prueba = json.load(f)
 liststwo = prueba['instruments']
-removeinst = []
 
-for item in lists:
-     for items in liststwo:
-          if item == items:
-               removeinst.append(item)
-
-for itemss in removeinst:
-     lists.pop(lists.index(itemss))
 
 dicttwo = {}
 dicttwo['instruments'] = lists
@@ -47,5 +39,5 @@ with open("idkeysextend.json", 'w') as inst:
 
 with open('idkeys.json', 'r') as inst:
         datas = json.load(inst)
-        ids = datas["EUR_USD" + " Close"]
+        ids = datas["USD_NOK" + " Close"]
 print(ids)
