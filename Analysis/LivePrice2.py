@@ -1,4 +1,4 @@
-import Price
+import DataCenter.Price
 import asyncio
 import time
 import threading
@@ -15,7 +15,7 @@ def caller():
         if len(instrument) > 1:
             break
         
-    Price.loop(instrument)
+    DataCenter.Price.loop(instrument)
 
 def controlbox():
     caller()

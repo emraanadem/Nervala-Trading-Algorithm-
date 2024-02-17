@@ -11,6 +11,13 @@ const { createModel } = require('polynomial-regression');
 const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
 
+const createClient = require('@supabase/supabase-js').createClient;
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://nvlbmpghemfunkpnhwee.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52bGJtcGdoZW1mdW5rcG5od2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDgxMTg3ODcsImV4cCI6MjAyMzY5NDc4N30.woZOGh5WaEcUtEyvsXaNP3Kg6BsNP8UOWhmv5RG4iMY')
+
+
+
 
 class Fifteen_Min_Nexus{
 
@@ -496,44 +503,44 @@ class Fifteen_Min_Functions{
         return dataspecific
     }
 /** load historical prices from json file */
-    static HistoryAssigner(){
+    static async HistoryAssigner(){
         let instrument = Fifteen_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('Data.json')
-        let rawtwo = fs.readFileSync('High.json')
-        let rawthree = fs.readFileSync('Low.json')
-        let rawfour = fs.readFileSync('DataExtend.json')
-        let rawfive= fs.readFileSync('HighExtend.json')
-        let rawsix = fs.readFileSync('LowExtend.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]['Fifteen_Min']
-            Fifteen_Min_Functions.priceHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawtwo)
-            let dataspecific = data[instrument]['Fifteen_Min']
-            Fifteen_Min_Functions.highs = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawthree)
-            let dataspecific = data[instrument]['Fifteen_Min']
-            Fifteen_Min_Functions.lows = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawfour)
-            let dataspecific = data[instrument]['Fifteen_Min']
-            Fifteen_Min_Functions.extendHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawfive)
-            let dataspecific = data[instrument]['Fifteen_Min']
-            Fifteen_Min_Functions.extendHigh = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawsix)
-            let dataspecific = data[instrument]['Fifteen_Min']
-            Fifteen_Min_Functions.extendLow = dataspecific
-        }catch (error) {}
+        var { data, error } = await supabase
+            .from('Fifteen_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Fifteen_Min_Functions.priceHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Fifteen_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Fifteen_Min_Functions.highs = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Fifteen_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Fifteen_Min_Functions.lows = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Fifteen_Min Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Fifteen_Min_Functions.extendHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Fifteen_Min Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Fifteen_Min_Functions.extendHigh = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Fifteen_Min Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Fifteen_Min_Functions.extendLow = data[0]['Data']
         let lens = []
         lens.push(Fifteen_Min_Functions.priceHist.length)
         lens.push(Fifteen_Min_Functions.highs.length)
@@ -1360,44 +1367,44 @@ class Four_Hour_Functions{
         return dataspecific
     }
 /** load historical prices from json file */
-   static HistoryAssigner(){
+    static async HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('Data.json')
-        let rawtwo = fs.readFileSync('High.json')
-        let rawthree = fs.readFileSync('Low.json')
-        let rawfour = fs.readFileSync('DataExtend.json')
-        let rawfive= fs.readFileSync('HighExtend.json')
-        let rawsix = fs.readFileSync('LowExtend.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]['Four_Hour']
-            Four_Hour_Functions.priceHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawtwo)
-            let dataspecific = data[instrument]['Four_Hour']
-            Four_Hour_Functions.highs = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawthree)
-            let dataspecific = data[instrument]['Four_Hour']
-            Four_Hour_Functions.lows = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawfour)
-            let dataspecific = data[instrument]['Four_Hour']
-            Four_Hour_Functions.extendHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawfive)
-            let dataspecific = data[instrument]['Four_Hour']
-            Four_Hour_Functions.extendHigh = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawsix)
-            let dataspecific = data[instrument]['Four_Hour']
-            Four_Hour_Functions.extendLow = dataspecific
-        }catch (error) {}
+        var { data, error } = await supabase
+            .from('Four_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Four_Hour_Functions.priceHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Four_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Four_Hour_Functions.highs = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Four_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Four_Hour_Functions.lows = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Four_Hour Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Four_Hour_Functions.extendHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Four_Hour Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Four_Hour_Functions.extendHigh = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Four_Hour Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Four_Hour_Functions.extendLow = data[0]['Data']
         let lens = []
         lens.push(Four_Hour_Functions.priceHist.length)
         lens.push(Four_Hour_Functions.highs.length)
@@ -2079,26 +2086,25 @@ class One_Hour_Functions{
     lows = []
     
 
-    static HistoryAssigner(){
+    static async HistoryAssigner(){
         let instrument = Fifteen_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('Data.json')
-        let rawtwo = fs.readFileSync('High.json')
-        let rawthree = fs.readFileSync('Low.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]['One_Hour']
-            One_Hour_Functions.priceHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawtwo)
-            let dataspecific = data[instrument]['One_Hour']
-            One_Hour_Functions.highs = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawthree)
-            let dataspecific = data[instrument]['One_Hour']
-            One_Hour_Functions.lows = dataspecific
-        }catch (error) {}
+        var { data, error } = await supabase
+            .from('One_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        One_Hour_Functions.priceHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('One_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        One_Hour_Functions.highs = data[0]['Data']
+        var { data, error} = await supabase
+            .from('One_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
         let lens = []
         lens.push(One_Hour_Functions.priceHist.length)
         lens.push(One_Hour_Functions.highs.length)
@@ -2264,26 +2270,26 @@ class Five_Min_Functions{
     lows = []
     highs = []
     
-    static HistoryAssigner(){
+    static async HistoryAssigner(){
         let instrument = Fifteen_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('Data.json')
-        let rawtwo = fs.readFileSync('High.json')
-        let rawthree = fs.readFileSync('Low.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]['Five_Min']
-            Five_Min_Functions.priceHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawtwo)
-            let dataspecific = data[instrument]['Five_Min']
-            Five_Min_Functions.highs = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawthree)
-            let dataspecific = data[instrument]['Five_Min']
-            Five_Min_Functions.lows = dataspecific
-        }catch (error) {}
+        var { data, error } = await supabase
+            .from('Five_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Five_Min_Functions.priceHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Five_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Five_Min_Functions.highs = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Five_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Five_Min_Functions.lows = data[0]['Data']
         let lens = []
         lens.push(Five_Min_Functions.priceHist.length)
         lens.push(Five_Min_Functions.highs.length)

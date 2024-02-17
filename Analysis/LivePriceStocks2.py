@@ -1,4 +1,4 @@
-import PriceStocks
+import DataCenter.PriceStocks
 import asyncio
 import time
 import threading
@@ -18,7 +18,7 @@ def caller():
         except json.decoder.JSONDecodeError:
              q = 0
     
-    PriceStocks.loop(instrument)
+    DataCenter.PriceStocks.loop(instrument)
 
 
 

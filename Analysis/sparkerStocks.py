@@ -1,11 +1,8 @@
-import msgspec
 import json
 import os
-import ast
+import msgspec
 import threading
 from subprocess import Popen, PIPE
-
-
 
 class Auto:
     
@@ -33,16 +30,16 @@ class Auto:
             instrum = json.load(accinf)
             instrument = str(instrum['instrument'])
             Auto.inst = instrument
-        import Motor42, Motor32, Motor22, Motor12, Motor52, Motor1Extend2, Motor2Extend2, Motor3Extend2, Motor5Extend2
-        Motor42.controller()
-        Motor32.controller()       
-        Motor22.controller()
-        Motor12.controller()
-        Motor52.controller()
-        Motor1Extend2.controller()
-        Motor2Extend2.controller()
-        Motor3Extend2.controller()
-        Motor5Extend2.controller()
+        import DataCenter.Motor22Stocks, DataCenter.Motor32Stocks, DataCenter.Motor42Stocks, DataCenter.Motor12Stocks, DataCenter.Motor52Stocks, DataCenter.Motor1StocksExtend2, DataCenter.Motor2StocksExtend2, DataCenter.Motor3Extend2Stocks, DataCenter.Motor5ExtendStocks2
+        DataCenter.Motor42Stocks.controller()
+        DataCenter.Motor12Stocks.controller()
+        DataCenter.Motor22Stocks.controller()
+        DataCenter.Motor32Stocks.controller()
+        DataCenter.Motor52Stocks.controller()
+        DataCenter.Motor1StocksExtend2.controller()
+        DataCenter.Motor2StocksExtend2.controller()
+        DataCenter.Motor3Extend2Stocks.controller()
+        DataCenter.Motor5ExtendStocks2.controller()
         Auto.junction()
 
     @staticmethod
@@ -60,8 +57,9 @@ class Automatically:
     def automatic():
         Auto.controll()
 
-Auto.controll()
 
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
-        
+
+# /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+# have been included with this distribution. */

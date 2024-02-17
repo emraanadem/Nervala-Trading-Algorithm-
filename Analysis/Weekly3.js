@@ -470,86 +470,86 @@ class Weekly_Functions{
         return dataspecific
     }
 /** load historical prices from json file */
-static HistoryAssigner(){
-    let instrument = Weekly_Functions.instrument_name()
-    let raw = fs.readFileSync('Data.json')
-    let rawtwo = fs.readFileSync('High.json')
-    let rawthree = fs.readFileSync('Low.json')
-    let rawfour = fs.readFileSync('DataExtend.json')
-    let rawfive= fs.readFileSync('HighExtend.json')
-    let rawsix = fs.readFileSync('LowExtend.json')
-    try{
-        let data = JSON.parse(raw)
-        let dataspecific = data[instrument]['Weekly']
-        Weekly_Functions.priceHist = dataspecific
-    }catch (error) {}
-    try{
-        let data = JSON.parse(rawtwo)
-        let dataspecific = data[instrument]['Weekly']
-        Weekly_Functions.highs = dataspecific
-    }catch (error) {}
-    try{
-        let data = JSON.parse(rawthree)
-        let dataspecific = data[instrument]['Weekly']
-        Weekly_Functions.lows = dataspecific
-    }catch (error) {}
-    try{
-        let data = JSON.parse(rawfour)
-        let dataspecific = data[instrument]['Weekly']
-        Weekly_Functions.extendHist = dataspecific
-    }catch (error) {}
-    try{
-        let data = JSON.parse(rawfive)
-        let dataspecific = data[instrument]['Weekly']
-        Weekly_Functions.extendHigh = dataspecific
-    }catch (error) {}
-    try{
-        let data = JSON.parse(rawsix)
-        let dataspecific = data[instrument]['Weekly']
-        Weekly_Functions.extendLow = dataspecific
-    }catch (error) {}
-    let lens = []
-    lens.push(Weekly_Functions.priceHist.length)
-    lens.push(Weekly_Functions.highs.length)
-    lens.push(Weekly_Functions.lows.length)
-    let minlens = Math.min(...lens)
-    let lists = [Weekly_Functions.priceHist, Weekly_Functions.highs, Weekly_Functions.lows]
-    let items;
-    for (items in lists){
-        if (items.length > minlens){
-            if (items == Weekly_Functions.priceHist){
-                for(let item = 0; item < (Weekly_Functions.priceHist.length - minlens); item++){
-                    Weekly_Functions.priceHist.splice(0,1)
-                }
-            if (items == Weekly_Functions.lows){
-                for(let item = 0; item < (Weekly_Functions.lows.length - minlens); item++){
-                    Weekly_Functions.lows.splice(0,1)
-                }
-            if (items == Weekly_Functions.highs){
-                for(let item = 0; item < (Weekly_Functions.highs.length - minlens); item++){
-                    Weekly_Functions.highs.splice(0,1)
-                }}}}}}
-    lens = []
-    lens.push(Weekly_Functions.extendHist.length)
-    lens.push(Weekly_Functions.extendHigh.length)
-    lens.push(Weekly_Functions.extendLow.length)
-    minlens = Math.min(...lens)
-    lists = [Weekly_Functions.extendHist, Weekly_Functions.extendHigh, Weekly_Functions.extendLow]
-    for (items in lists){
-        if (items.length > minlens){
-            if (items == Weekly_Functions.extendHist){
-                for(let item = 0; item < (Weekly_Functions.extendHist.length - minlens); item++){
-                    Weekly_Functions.extendHist.splice(0,1)
-                }
-            if (items == Weekly_Functions.extendLow){
-                for(let item = 0; item < (Weekly_Functions.extendLow.length - minlens); item++){
-                    Weekly_Functions.extendLow.splice(0,1)
-                }
-            if (items == Weekly_Functions.extendHigh){
-                for(let item = 0; item < (Weekly_Functions.extendHigh.length - minlens); item++){
-                    Weekly_Functions.extendHigh.splice(0,1)
-                }}}}}}
-    }
+    static async HistoryAssigner(){
+        let instrument = Weekly_Functions.instrument_name()
+        var { data, error } = await supabase
+            .from('Weekly')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Weekly_Functions.priceHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Weekly')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Weekly_Functions.highs = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Weekly')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Weekly_Functions.lows = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Weekly Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Weekly_Functions.extendHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Weekly Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Weekly_Functions.extendHigh = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Weekly Extend')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Weekly_Functions.extendLow = data[0]['Data']
+        let lens = []
+        lens.push(Weekly_Functions.priceHist.length)
+        lens.push(Weekly_Functions.highs.length)
+        lens.push(Weekly_Functions.lows.length)
+        let minlens = Math.min(...lens)
+        let lists = [Weekly_Functions.priceHist, Weekly_Functions.highs, Weekly_Functions.lows]
+        let items;
+        for (items in lists){
+            if (items.length > minlens){
+                if (items == Weekly_Functions.priceHist){
+                    for(let item = 0; item < (Weekly_Functions.priceHist.length - minlens); item++){
+                        Weekly_Functions.priceHist.splice(0,1)
+                    }
+                if (items == Weekly_Functions.lows){
+                    for(let item = 0; item < (Weekly_Functions.lows.length - minlens); item++){
+                        Weekly_Functions.lows.splice(0,1)
+                    }
+                if (items == Weekly_Functions.highs){
+                    for(let item = 0; item < (Weekly_Functions.highs.length - minlens); item++){
+                        Weekly_Functions.highs.splice(0,1)
+                    }}}}}}
+        lens = []
+        lens.push(Weekly_Functions.extendHist.length)
+        lens.push(Weekly_Functions.extendHigh.length)
+        lens.push(Weekly_Functions.extendLow.length)
+        minlens = Math.min(...lens)
+        lists = [Weekly_Functions.extendHist, Weekly_Functions.extendHigh, Weekly_Functions.extendLow]
+        for (items in lists){
+            if (items.length > minlens){
+                if (items == Weekly_Functions.extendHist){
+                    for(let item = 0; item < (Weekly_Functions.extendHist.length - minlens); item++){
+                        Weekly_Functions.extendHist.splice(0,1)
+                    }
+                if (items == Weekly_Functions.extendLow){
+                    for(let item = 0; item < (Weekly_Functions.extendLow.length - minlens); item++){
+                        Weekly_Functions.extendLow.splice(0,1)
+                    }
+                if (items == Weekly_Functions.extendHigh){
+                    for(let item = 0; item < (Weekly_Functions.extendHigh.length - minlens); item++){
+                        Weekly_Functions.extendHigh.splice(0,1)
+                    }}}}}}
+        }
 /** load price from json file */
 static ValueAssigner(){
     let instrument = Weekly_Functions.instrument_name()
@@ -1312,26 +1312,26 @@ class Daily_Functions{
     highs = []
     lows = []
     
-    static HistoryAssigner(){
+    static async HistoryAssigner(){
         let instrument = Weekly_Functions.instrument_name()
-        let raw = fs.readFileSync('Data.json')
-        let rawtwo = fs.readFileSync('High.json')
-        let rawthree = fs.readFileSync('Low.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]['Daily']
-            Daily_Functions.priceHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawtwo)
-            let dataspecific = data[instrument]['Daily']
-            Daily_Functions.highs = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawthree)
-            let dataspecific = data[instrument]['Daily']
-            Daily_Functions.lows = dataspecific
-        }catch (error) {}
+        var { data, error } = await supabase
+            .from('Daily')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Daily_Functions.priceHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Daily')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Daily_Functions.highs = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Daily')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Daily_Functions.lows = data[0]['Data']
         let lens = []
         lens.push(Daily_Functions.priceHist.length)
         lens.push(Daily_Functions.highs.length)
@@ -1436,26 +1436,26 @@ class One_Hour_Functions{
     lows = []
     highs = []
     
-    static HistoryAssigner(){
+    static async HistoryAssigner(){
         let instrument = Weekly_Functions.instrument_name()
-        let raw = fs.readFileSync('Data.json')
-        let rawtwo = fs.readFileSync('High.json')
-        let rawthree = fs.readFileSync('Low.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]['One_Hour']
-            One_Hour_Functions.priceHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawtwo)
-            let dataspecific = data[instrument]['One_Hour']
-            One_Hour_Functions.highs = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawthree)
-            let dataspecific = data[instrument]['One_Hour']
-            One_Hour_Functions.lows = dataspecific
-        }catch (error) {}
+        var { data, error } = await supabase
+            .from('One_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        One_Hour_Functions.priceHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('One_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        One_Hour_Functions.highs = data[0]['Data']
+        var { data, error} = await supabase
+            .from('One_Hour')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        One_Hour_Functions.lows = data[0]['Data']
         let lens = []
         lens.push(One_Hour_Functions.priceHist.length)
         lens.push(One_Hour_Functions.highs.length)
@@ -1593,26 +1593,26 @@ class Thirty_Min_Functions{
     lows = []
     highs = []
     
-    static HistoryAssigner(){
+    static async HistoryAssigner(){
         let instrument = Weekly_Functions.instrument_name()
-        let raw = fs.readFileSync('Data.json')
-        let rawtwo = fs.readFileSync('High.json')
-        let rawthree = fs.readFileSync('Low.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]['Thirty_Min']
-            Thirty_Min_Functions.priceHist = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawtwo)
-            let dataspecific = data[instrument]['Thirty_Min']
-            Thirty_Min_Functions.highs = dataspecific
-        }catch (error) {}
-        try{
-            let data = JSON.parse(rawthree)
-            let dataspecific = data[instrument]['Thirty_Min']
-            Thirty_Min_Functions.lows = dataspecific
-        }catch (error) {}
+        var { data, error } = await supabase
+            .from('Thirty_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'c')
+        Thirty_Min_Functions.priceHist = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Thirty_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'h')
+        Thirty_Min_Functions.highs = data[0]['Data']
+        var { data, error} = await supabase
+            .from('Thirty_Min')
+            .select('Data')
+            .eq('Instrument', instrument)
+            .eq('OHLC', 'l')
+        Thirty_Min_Functions.lows = data[0]['Data']
         let lens = []
         lens.push(Thirty_Min_Functions.priceHist.length)
         lens.push(Thirty_Min_Functions.highs.length)

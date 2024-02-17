@@ -1,11 +1,10 @@
-import PriceStocks
+import DataCenter.Price
 import asyncio
 import time
 import threading
 import msgspec
 import json
 i = 0
-
 
 def caller():
     i = 0
@@ -19,7 +18,7 @@ def caller():
         except json.decoder.JSONDecodeError:
             q = 0
         try:
-            threading.Thread(target=PriceStocks.loop(instrument)).start()
+            threading.Thread(target=DataCenter.Price.loop(instrument)).start()
         except Exception as error:
             q = 0
        ## print(end-start)
