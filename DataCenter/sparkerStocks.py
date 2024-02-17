@@ -34,16 +34,16 @@ class Auto:
             instrum = json.load(accinf)
             instrument = str(instrum['instrument'])
             Auto.inst = instrument
-        import Motor22Stocks, Motor32Stocks, Motor42Stocks, Motor12Stocks, Motor52Stocks, Motor1StocksExtend2, Motor2StocksExtend2, Motor3Extend2Stocks, Motor5ExtendStocks2
-        Motor42Stocks.controller()
-        Motor12Stocks.controller()
-        Motor22Stocks.controller()
-        Motor32Stocks.controller()
-        Motor52Stocks.controller()
-        Motor1StocksExtend2.controller()
-        Motor2StocksExtend2.controller()
-        Motor3Extend2Stocks.controller()
-        Motor5ExtendStocks2.controller()
+        import MotorStocks, Motor3Stocks, Motor4Stocks, MotorStocks2, Motor5Stocks, MotorStocksExtend, MotorStocks2Extend, Motor3ExtendStocks, Motor5ExtendStocks
+        Motor4Stocks.controller()
+        MotorStocks.controller()
+        MotorStocks2.controller()
+        Motor3Stocks.controller()
+        Motor5Stocks.controller()
+        MotorStocksExtend.controller()
+        MotorStocks2Extend.controller()
+        Motor3ExtendStocks.controller()
+        Motor5ExtendStocks.controller()
 
     @staticmethod
     def junction():

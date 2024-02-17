@@ -33,16 +33,6 @@ class Auto:
             instrum = json.load(accinf)
             instrument = str(instrum['instrument'])
             Auto.inst = instrument
-        import DataCenter.Motor42, DataCenter.Motor32, DataCenter.Motor22, DataCenter.Motor12, DataCenter.Motor52, DataCenter.Motor1Extend2, DataCenter.Motor2Extend2, DataCenter.Motor3Extend2, DataCenter.Motor5Extend2
-        DataCenter.Motor42.controller()
-        DataCenter.Motor32.controller()       
-        DataCenter.Motor22.controller()
-        DataCenter.Motor12.controller()
-        DataCenter.Motor52.controller()
-        DataCenter.Motor1Extend2.controller()
-        DataCenter.Motor2Extend2.controller()
-        DataCenter.Motor3Extend2.controller()
-        DataCenter.Motor5Extend2.controller()
         Auto.junction()
 
     @staticmethod
