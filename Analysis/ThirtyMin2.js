@@ -346,11 +346,11 @@ class Thirty_Min_Nexus{
         Thirty_Min_Functions.stoploss()
         Thirty_Min_Functions.getPrice()
         Thirty_Min_Functions.supreslevs()
-        Thirty_Min_Nexus.controlBiggerPeriod()
+        await Thirty_Min_Nexus.controlBiggerPeriod()
         if ( !Thirty_Min_Functions.consolidationtwo() && Thirty_Min_Functions.overall() && !Thirty_Min_Functions.consolidation() 
             && !Thirty_Min_Functions.keylev()){
                 if (Thirty_Min_Functions.ema()){
-                    if (Thirty_Min_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Thirty_Min_Nexus.controlSmallerPeriod()[0] == true){
                         if (Thirty_Min_Functions.trend() && Thirty_Min_Functions.rsi() 
                             && Thirty_Min_Functions.macd() && Thirty_Min_Functions.roc() && Thirty_Min_Functions.obv()) {
                                 if (!Thirty_Min_Nexus.pos){
@@ -360,7 +360,7 @@ class Thirty_Min_Nexus{
                                         Thirty_Min_Nexus.piploginit()
                                         Thirty_Min_Nexus.buy()}}}}
                 if (!Thirty_Min_Functions.ema()){
-                    if (Thirty_Min_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Thirty_Min_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Thirty_Min_Functions.trend() && !Thirty_Min_Functions.rsi() 
                             && !Thirty_Min_Functions.macd() && !Thirty_Min_Functions.roc() && !Thirty_Min_Functions.obv()) {
                                 if (!Thirty_Min_Nexus.pos){

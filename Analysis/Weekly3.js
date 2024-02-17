@@ -328,7 +328,7 @@ class Weekly_Nexus{
         if (!Weekly_Functions.consolidationtwo() && Weekly_Functions.overall() && !Weekly_Functions.consolidation()
             && !Weekly_Functions.keylev()){
                 if (Weekly_Functions.ema()){
-                    if (Weekly_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Weekly_Nexus.controlSmallerPeriod()[0] == true){
                         if (Weekly_Functions.trend() && Weekly_Functions.rsi() 
                             && Weekly_Functions.macd() && Weekly_Functions.roc() && Weekly_Functions.obv()) {
                                 if (!Weekly_Nexus.pos){
@@ -338,7 +338,7 @@ class Weekly_Nexus{
                                         Weekly_Nexus.piploginit()
                                         Weekly_Nexus.buy()}}}}
                 if (!Weekly_Functions.ema()){
-                    if (Weekly_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Weekly_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Weekly_Functions.trend() && !Weekly_Functions.rsi() 
                             && !Weekly_Functions.macd() && !Weekly_Functions.roc() && !Weekly_Functions.obv()) {
                                 if (!Weekly_Nexus.pos){
@@ -1750,6 +1750,7 @@ function controlbox(){
 }
 
 Weekly_Nexus.controlMain()
+
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */

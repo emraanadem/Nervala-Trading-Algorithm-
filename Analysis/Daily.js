@@ -334,11 +334,11 @@ class Daily_Nexus{
         Daily_Functions.stoploss()
         Daily_Functions.getPrice()
         Daily_Functions.supreslevs()
-        Daily_Nexus.controlBiggerPeriod()
+        await Daily_Nexus.controlBiggerPeriod()
         if (!Daily_Functions.consolidationtwo() && Daily_Functions.overall() && !Daily_Functions.consolidation()
             && !Daily_Functions.keylev()){
                 if (Daily_Functions.ema()){
-                    if (Daily_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Daily_Nexus.controlSmallerPeriod()[0] == true){
                         if (Daily_Functions.trend() && Daily_Functions.rsi() 
                             && Daily_Functions.macd() && Daily_Functions.roc() && Daily_Functions.obv()) {
                                 if (!Daily_Nexus.pos){
@@ -348,7 +348,7 @@ class Daily_Nexus{
                                         Daily_Nexus.piploginit()
                                         Daily_Nexus.buy()}}}}
                 if (!Daily_Functions.ema()){
-                    if (Daily_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Daily_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Daily_Functions.trend() && !Daily_Functions.rsi() 
                             && !Daily_Functions.macd() && !Daily_Functions.roc() && !Daily_Functions.obv()) {
                                 if (!Daily_Nexus.pos){

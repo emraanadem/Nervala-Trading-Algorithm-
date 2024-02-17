@@ -350,11 +350,11 @@ class Fifteen_Min_Nexus{
         Fifteen_Min_Functions.stoploss()
         Fifteen_Min_Functions.getPrice()
         Fifteen_Min_Functions.supreslevs()
-        Fifteen_Min_Nexus.controlBiggerPeriod()
+        await Fifteen_Min_Nexus.controlBiggerPeriod()
         if (!Fifteen_Min_Functions.consolidationtwo() && !Fifteen_Min_Functions.consolidation() && !Fifteen_Min_Functions.overall() 
             && !Fifteen_Min_Functions.keylev()){
                 if (Fifteen_Min_Functions.ema()){
-                    if (Fifteen_Min_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Fifteen_Min_Nexus.controlSmallerPeriod()[0] == true){
                         if (Fifteen_Min_Functions.trend() && Fifteen_Min_Functions.rsi() 
                             && Fifteen_Min_Functions.macd() && Fifteen_Min_Functions.roc() && Fifteen_Min_Functions.obv()) {
                                 if (!Fifteen_Min_Nexus.pos){
@@ -364,7 +364,7 @@ class Fifteen_Min_Nexus{
                                         Fifteen_Min_Nexus.piploginit()
                                         Fifteen_Min_Nexus.buy()}}}}
                 if (!Fifteen_Min_Functions.ema()){
-                    if (Fifteen_Min_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Fifteen_Min_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Fifteen_Min_Functions.trend() && !Fifteen_Min_Functions.rsi() 
                             && !Fifteen_Min_Functions.macd() && !Fifteen_Min_Functions.roc() && !Fifteen_Min_Functions.obv()) {
                                 if (!Fifteen_Min_Nexus.pos){
@@ -2105,6 +2105,7 @@ class One_Hour_Functions{
             .select('Data')
             .eq('Instrument', instrument)
             .eq('OHLC', 'l')
+        One_Hour_Functions.lows  = data[0]['Data']
         let lens = []
         lens.push(One_Hour_Functions.priceHist.length)
         lens.push(One_Hour_Functions.highs.length)

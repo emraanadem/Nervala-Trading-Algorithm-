@@ -346,11 +346,11 @@ class One_Hour_Nexus{
         One_Hour_Functions.ValueAssigner()
         One_Hour_Functions.getPrice()
         One_Hour_Functions.supreslevs()
-        One_Hour_Nexus.controlBiggerPeriod()
+        await One_Hour_Nexus.controlBiggerPeriod()
         if (!One_Hour_Functions.consolidationtwo() && One_Hour_Functions.overall() && !One_Hour_Functions.consolidation() 
             && !One_Hour_Functions.keylev()){
                 if (One_Hour_Functions.ema()){
-                    if (One_Hour_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await One_Hour_Nexus.controlSmallerPeriod()[0] == true){
                         if (One_Hour_Functions.trend() && One_Hour_Functions.rsi() 
                             && One_Hour_Functions.macd() && One_Hour_Functions.roc() && One_Hour_Functions.obv()) {
                                 if (!One_Hour_Nexus.pos){
@@ -359,7 +359,7 @@ class One_Hour_Nexus{
                                         One_Hour_Nexus.piploginit()
                                         One_Hour_Nexus.buy()}}}}
                 if (!One_Hour_Functions.ema()){
-                    if (One_Hour_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await One_Hour_Nexus.controlSmallerPeriod()[1] == true){
                         if (!One_Hour_Functions.trend() && !One_Hour_Functions.rsi() 
                             && !One_Hour_Functions.macd() && !One_Hour_Functions.roc() && !One_Hour_Functions.obv()) {
                                 if (!One_Hour_Nexus.pos){

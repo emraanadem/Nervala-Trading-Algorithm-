@@ -328,7 +328,7 @@ class Weekly_Nexus{
         if (!Weekly_Functions.consolidationtwo() && Weekly_Functions.overall() && !Weekly_Functions.consolidation()
             && !Weekly_Functions.keylev()){
                 if (Weekly_Functions.ema()){
-                    if (Weekly_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Weekly_Nexus.controlSmallerPeriod()[0] == true){
                         if (Weekly_Functions.trend() && Weekly_Functions.rsi() 
                             && Weekly_Functions.macd() && Weekly_Functions.roc() && Weekly_Functions.obv()) {
                                 if (!Weekly_Nexus.pos){
@@ -338,7 +338,7 @@ class Weekly_Nexus{
                                         Weekly_Nexus.piploginit()
                                         Weekly_Nexus.buy()}}}}
                 if (!Weekly_Functions.ema()){
-                    if (Weekly_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Weekly_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Weekly_Functions.trend() && !Weekly_Functions.rsi() 
                             && !Weekly_Functions.macd() && !Weekly_Functions.roc() && !Weekly_Functions.obv()) {
                                 if (!Weekly_Nexus.pos){

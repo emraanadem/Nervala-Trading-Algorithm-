@@ -353,11 +353,11 @@ class Two_Hour_Nexus{
         Two_Hour_Functions.stoploss()
         Two_Hour_Functions.getPrice()
         Two_Hour_Functions.supreslevs()
-        Two_Hour_Nexus.controlBiggerPeriod()
+        await Two_Hour_Nexus.controlBiggerPeriod()
         if (!Two_Hour_Functions.consolidationtwo() && Two_Hour_Functions.overall() && !Two_Hour_Functions.consolidation()
             && !Two_Hour_Functions.keylev()){
                 if (Two_Hour_Functions.ema()){
-                    if (Two_Hour_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Two_Hour_Nexus.controlSmallerPeriod()[0] == true){
                         if (Two_Hour_Functions.trend() && Two_Hour_Functions.rsi() 
                             && Two_Hour_Functions.macd() && Two_Hour_Functions.roc() && Two_Hour_Functions.obv()) {
                                 if (!Two_Hour_Nexus.pos){
@@ -367,7 +367,7 @@ class Two_Hour_Nexus{
                                         Two_Hour_Nexus.piploginit()
                                         Two_Hour_Nexus.buy()}}}}
                 if (!Two_Hour_Functions.ema()){
-                    if (Two_Hour_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Two_Hour_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Two_Hour_Functions.trend() && !Two_Hour_Functions.rsi() 
                             && !Two_Hour_Functions.macd() && !Two_Hour_Functions.roc() && !Two_Hour_Functions.obv()) {
                                 if (!Two_Hour_Nexus.pos){
@@ -1365,7 +1365,7 @@ class Four_Hour_Functions{
         return dataspecific
     }
 /** load historical prices from json file */
-    static async HistoryAssigner(){
+   static async HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
         var { data, error } = await supabase
             .from('Four_Hour')
