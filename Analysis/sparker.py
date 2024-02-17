@@ -43,6 +43,7 @@ class Auto:
         DataCenter.Motor2Extend2.controller()
         DataCenter.Motor3Extend2.controller()
         DataCenter.Motor5Extend2.controller()
+        Auto.junction()
 
     @staticmethod
     def junction():

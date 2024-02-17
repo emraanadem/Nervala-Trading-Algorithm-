@@ -32,7 +32,7 @@ class Starters:
                 rowid+=1 
         redo = True
         Starters.current_val = val
-        pathtwo = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
+        pathtwo = str(pathlib.Path(__file__).parent.resolve()) + "/" + val + "_Data"
         #path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         if os.path.isdir(pathtwo):
             dict = {}
@@ -72,13 +72,13 @@ class Starters:
                                 json.dump([valss[0],valss[1]], inst)
                         Starters.evenmoreimpinfo = []
         import pathlib
-        path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
+        path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val + "_Data"
         #path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         Starters.importantinfo.append([path, val])
 
     def starting(path, current_val):
         try:
-            path = str(current_val)
+            path = str(current_val) + "_Data"
             with open(path + '/pythoner' + current_val + ".py", "w+") as file:
                 file.write('\nimport sparker as starttt' + "\nstarttt.Automatically.automatic()")
             file.close()

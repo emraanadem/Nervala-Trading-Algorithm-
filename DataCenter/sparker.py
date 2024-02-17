@@ -43,7 +43,6 @@ class Auto:
         Motor2Extend2.controller()
         Motor3Extend2.controller()
         Motor5Extend2.controller()
-        Auto.junction()
 
     @staticmethod
     def junction():
