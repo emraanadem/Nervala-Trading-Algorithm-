@@ -1,9 +1,51 @@
-import csv
-lists = []
-with open('nasdaqw.csv', newline='') as csvfile:
-    spamreader = csv.reader(csvfile, delimiter=',')
-    for row in spamreader:
-        if row[0] != 'Symbol':
-            lists.append(row[0])
+import json
+f= open('instrumentsthree.json')
+prueba = json.load(f)
+lists = prueba['instruments']
+f = open('instrumentstwo.json')
+prueba = json.load(f)
+liststwo = prueba['instruments']
+removeinst = []
 
-print(lists)
+for item in lists:
+     for items in liststwo:
+          if item == items:
+               removeinst.append(item)
+
+for itemss in removeinst:
+     lists.pop(lists.index(itemss))
+
+dicttwo = {}
+dicttwo['instruments'] = lists
+with open('instrumentsthree.json', 'w') as inst:
+     json.dump(dicttwo, inst)
+               
+idkeys = {}
+count = 0
+idkeysextend = {}
+for val in lists:
+     idkeys[val + " Open"] = count
+     idkeysextend[val + " Open Extend"] = count
+     count += 1
+     idkeys[val + " High"] = count
+     idkeysextend[val + " High Extend"] = count
+     count += 1
+     idkeys[val + " Low"] = count
+     idkeysextend[val + " Low Extend"] = count
+     count += 1
+     idkeys[val + " Close"] = count
+     idkeysextend[val + " Close Extend"] = count
+     count += 1
+
+with open("idkeys.json", 'w') as inst:
+    json.dump(idkeys, inst)
+
+
+with open("idkeysextend.json", 'w') as inst:
+    json.dump(idkeysextend, inst)
+
+
+with open('idkeys.json', 'r') as inst:
+        datas = json.load(inst)
+        ids = datas["EUR_USD" + " Close"]
+print(ids)
