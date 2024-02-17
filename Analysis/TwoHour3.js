@@ -299,14 +299,18 @@ class Two_Hour_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static controlSmallerPeriod(){
+    static async controlSmallerPeriod(){
+        try{
         /*Confirm Trend w/ indicators and price movement*/
-        One_Hour_Functions.HistoryAssigner()
-        Thirty_Min_Functions.HistoryAssigner()
-        Daily_Functions.HistoryAssigner()
-        Fifteen_Min_Functions.HistoryAssigner()
+        await One_Hour_Functions.HistoryAssigner()
+        await Thirty_Min_Functions.HistoryAssigner()
+        await Daily_Functions.HistoryAssigner()
+        await Fifteen_Min_Functions.HistoryAssigner()
         Two_Hour_Functions.stoploss()
-        Two_Hour_Functions.tpvariation()
+        Two_Hour_Functions.tpvariation()}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let buy = false
         let sell = false
         if(!Four_Hour_Functions.rejectionzoning() && 
@@ -324,17 +328,22 @@ class Two_Hour_Nexus{
         return [buy, sell]
     }
     /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-    static controlBiggerPeriod(){
+    static async controlBiggerPeriod(){
         /*Price Zones*/
+        try{
         Daily_Functions.ValueAssigner()
         Weekly_Functions.ValueAssigner()
         Four_Hour_Functions.ValueAssigner()
-        Daily_Functions.HistoryAssigner()
-        Weekly_Functions.HistoryAssigner()
-        Four_Hour_Functions.HistoryAssigner()
+        await Daily_Functions.HistoryAssigner()
+        await Weekly_Functions.HistoryAssigner()
+        await Four_Hour_Functions.HistoryAssigner()
         Daily_Functions.priceZones()
         Four_Hour_Functions.priceZones()
         Weekly_Functions.priceZones()
+        }
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let h = new Array();
         h = Daily_Functions.finlevs
         let i = Weekly_Functions.finlevs
@@ -345,10 +354,11 @@ class Two_Hour_Nexus{
         Two_Hour_Nexus.finlevs.concat(totallevs)
     }
     /** main control method, takes control of the entire program and serves as the brain */
-    static controlMain(){
+    static async controlMain(){
+        try{
         Two_Hour_Functions.rejecinit()
         Four_Hour_Functions.rejecinit()
-        Two_Hour_Functions.HistoryAssigner()
+        await Two_Hour_Functions.HistoryAssigner()
         Two_Hour_Functions.ValueAssigner()
         Two_Hour_Functions.stoploss()
         Two_Hour_Functions.getPrice()
@@ -357,7 +367,7 @@ class Two_Hour_Nexus{
         if (!Two_Hour_Functions.consolidationtwo() && Two_Hour_Functions.overall() && !Two_Hour_Functions.consolidation()
             && !Two_Hour_Functions.keylev()){
                 if (Two_Hour_Functions.ema()){
-                    if (Two_Hour_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Two_Hour_Nexus.controlSmallerPeriod()[0] == true){
                         if (Two_Hour_Functions.trend() && Two_Hour_Functions.rsi() 
                             && Two_Hour_Functions.macd() && Two_Hour_Functions.roc() && Two_Hour_Functions.obv()) {
                                 if (!Two_Hour_Nexus.pos){
@@ -367,7 +377,7 @@ class Two_Hour_Nexus{
                                         Two_Hour_Nexus.piploginit()
                                         Two_Hour_Nexus.buy()}}}}
                 if (!Two_Hour_Functions.ema()){
-                    if (Two_Hour_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Two_Hour_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Two_Hour_Functions.trend() && !Two_Hour_Functions.rsi() 
                             && !Two_Hour_Functions.macd() && !Two_Hour_Functions.roc() && !Two_Hour_Functions.obv()) {
                                 if (!Two_Hour_Nexus.pos){
@@ -389,7 +399,10 @@ class Two_Hour_Nexus{
             Two_Hour_Nexus.tstoplosscont()
             Two_Hour_Nexus.takeProfitSell()}
         Two_Hour_Functions.rejecsave()
-        Four_Hour_Functions.rejecsave()
+        Four_Hour_Functions.rejecsave()}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
@@ -508,6 +521,7 @@ class Two_Hour_Functions{
 /** load historical prices from json file */
     static async HistoryAssigner(){
         let instrument = Two_Hour_Functions.instrument_name()
+        try{
         var { data, error } = await supabase
             .from('Two_Hour')
             .select('Data')
@@ -543,7 +557,10 @@ class Two_Hour_Functions{
             .select('Data')
             .eq('Instrument', instrument)
             .eq('OHLC', 'l')
-        Two_Hour_Functions.extendLow = data[0]['Data']
+        Two_Hour_Functions.extendLow = data[0]['Data']}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let lens = []
         lens.push(Two_Hour_Functions.priceHist.length)
         lens.push(Two_Hour_Functions.highs.length)
@@ -1367,6 +1384,7 @@ class Four_Hour_Functions{
 /** load historical prices from json file */
    static async HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
+        try{
         var { data, error } = await supabase
             .from('Four_Hour')
             .select('Data')
@@ -1402,7 +1420,10 @@ class Four_Hour_Functions{
             .select('Data')
             .eq('Instrument', instrument)
             .eq('OHLC', 'l')
-        Four_Hour_Functions.extendLow = data[0]['Data']
+        Four_Hour_Functions.extendLow = data[0]['Data']}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let lens = []
         lens.push(Four_Hour_Functions.priceHist.length)
         lens.push(Four_Hour_Functions.highs.length)
@@ -2081,6 +2102,7 @@ class Daily_Functions{
 
     static async HistoryAssigner(){
         let instrument = Two_Hour_Functions.instrument_name()
+        try{
         var { data, error } = await supabase
             .from('Daily')
             .select('Data')
@@ -2098,7 +2120,10 @@ class Daily_Functions{
             .select('Data')
             .eq('Instrument', instrument)
             .eq('OHLC', 'l')
-        Daily_Functions.lows = data[0]['Data']
+        Daily_Functions.lows = data[0]['Data']}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let lens = []
         lens.push(Daily_Functions.priceHist.length)
         lens.push(Daily_Functions.highs.length)
@@ -2120,6 +2145,7 @@ class Daily_Functions{
                     for(let item = 0; item < (Daily_Functions.highs.length - minlens); item++){
                         Daily_Functions.highs.splice(0,1)
                     }}}}}}
+            
         }
 
     static ValueAssigner(){
@@ -2288,6 +2314,7 @@ class Weekly_Functions{
 
     static async HistoryAssigner(){
         let instrument = Two_Hour_Functions.instrument_name()
+        try{
         var { data, error } = await supabase
             .from('Weekly')
             .select('Data')
@@ -2305,7 +2332,10 @@ class Weekly_Functions{
             .select('Data')
             .eq('Instrument', instrument)
             .eq('OHLC', 'l')
-        Weekly_Functions.lows = data[0]['Data']
+        Weekly_Functions.lows = data[0]['Data']}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let lens = []
         lens.push(Weekly_Functions.priceHist.length)
         lens.push(Weekly_Functions.highs.length)
@@ -2474,6 +2504,7 @@ class One_Hour_Functions{
     
     static async HistoryAssigner(){
         let instrument = Two_Hour_Functions.instrument_name()
+        try{
         var { data, error } = await supabase
             .from('One_Hour')
             .select('Data')
@@ -2491,7 +2522,10 @@ class One_Hour_Functions{
             .select('Data')
             .eq('Instrument', instrument)
             .eq('OHLC', 'l')
-        One_Hour_Functions.lows = data[0]['Data']
+        One_Hour_Functions.lows = data[0]['Data']}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let lens = []
         lens.push(One_Hour_Functions.priceHist.length)
         lens.push(One_Hour_Functions.highs.length)
@@ -2599,6 +2633,7 @@ class Thirty_Min_Functions{
     
     static async HistoryAssigner(){
         let instrument = Two_Hour_Functions.instrument_name()
+        try{
         var { data, error } = await supabase
             .from('Thirty_Min')
             .select('Data')
@@ -2616,7 +2651,10 @@ class Thirty_Min_Functions{
             .select('Data')
             .eq('Instrument', instrument)
             .eq('OHLC', 'l')
-        Thirty_Min_Functions.lows = data[0]['Data']
+        Thirty_Min_Functions.lows = data[0]['Data']}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let lens = []
         lens.push(Thirty_Min_Functions.priceHist.length)
         lens.push(Thirty_Min_Functions.highs.length)
@@ -2758,6 +2796,7 @@ class Fifteen_Min_Functions{
     
     static async HistoryAssigner(){
         let instrument = Two_Hour_Functions.instrument_name()
+        try{
         var { data, error } = await supabase
             .from('Fifteen_Min')
             .select('Data')
@@ -2775,7 +2814,10 @@ class Fifteen_Min_Functions{
             .select('Data')
             .eq('Instrument', instrument)
             .eq('OHLC', 'l')
-        Fifteen_Min_Functions.lows = data[0]['Data']
+        Fifteen_Min_Functions.lows = data[0]['Data']}
+        catch (error) {
+            throw new Error(`Error: ${error.message}`);
+            }
         let lens = []
         lens.push(Fifteen_Min_Functions.priceHist.length)
         lens.push(Fifteen_Min_Functions.highs.length)
