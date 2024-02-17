@@ -319,8 +319,8 @@ class Weekly_Nexus{
                             sell = true}}}}}
         return [buy, sell]}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
     }
 
     /** main control method, takes control of the entire program and serves as the brain */
@@ -368,8 +368,8 @@ class Weekly_Nexus{
             Weekly_Nexus.takeProfitSell()}
         Weekly_Functions.rejecsave()}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
@@ -524,8 +524,8 @@ class Weekly_Functions{
             .eq('OHLC', 'l')
         Weekly_Functions.extendLow = data[0]['Data']
         } catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Weekly_Functions.priceHist.length)
         lens.push(Weekly_Functions.highs.length)
@@ -1352,8 +1352,8 @@ class Daily_Functions{
             .eq('OHLC', 'l')
         Daily_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Daily_Functions.priceHist.length)
         lens.push(Daily_Functions.highs.length)
@@ -1480,8 +1480,8 @@ class One_Hour_Functions{
             .eq('OHLC', 'l')
         One_Hour_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(One_Hour_Functions.priceHist.length)
         lens.push(One_Hour_Functions.highs.length)
@@ -1641,8 +1641,8 @@ class Thirty_Min_Functions{
             .eq('OHLC', 'l')
         Thirty_Min_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Thirty_Min_Functions.priceHist.length)
         lens.push(Thirty_Min_Functions.highs.length)

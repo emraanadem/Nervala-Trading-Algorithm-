@@ -309,8 +309,8 @@ class Two_Hour_Nexus{
         Two_Hour_Functions.stoploss()
         Two_Hour_Functions.tpvariation()}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let buy = false
         let sell = false
         if(!Four_Hour_Functions.rejectionzoning() && 
@@ -342,8 +342,8 @@ class Two_Hour_Nexus{
         Weekly_Functions.priceZones()
         }
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let h = new Array();
         h = Daily_Functions.finlevs
         let i = Weekly_Functions.finlevs
@@ -401,8 +401,8 @@ class Two_Hour_Nexus{
         Two_Hour_Functions.rejecsave()
         Four_Hour_Functions.rejecsave()}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
@@ -559,8 +559,8 @@ class Two_Hour_Functions{
             .eq('OHLC', 'l')
         Two_Hour_Functions.extendLow = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Two_Hour_Functions.priceHist.length)
         lens.push(Two_Hour_Functions.highs.length)
@@ -1422,8 +1422,8 @@ class Four_Hour_Functions{
             .eq('OHLC', 'l')
         Four_Hour_Functions.extendLow = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Four_Hour_Functions.priceHist.length)
         lens.push(Four_Hour_Functions.highs.length)
@@ -2122,8 +2122,8 @@ class Daily_Functions{
             .eq('OHLC', 'l')
         Daily_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Daily_Functions.priceHist.length)
         lens.push(Daily_Functions.highs.length)
@@ -2334,8 +2334,8 @@ class Weekly_Functions{
             .eq('OHLC', 'l')
         Weekly_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Weekly_Functions.priceHist.length)
         lens.push(Weekly_Functions.highs.length)
@@ -2524,8 +2524,8 @@ class One_Hour_Functions{
             .eq('OHLC', 'l')
         One_Hour_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(One_Hour_Functions.priceHist.length)
         lens.push(One_Hour_Functions.highs.length)
@@ -2653,8 +2653,8 @@ class Thirty_Min_Functions{
             .eq('OHLC', 'l')
         Thirty_Min_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Thirty_Min_Functions.priceHist.length)
         lens.push(Thirty_Min_Functions.highs.length)
@@ -2816,8 +2816,8 @@ class Fifteen_Min_Functions{
             .eq('OHLC', 'l')
         Fifteen_Min_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Fifteen_Min_Functions.priceHist.length)
         lens.push(Fifteen_Min_Functions.highs.length)

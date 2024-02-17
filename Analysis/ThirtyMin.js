@@ -307,8 +307,8 @@ class Thirty_Min_Nexus{
         Thirty_Min_Functions.stoploss()
         Thirty_Min_Functions.tpvariation()}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let buy = false
         let sell = false
         if(!Four_Hour_Functions.rejectionzoning() && 
@@ -337,8 +337,8 @@ class Thirty_Min_Nexus{
         One_Hour_Functions.priceZones()
         }
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let h = new Array();
         h = Four_Hour_Functions.finlevs
         let i = One_Hour_Functions.finlevs
@@ -394,8 +394,8 @@ class Thirty_Min_Nexus{
         Thirty_Min_Functions.rejecsave()
         Four_Hour_Functions.rejecsave()}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
@@ -552,8 +552,8 @@ class Thirty_Min_Functions{
             .eq('OHLC', 'l')
         Thirty_Min_Functions.extendLow = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Thirty_Min_Functions.priceHist.length)
         lens.push(Thirty_Min_Functions.highs.length)
@@ -1416,8 +1416,8 @@ class Four_Hour_Functions{
             .eq('OHLC', 'l')
         Four_Hour_Functions.extendLow = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Four_Hour_Functions.priceHist.length)
         lens.push(Four_Hour_Functions.highs.length)
@@ -2115,8 +2115,8 @@ class One_Hour_Functions{
             .eq('OHLC', 'l')
         One_Hour_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(One_Hour_Functions.priceHist.length)
         lens.push(One_Hour_Functions.highs.length)
@@ -2305,8 +2305,8 @@ class Fifteen_Min_Functions{
             .eq('OHLC', 'l')
         Fifteen_Min_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Fifteen_Min_Functions.priceHist.length)
         lens.push(Fifteen_Min_Functions.highs.length)
@@ -2434,8 +2434,8 @@ class Five_Min_Functions{
             .eq('OHLC', 'l')
         Five_Min_Functions.lows = data[0]['Data']}
         catch (error) {
-            throw new Error(`Error: ${error.message}`);
-            }
+            console.log(error)
+        }
         let lens = []
         lens.push(Five_Min_Functions.priceHist.length)
         lens.push(Five_Min_Functions.highs.length)
