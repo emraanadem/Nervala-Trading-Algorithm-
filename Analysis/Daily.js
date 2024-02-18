@@ -291,13 +291,12 @@ class Daily_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static async controlSmallerPeriod(){
-        try{
+    static controlSmallerPeriod(){
         /*Confirm Trend w/ indicators and price movement*/
-        await Four_Hour_Functions.HistoryAssigner()
-        await One_Hour_Functions.HistoryAssigner()
-        await Weekly_Functions.HistoryAssigner()
-        await Fifteen_Min_Functions.HistoryAssigner()
+        Four_Hour_Functions.HistoryAssigner()
+        One_Hour_Functions.HistoryAssigner()
+        Weekly_Functions.HistoryAssigner()
+        Fifteen_Min_Functions.HistoryAssigner()
         Daily_Functions.stoploss()
         Daily_Functions.tpvariation()
         let buy = false
@@ -313,32 +312,24 @@ class Daily_Nexus{
                     if(!One_Hour_Functions.ema()){
                         if(!One_Hour_Functions.rsi() && !One_Hour_Functions.obv()){
                             sell = true}}}}}
-        return [buy, sell]}
-        catch (error) {
-            console.log(error)
-        }
+        return [buy, sell]
     }
     /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-    static async controlBiggerPeriod(){
+    static controlBiggerPeriod(){
         /*Price Zones*/
-        try{
         Weekly_Functions.ValueAssigner()
-        await Weekly_Functions.HistoryAssigner()
+        Weekly_Functions.HistoryAssigner()
         Weekly_Functions.priceZones()
         let h = [0]
         h = Weekly_Functions.finlevs
         let totallevs = h
         Daily_Nexus.biggersupres = totallevs
         Daily_Nexus.finlevs.concat(totallevs)}
-        catch (error) {
-            console.log(error)
-        }
-    }
+        
     /** main control method, takes control of the entire program and serves as the brain */
-    static async controlMain(){
-        try{
+    static controlMain(){
         Daily_Functions.rejecinit()
-        await Daily_Functions.HistoryAssigner()
+        Daily_Functions.HistoryAssigner()
         Daily_Functions.ValueAssigner()
         Daily_Functions.stoploss()
         Daily_Functions.getPrice()
@@ -347,7 +338,7 @@ class Daily_Nexus{
         if (!Daily_Functions.consolidationtwo() && Daily_Functions.overall() && !Daily_Functions.consolidation()
             && !Daily_Functions.keylev()){
                 if (Daily_Functions.ema()){
-                    if (await Daily_Nexus.controlSmallerPeriod()[0] == true){
+                    if (Daily_Nexus.controlSmallerPeriod()[0] == true){
                         if (Daily_Functions.trend() && Daily_Functions.rsi() 
                             && Daily_Functions.macd() && Daily_Functions.roc() && Daily_Functions.obv()) {
                                 if (!Daily_Nexus.pos){
@@ -357,7 +348,7 @@ class Daily_Nexus{
                                         Daily_Nexus.piploginit()
                                         Daily_Nexus.buy()}}}}
                 if (!Daily_Functions.ema()){
-                    if (await Daily_Nexus.controlSmallerPeriod()[1] == true){
+                    if (Daily_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Daily_Functions.trend() && !Daily_Functions.rsi() 
                             && !Daily_Functions.macd() && !Daily_Functions.roc() && !Daily_Functions.obv()) {
                                 if (!Daily_Nexus.pos){
@@ -378,10 +369,7 @@ class Daily_Nexus{
             Daily_Nexus.tstoplosscheck()
             Daily_Nexus.tstoplosscont()
             Daily_Nexus.takeProfitSell()}
-        Daily_Functions.rejecsave()}
-        catch (error) {
-            console.log(error)
-        }
+        Daily_Functions.rejecsave()
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 

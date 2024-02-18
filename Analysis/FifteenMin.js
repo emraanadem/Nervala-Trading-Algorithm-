@@ -302,11 +302,10 @@ class Fifteen_Min_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static async controlSmallerPeriod(){
+    static controlSmallerPeriod(){
         /*Confirm Trend w/ indicators and price movement*/
-        try{
-        await Five_Min_Functions.HistoryAssigner()
-        await Four_Hour_Functions.HistoryAssigner()
+        Five_Min_Functions.HistoryAssigner()
+        Four_Hour_Functions.HistoryAssigner()
         Fifteen_Min_Functions.stoploss()
         Fifteen_Min_Functions.tpvariation()
         let buy = false
@@ -323,38 +322,30 @@ class Fifteen_Min_Nexus{
                         if(!Five_Min_Functions.ema()){
                             if(!Five_Min_Functions.rsi() && !Five_Min_Functions.obv()){
                                 sell = true}}}}}
-        return [buy, sell]}
-        catch (error) {
-            console.log(error)
-        }
+        return [buy, sell]
     }
     /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-    static async controlBiggerPeriod(){
+    static controlBiggerPeriod(){
         /*Price Zones*/
-        try{
         Four_Hour_Functions.ValueAssigner()
         One_Hour_Functions.ValueAssigner()
-        await Four_Hour_Functions.HistoryAssigner()
-        await One_Hour_Functions.HistoryAssigner()
+        Four_Hour_Functions.HistoryAssigner()
+        One_Hour_Functions.HistoryAssigner()
         Four_Hour_Functions.priceZones()
-        One_Hour_Functions.priceZones()}
-        catch (error) {
-            console.log(error)
-        }
+        One_Hour_Functions.priceZones()
         let h = new Array();
         let i = new Array();
         h = Four_Hour_Functions.finlevs
         i = One_Hour_Functions.finlevs
         let totallevs = h.push(i)
         Fifteen_Min_Nexus.biggersupres = totallevs
-        Fifteen_Min_Nexus.finlevs.concat(totallevs)
-    }
+        Fifteen_Min_Nexus.finlevs.concat(totallevs)}
+
     /** main control method, takes control of the entire program and serves as the brain */
-    static async controlMain(){
-        try{
+    static controlMain(){
         Four_Hour_Functions.rejecinit()
         Fifteen_Min_Functions.rejecinit()
-        await Fifteen_Min_Functions.HistoryAssigner()
+        Fifteen_Min_Functions.HistoryAssigner()
         Fifteen_Min_Functions.ValueAssigner()
         Fifteen_Min_Functions.stoploss()
         Fifteen_Min_Functions.getPrice()
@@ -363,7 +354,7 @@ class Fifteen_Min_Nexus{
         if (!Fifteen_Min_Functions.consolidationtwo() && !Fifteen_Min_Functions.consolidation() && !Fifteen_Min_Functions.overall() 
             && !Fifteen_Min_Functions.keylev()){
                 if (Fifteen_Min_Functions.ema()){
-                    if (await Fifteen_Min_Nexus.controlSmallerPeriod()[0] == true){
+                    if (Fifteen_Min_Nexus.controlSmallerPeriod()[0] == true){
                         if (Fifteen_Min_Functions.trend() && Fifteen_Min_Functions.rsi() 
                             && Fifteen_Min_Functions.macd() && Fifteen_Min_Functions.roc() && Fifteen_Min_Functions.obv()) {
                                 if (!Fifteen_Min_Nexus.pos){
@@ -373,7 +364,7 @@ class Fifteen_Min_Nexus{
                                         Fifteen_Min_Nexus.piploginit()
                                         Fifteen_Min_Nexus.buy()}}}}
                 if (!Fifteen_Min_Functions.ema()){
-                    if (await Fifteen_Min_Nexus.controlSmallerPeriod()[1] == true){
+                    if (Fifteen_Min_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Fifteen_Min_Functions.trend() && !Fifteen_Min_Functions.rsi() 
                             && !Fifteen_Min_Functions.macd() && !Fifteen_Min_Functions.roc() && !Fifteen_Min_Functions.obv()) {
                                 if (!Fifteen_Min_Nexus.pos){
@@ -395,10 +386,7 @@ class Fifteen_Min_Nexus{
             Fifteen_Min_Nexus.tstoplosscont()
             Fifteen_Min_Nexus.takeProfitSell()}
         Four_Hour_Functions.rejecsave()
-        Fifteen_Min_Functions.rejecsave()}
-        catch (error) {
-            console.log(error)
-        }
+        Fifteen_Min_Functions.rejecsave()
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
