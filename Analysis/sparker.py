@@ -46,7 +46,7 @@ class Auto:
 
 class Automatically:
 
-    @staticmethod
+    @staticmethod  
     def automatic():
         Auto.controll()
 

@@ -299,12 +299,12 @@ class Two_Hour_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static controlSmallerPeriod(){
+    static async controlSmallerPeriod(){
         /*Confirm Trend w/ indicators and price movement*/
-        One_Hour_Functions.HistoryAssigner()
-        Thirty_Min_Functions.HistoryAssigner()
-        Daily_Functions.HistoryAssigner()
-        Fifteen_Min_Functions.HistoryAssigner()
+        await One_Hour_Functions.HistoryAssigner()
+        await Thirty_Min_Functions.HistoryAssigner()
+        await Daily_Functions.HistoryAssigner()
+        await Fifteen_Min_Functions.HistoryAssigner()
         Two_Hour_Functions.stoploss()
         Two_Hour_Functions.tpvariation()
         let buy = false
@@ -324,14 +324,14 @@ class Two_Hour_Nexus{
         return [buy, sell]
     }
     /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-    static controlBiggerPeriod(){
+    static async controlBiggerPeriod(){
         /*Price Zones*/
         Daily_Functions.ValueAssigner()
         Weekly_Functions.ValueAssigner()
         Four_Hour_Functions.ValueAssigner()
-        Daily_Functions.HistoryAssigner()
-        Weekly_Functions.HistoryAssigner()
-        Four_Hour_Functions.HistoryAssigner()
+        await Daily_Functions.HistoryAssigner()
+        await Weekly_Functions.HistoryAssigner()
+        await Four_Hour_Functions.HistoryAssigner()
         Daily_Functions.priceZones()
         Four_Hour_Functions.priceZones()
         Weekly_Functions.priceZones()
@@ -345,19 +345,19 @@ class Two_Hour_Nexus{
         Two_Hour_Nexus.finlevs.concat(totallevs)
     }
     /** main control method, takes control of the entire program and serves as the brain */
-    static controlMain(){
+    static async controlMain(){
         Two_Hour_Functions.rejecinit()
         Four_Hour_Functions.rejecinit()
-        Two_Hour_Functions.HistoryAssigner()
+        await Two_Hour_Functions.HistoryAssigner()
         Two_Hour_Functions.ValueAssigner()
         Two_Hour_Functions.stoploss()
         Two_Hour_Functions.getPrice()
         Two_Hour_Functions.supreslevs()
-        Two_Hour_Nexus.controlBiggerPeriod()
+        await Two_Hour_Nexus.controlBiggerPeriod()
         if (!Two_Hour_Functions.consolidationtwo() && Two_Hour_Functions.overall() && !Two_Hour_Functions.consolidation()
             && !Two_Hour_Functions.keylev()){
                 if (Two_Hour_Functions.ema()){
-                    if (Two_Hour_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Two_Hour_Nexus.controlSmallerPeriod()[0] == true){
                         if (Two_Hour_Functions.trend() && Two_Hour_Functions.rsi() 
                             && Two_Hour_Functions.macd() && Two_Hour_Functions.roc() && Two_Hour_Functions.obv()) {
                                 if (!Two_Hour_Nexus.pos){
@@ -367,7 +367,7 @@ class Two_Hour_Nexus{
                                         Two_Hour_Nexus.piploginit()
                                         Two_Hour_Nexus.buy()}}}}
                 if (!Two_Hour_Functions.ema()){
-                    if (Two_Hour_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Two_Hour_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Two_Hour_Functions.trend() && !Two_Hour_Functions.rsi() 
                             && !Two_Hour_Functions.macd() && !Two_Hour_Functions.roc() && !Two_Hour_Functions.obv()) {
                                 if (!Two_Hour_Nexus.pos){

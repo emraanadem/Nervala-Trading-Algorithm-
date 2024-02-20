@@ -291,12 +291,12 @@ class Daily_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static controlSmallerPeriod(){
+    static async controlSmallerPeriod(){
         /*Confirm Trend w/ indicators and price movement*/
-        Four_Hour_Functions.HistoryAssigner()
-        One_Hour_Functions.HistoryAssigner()
-        Weekly_Functions.HistoryAssigner()
-        Fifteen_Min_Functions.HistoryAssigner()
+        await Four_Hour_Functions.HistoryAssigner()
+        await One_Hour_Functions.HistoryAssigner()
+        await Weekly_Functions.HistoryAssigner()
+        await Fifteen_Min_Functions.HistoryAssigner()
         Daily_Functions.stoploss()
         Daily_Functions.tpvariation()
         let buy = false
@@ -315,10 +315,10 @@ class Daily_Nexus{
         return [buy, sell]
     }
     /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-    static controlBiggerPeriod(){
+    static async controlBiggerPeriod(){
         /*Price Zones*/
         Weekly_Functions.ValueAssigner()
-        Weekly_Functions.HistoryAssigner()
+        await Weekly_Functions.HistoryAssigner()
         Weekly_Functions.priceZones()
         let h = [0]
         h = Weekly_Functions.finlevs
@@ -327,18 +327,18 @@ class Daily_Nexus{
         Daily_Nexus.finlevs.concat(totallevs)}
         
     /** main control method, takes control of the entire program and serves as the brain */
-    static controlMain(){
+    static async controlMain(){
         Daily_Functions.rejecinit()
-        Daily_Functions.HistoryAssigner()
+        await Daily_Functions.HistoryAssigner()
         Daily_Functions.ValueAssigner()
         Daily_Functions.stoploss()
         Daily_Functions.getPrice()
         Daily_Functions.supreslevs()
-        Daily_Nexus.controlBiggerPeriod()
+        await Daily_Nexus.controlBiggerPeriod()
         if (!Daily_Functions.consolidationtwo() && Daily_Functions.overall() && !Daily_Functions.consolidation()
             && !Daily_Functions.keylev()){
                 if (Daily_Functions.ema()){
-                    if (Daily_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Daily_Nexus.controlSmallerPeriod()[0] == true){
                         if (Daily_Functions.trend() && Daily_Functions.rsi() 
                             && Daily_Functions.macd() && Daily_Functions.roc() && Daily_Functions.obv()) {
                                 if (!Daily_Nexus.pos){
@@ -348,7 +348,7 @@ class Daily_Nexus{
                                         Daily_Nexus.piploginit()
                                         Daily_Nexus.buy()}}}}
                 if (!Daily_Functions.ema()){
-                    if (Daily_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Daily_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Daily_Functions.trend() && !Daily_Functions.rsi() 
                             && !Daily_Functions.macd() && !Daily_Functions.roc() && !Daily_Functions.obv()) {
                                 if (!Daily_Nexus.pos){

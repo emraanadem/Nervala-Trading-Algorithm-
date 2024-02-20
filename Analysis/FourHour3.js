@@ -298,12 +298,12 @@ class Four_Hour_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static controlSmallerPeriod(){
+    static async controlSmallerPeriod(){
         /*Confirm Trend w/ indicators and price movement*/
-        One_Hour_Functions.HistoryAssigner()
-        Thirty_Min_Functions.HistoryAssigner()
-        Daily_Functions.HistoryAssigner()
-        Fifteen_Min_Functions.HistoryAssigner()
+        await One_Hour_Functions.HistoryAssigner()
+        await Thirty_Min_Functions.HistoryAssigner()
+        await Daily_Functions.HistoryAssigner()
+        await Fifteen_Min_Functions.HistoryAssigner()
         Four_Hour_Functions.stoploss()
         Four_Hour_Functions.tpvariation()
         let buy = false
@@ -322,12 +322,12 @@ class Four_Hour_Nexus{
         return [buy, sell]
     }
     /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-    static controlBiggerPeriod(){
+    static async controlBiggerPeriod(){
         /*Price Zones*/
         Daily_Functions.ValueAssigner()
         Weekly_Functions.ValueAssigner()
-        Daily_Functions.HistoryAssigner()
-        Weekly_Functions.HistoryAssigner()
+        await Daily_Functions.HistoryAssigner()
+        await Weekly_Functions.HistoryAssigner()
         Daily_Functions.priceZones()
         Weekly_Functions.priceZones()
         let h = [0]
@@ -338,18 +338,18 @@ class Four_Hour_Nexus{
         Four_Hour_Nexus.finlevs.concat(totallevs)
     }
     /** main control method, takes control of the entire program and serves as the brain */
-    static controlMain(){
+    static async controlMain(){
         Four_Hour_Functions.rejecinit()
-        Four_Hour_Functions.HistoryAssigner()
+        await Four_Hour_Functions.HistoryAssigner()
         Four_Hour_Functions.ValueAssigner()
         Four_Hour_Functions.stoploss()
         Four_Hour_Functions.getPrice()
         Four_Hour_Functions.supreslevs()
-        Four_Hour_Nexus.controlBiggerPeriod()
+        await Four_Hour_Nexus.controlBiggerPeriod()
         if (!Four_Hour_Functions.consolidationtwo() && Four_Hour_Functions.overall() && !Four_Hour_Functions.consolidation() 
             && !Four_Hour_Functions.keylev()){
                 if (Four_Hour_Functions.ema()){
-                    if (Four_Hour_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Four_Hour_Nexus.controlSmallerPeriod()[0] == true){
                         if (Four_Hour_Functions.trend() && Four_Hour_Functions.rsi() 
                             && Four_Hour_Functions.macd() && Four_Hour_Functions.roc() && Four_Hour_Functions.obv()) {
                                 if (!Four_Hour_Nexus.pos){
@@ -359,7 +359,7 @@ class Four_Hour_Nexus{
                                         Four_Hour_Nexus.piploginit()
                                         Four_Hour_Nexus.buy()}}}}
                 if (!Four_Hour_Functions.ema()){
-                    if (Four_Hour_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Four_Hour_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Four_Hour_Functions.trend() && !Four_Hour_Functions.rsi() 
                             && !Four_Hour_Functions.macd() && !Four_Hour_Functions.roc() && !Four_Hour_Functions.obv()) {
                                 if (!Four_Hour_Nexus.pos){

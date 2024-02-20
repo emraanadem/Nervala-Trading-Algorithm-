@@ -298,11 +298,11 @@ class Weekly_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static controlSmallerPeriod(){
+    static async controlSmallerPeriod(){
         /*Confirm Trend w/ indicators and price movement*/
-        Daily_Functions.HistoryAssigner()
-        One_Hour_Functions.HistoryAssigner()
-        Thirty_Min_Functions.HistoryAssigner()
+        await Daily_Functions.HistoryAssigner()
+        await One_Hour_Functions.HistoryAssigner()
+        await Thirty_Min_Functions.HistoryAssigner()
         let buy = false
         let sell = false
         if(!One_Hour_Functions.consolidationtwo() && !Thirty_Min_Functions.consolidationtwo()){
@@ -320,9 +320,9 @@ class Weekly_Nexus{
     }
 
     /** main control method, takes control of the entire program and serves as the brain */
-    static controlMain(){
+    static async controlMain(){
         Weekly_Functions.rejecinit()
-        Weekly_Functions.HistoryAssigner()
+        await Weekly_Functions.HistoryAssigner()
         Weekly_Functions.ValueAssigner()
         Weekly_Functions.stoploss()
         Weekly_Functions.getPrice()
@@ -330,7 +330,7 @@ class Weekly_Nexus{
         if (!Weekly_Functions.consolidationtwo() && Weekly_Functions.overall() && !Weekly_Functions.consolidation()
             && !Weekly_Functions.keylev()){
                 if (Weekly_Functions.ema()){
-                    if (Weekly_Nexus.controlSmallerPeriod()[0] == true){
+                    if (await Weekly_Nexus.controlSmallerPeriod()[0] == true){
                         if (Weekly_Functions.trend() && Weekly_Functions.rsi() 
                             && Weekly_Functions.macd() && Weekly_Functions.roc() && Weekly_Functions.obv()) {
                                 if (!Weekly_Nexus.pos){
@@ -340,7 +340,7 @@ class Weekly_Nexus{
                                         Weekly_Nexus.piploginit()
                                         Weekly_Nexus.buy()}}}}
                 if (!Weekly_Functions.ema()){
-                    if (Weekly_Nexus.controlSmallerPeriod()[1] == true){
+                    if (await Weekly_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Weekly_Functions.trend() && !Weekly_Functions.rsi() 
                             && !Weekly_Functions.macd() && !Weekly_Functions.roc() && !Weekly_Functions.obv()) {
                                 if (!Weekly_Nexus.pos){
