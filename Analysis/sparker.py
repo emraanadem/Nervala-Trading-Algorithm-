@@ -40,7 +40,7 @@ class Auto:
 
     @staticmethod
     def junction():
-        listse = ['python3 HistAssign.py', 'node FifteenMin3.js', 'node ThirtyMin3.js', 'node OneHour3.js', 'node TwoHour3.js', 'node FourHour3.js', 'node Daily3.js', 'node Weekly3.js']
+        listse = ['node FifteenMin.js', 'node ThirtyMin.js', 'node OneHour.js', 'node TwoHour.js', 'node FourHour.js', 'node Daily.js', 'node Weekly.js']
         def commander():
             for item in listse:
                 Popen(item, shell = True).communicate()
