@@ -12,7 +12,6 @@ const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
 
 const createClient = require('@supabase/supabase-js').createClient;
-
 // Create a single supabase client for interacting with your database
 const supabase = createClient('https://nvlbmpghemfunkpnhwee.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52bGJtcGdoZW1mdW5rcG5od2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDgxMTg3ODcsImV4cCI6MjAyMzY5NDc4N30.woZOGh5WaEcUtEyvsXaNP3Kg6BsNP8UOWhmv5RG4iMY')
 
@@ -298,12 +297,13 @@ class Four_Hour_Nexus{
         }*/
 
     /** checks for price movement in lower periods to get better idea of the trend */
-    static async controlSmallerPeriod(){
+    static controlSmallerPeriod(){
+        try{
         /*Confirm Trend w/ indicators and price movement*/
-        await One_Hour_Functions.HistoryAssigner()
-        await Thirty_Min_Functions.HistoryAssigner()
-        await Daily_Functions.HistoryAssigner()
-        await Fifteen_Min_Functions.HistoryAssigner()
+        One_Hour_Functions.HistoryAssigner()
+        Thirty_Min_Functions.HistoryAssigner()
+        Daily_Functions.HistoryAssigner()
+        Fifteen_Min_Functions.HistoryAssigner()
         Four_Hour_Functions.stoploss()
         Four_Hour_Functions.tpvariation()
         let buy = false
@@ -319,15 +319,23 @@ class Four_Hour_Nexus{
                     if(!Thirty_Min_Functions.ema()){
                         if(!Thirty_Min_Functions.rsi() && !Thirty_Min_Functions.obv()){
                             sell = true}}}}}
-        return [buy, sell]
+        return [buy, sell]}
+        catch (error) {
+            console.log(error)
+        }
     }
     /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-    static async controlBiggerPeriod(){
+    static controlBiggerPeriod(){
+        try{
         /*Price Zones*/
         Daily_Functions.ValueAssigner()
         Weekly_Functions.ValueAssigner()
-        await Daily_Functions.HistoryAssigner()
-        await Weekly_Functions.HistoryAssigner()
+        Daily_Functions.HistoryAssigner()
+        Weekly_Functions.HistoryAssigner()
+        }
+        catch (error) {
+            console.log(error)
+        }
         Daily_Functions.priceZones()
         Weekly_Functions.priceZones()
         let h = [0]
@@ -338,18 +346,19 @@ class Four_Hour_Nexus{
         Four_Hour_Nexus.finlevs.concat(totallevs)
     }
     /** main control method, takes control of the entire program and serves as the brain */
-    static async controlMain(){
+    static controlMain(){
+        try{
         Four_Hour_Functions.rejecinit()
-        await Four_Hour_Functions.HistoryAssigner()
+        Four_Hour_Functions.HistoryAssigner()
         Four_Hour_Functions.ValueAssigner()
         Four_Hour_Functions.stoploss()
         Four_Hour_Functions.getPrice()
         Four_Hour_Functions.supreslevs()
-        await Four_Hour_Nexus.controlBiggerPeriod()
+        Four_Hour_Nexus.controlBiggerPeriod()
         if (!Four_Hour_Functions.consolidationtwo() && Four_Hour_Functions.overall() && !Four_Hour_Functions.consolidation() 
             && !Four_Hour_Functions.keylev()){
                 if (Four_Hour_Functions.ema()){
-                    if (await Four_Hour_Nexus.controlSmallerPeriod()[0] == true){
+                    if (Four_Hour_Nexus.controlSmallerPeriod()[0] == true){
                         if (Four_Hour_Functions.trend() && Four_Hour_Functions.rsi() 
                             && Four_Hour_Functions.macd() && Four_Hour_Functions.roc() && Four_Hour_Functions.obv()) {
                                 if (!Four_Hour_Nexus.pos){
@@ -359,7 +368,7 @@ class Four_Hour_Nexus{
                                         Four_Hour_Nexus.piploginit()
                                         Four_Hour_Nexus.buy()}}}}
                 if (!Four_Hour_Functions.ema()){
-                    if (await Four_Hour_Nexus.controlSmallerPeriod()[1] == true){
+                    if (Four_Hour_Nexus.controlSmallerPeriod()[1] == true){
                         if (!Four_Hour_Functions.trend() && !Four_Hour_Functions.rsi() 
                             && !Four_Hour_Functions.macd() && !Four_Hour_Functions.roc() && !Four_Hour_Functions.obv()) {
                                 if (!Four_Hour_Nexus.pos){
@@ -380,7 +389,10 @@ class Four_Hour_Nexus{
             Four_Hour_Nexus.tstoplosscheck()
             Four_Hour_Nexus.tstoplosscont()
             Four_Hour_Nexus.takeProfitSell()}
-        Four_Hour_Functions.rejecsave()
+        Four_Hour_Functions.rejecsave()}
+        catch (error) {
+            console.log(error)
+        }
         /*figure out how to clear memory, and do so here after every iteration*/
         /*memory issue solved: 4/20/22 */}
 
@@ -496,89 +508,14 @@ class Four_Hour_Functions{
         return dataspecific
     }
 /** load historical prices from json file */
-   static async HistoryAssigner(){
+   static HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
-        try{
-        var { data, error } = await supabase
-            .from('Four_Hour')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        Four_Hour_Functions.priceHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Four_Hour')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        Four_Hour_Functions.highs = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Four_Hour')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        Four_Hour_Functions.lows = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Four_Hour Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        Four_Hour_Functions.extendHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Four_Hour Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        Four_Hour_Functions.extendHigh = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Four_Hour Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        Four_Hour_Functions.extendLow = data[0]['Data']}
-        catch (error) {
-            console.log(error)
-        }
-        let lens = []
-        lens.push(Four_Hour_Functions.priceHist.length)
-        lens.push(Four_Hour_Functions.highs.length)
-        lens.push(Four_Hour_Functions.lows.length)
-        let minlens = Math.min(...lens)
-        let lists = [Four_Hour_Functions.priceHist, Four_Hour_Functions.highs, Four_Hour_Functions.lows]
-        let items;
-        for (items in lists){
-            if (items.length > minlens){
-                if (items == Four_Hour_Functions.priceHist){
-                    for(let item = 0; item < (Four_Hour_Functions.priceHist.length - minlens); item++){
-                        Four_Hour_Functions.priceHist.splice(0,1)
-                    }
-                if (items == Four_Hour_Functions.lows){
-                    for(let item = 0; item < (Four_Hour_Functions.lows.length - minlens); item++){
-                        Four_Hour_Functions.lows.splice(0,1)
-                    }
-                if (items == Four_Hour_Functions.highs){
-                    for(let item = 0; item < (Four_Hour_Functions.highs.length - minlens); item++){
-                        Four_Hour_Functions.highs.splice(0,1)
-                    }}}}}}
-        lens = []
-        lens.push(Four_Hour_Functions.extendHist.length)
-        lens.push(Four_Hour_Functions.extendHigh.length)
-        lens.push(Four_Hour_Functions.extendLow.length)
-        minlens = Math.min(...lens)
-        lists = [Four_Hour_Functions.extendHist, Four_Hour_Functions.extendHigh, Four_Hour_Functions.extendLow]
-        for (items in lists){
-            if (items.length > minlens){
-                if (items == Four_Hour_Functions.extendHist){
-                    for(let item = 0; item < (Four_Hour_Functions.extendHist.length - minlens); item++){
-                        Four_Hour_Functions.extendHist.splice(0,1)
-                    }
-                if (items == Four_Hour_Functions.extendLow){
-                    for(let item = 0; item < (Four_Hour_Functions.extendLow.length - minlens); item++){
-                        Four_Hour_Functions.extendLow.splice(0,1)
-                    }
-                if (items == Four_Hour_Functions.extendHigh){
-                    for(let item = 0; item < (Four_Hour_Functions.extendHigh.length - minlens); item++){
-                        Four_Hour_Functions.extendHigh.splice(0,1)
-                    }}}}}}
+        Four_Hour_Functions.priceHist = dataset["Four_Hour"]['c']
+        Four_Hour_Functions.highs = dataset["Four_Hour"]['h']
+        Four_Hour_Functions.lows = dataset["Four_Hour"]['l']
+        Four_Hour_Functions.extendHist = dataset["Four_Hour Extend"]['c']
+        Four_Hour_Functions.extendHigh = dataset["Four_Hour Extend"]['h']
+        Four_Hour_Functions.extendLow = dataset["Four_Hour Extend"]['l']
         }
         
 /** load price from json file */
@@ -1347,51 +1284,14 @@ class Daily_Functions{
     highs = []
     lows = []
 
-    static async HistoryAssigner(){
+    static HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
-        try{
-        var { data, error } = await supabase
-            .from('Daily')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        Daily_Functions.priceHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Daily')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        Daily_Functions.highs = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Daily')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        Daily_Functions.lows = data[0]['Data']}
-        catch (error) {
-            console.log(error)
-        }
-        let lens = []
-        lens.push(Daily_Functions.priceHist.length)
-        lens.push(Daily_Functions.highs.length)
-        lens.push(Daily_Functions.lows.length)
-        let minlens = Math.min(...lens)
-        let lists = [Daily_Functions.priceHist, Daily_Functions.highs, Daily_Functions.lows]
-        let items;
-        for (items in lists){
-            if (items.length > minlens){
-                if (items == Daily_Functions.priceHist){
-                    for(let item = 0; item < (Daily_Functions.priceHist.length - minlens); item++){
-                        Daily_Functions.priceHist.splice(0,1)
-                    }
-                if (items == Daily_Functions.lows){
-                    for(let item = 0; item < (Daily_Functions.lows.length - minlens); item++){
-                        Daily_Functions.lows.splice(0,1)
-                    }
-                if (items == Daily_Functions.highs){
-                    for(let item = 0; item < (Daily_Functions.highs.length - minlens); item++){
-                        Daily_Functions.highs.splice(0,1)
-                    }}}}}}
+        Daily_Functions.priceHist = dataset["Daily"]['c']
+        Daily_Functions.highs = dataset["Daily"]['h']
+        Daily_Functions.lows = dataset["Daily"]['l']
+        Daily_Functions.extendHist = dataset["Daily Extend"]['c']
+        Daily_Functions.extendHigh = dataset["Daily Extend"]['h']
+        Daily_Functions.extendLow = dataset["Daily Extend"]['l']
         }
 
     static ValueAssigner(){
@@ -1555,69 +1455,11 @@ class Weekly_Functions{
     lows = []
     
 
-    static async HistoryAssigner(){
+    static HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
-        try{
-        var { data, error } = await supabase
-            .from('Weekly')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        Weekly_Functions.priceHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Weekly')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        Weekly_Functions.highs = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Weekly')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        Weekly_Functions.lows = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Weekly Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        Weekly_Functions.extendHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Weekly Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        Weekly_Functions.extendHigh = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Weekly Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        Weekly_Functions.extendLow = data[0]['Data']}
-        catch (error) {
-            console.log(error)
-        }
-        let lens = []
-        lens.push(Weekly_Functions.priceHist.length)
-        lens.push(Weekly_Functions.highs.length)
-        lens.push(Weekly_Functions.lows.length)
-        let minlens = Math.min(...lens)
-        let lists = [Weekly_Functions.priceHist, Weekly_Functions.highs, Weekly_Functions.lows]
-        let items;
-        for (items in lists){
-            if (items.length > minlens){
-                if (items == Weekly_Functions.priceHist){
-                    for(let item = 0; item < (Weekly_Functions.priceHist.length - minlens); item++){
-                        Weekly_Functions.priceHist.splice(0,1)
-                    }
-                if (items == Weekly_Functions.lows){
-                    for(let item = 0; item < (Weekly_Functions.lows.length - minlens); item++){
-                        Weekly_Functions.lows.splice(0,1)
-                    }
-                if (items == Weekly_Functions.highs){
-                    for(let item = 0; item < (Weekly_Functions.highs.length - minlens); item++){
-                        Weekly_Functions.highs.splice(0,1)
-                    }}}}}}
+        Weekly_Functions.priceHist = dataset["Weekly"]['c']
+        Weekly_Functions.highs = dataset["Weekly"]['h']
+        Weekly_Functions.lows = dataset["Weekly"]['l']
         }
 
     static ValueAssigner(){
@@ -1761,69 +1603,14 @@ class One_Hour_Functions{
     highs = []
     lows = []
     
-    static async HistoryAssigner(){
+    static HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
-        try{
-        var { data, error } = await supabase
-            .from('One_Hour')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        One_Hour_Functions.priceHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('One_Hour')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        One_Hour_Functions.highs = data[0]['Data']
-        var { data, error} = await supabase
-            .from('One_Hour')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        One_Hour_Functions.lows = data[0]['Data']
-        var { data, error} = await supabase
-            .from('One_Hour Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        One_Hour_Functions.extendHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('One_Hour Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        One_Hour_Functions.extendHigh = data[0]['Data']
-        var { data, error} = await supabase
-            .from('One_Hour Extend')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        One_Hour_Functions.extendLow = data[0]['Data']}
-        catch (error) {
-            console.log(error)
-        }
-        let lens = []
-        lens.push(One_Hour_Functions.priceHist.length)
-        lens.push(One_Hour_Functions.highs.length)
-        lens.push(One_Hour_Functions.lows.length)
-        let minlens = Math.min(...lens)
-        let lists = [One_Hour_Functions.priceHist, One_Hour_Functions.highs, One_Hour_Functions.lows]
-        let items;
-        for (items in lists){
-            if (items.length > minlens){
-                if (items == One_Hour_Functions.priceHist){
-                    for(let item = 0; item < (One_Hour_Functions.priceHist.length - minlens); item++){
-                        One_Hour_Functions.priceHist.splice(0,1)
-                    }
-                if (items == One_Hour_Functions.lows){
-                    for(let item = 0; item < (One_Hour_Functions.lows.length - minlens); item++){
-                        One_Hour_Functions.lows.splice(0,1)
-                    }
-                if (items == One_Hour_Functions.highs){
-                    for(let item = 0; item < (One_Hour_Functions.highs.length - minlens); item++){
-                        One_Hour_Functions.highs.splice(0,1)
-                    }}}}}}
+        One_Hour_Functions.priceHist = dataset["One_Hour"]['c']
+        One_Hour_Functions.highs = dataset["One_Hour"]['h']
+        One_Hour_Functions.lows = dataset["One_Hour"]['l']
+        One_Hour_Functions.extendHist = dataset["One_Hour Extend"]['c']
+        One_Hour_Functions.extendHigh = dataset["One_Hour Extend"]['h']
+        One_Hour_Functions.extendLow = dataset["One_Hour Extend"]['l']
         }
     
     static trend(){
@@ -1906,51 +1693,11 @@ class Thirty_Min_Functions{
     lows = []
     highs = []
     
-    static async HistoryAssigner(){
+    static HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
-        try{
-        var { data, error } = await supabase
-            .from('Thirty_Min')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        Thirty_Min_Functions.priceHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Thirty_Min')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        Thirty_Min_Functions.highs = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Thirty_Min')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        Thirty_Min_Functions.lows = data[0]['Data']}
-        catch (error) {
-            console.log(error)
-        }
-        let lens = []
-        lens.push(Thirty_Min_Functions.priceHist.length)
-        lens.push(Thirty_Min_Functions.highs.length)
-        lens.push(Thirty_Min_Functions.lows.length)
-        let minlens = Math.min(...lens)
-        let lists = [Thirty_Min_Functions.priceHist, Thirty_Min_Functions.highs, Thirty_Min_Functions.lows]
-        let items;
-        for (items in lists){
-            if (items.length > minlens){
-                if (items == Thirty_Min_Functions.priceHist){
-                    for(let item = 0; item < (Thirty_Min_Functions.priceHist.length - minlens); item++){
-                        Thirty_Min_Functions.priceHist.splice(0,1)
-                    }
-                if (items == Thirty_Min_Functions.lows){
-                    for(let item = 0; item < (Thirty_Min_Functions.lows.length - minlens); item++){
-                        Thirty_Min_Functions.lows.splice(0,1)
-                    }
-                if (items == Thirty_Min_Functions.highs){
-                    for(let item = 0; item < (Thirty_Min_Functions.highs.length - minlens); item++){
-                        Thirty_Min_Functions.highs.splice(0,1)
-                    }}}}}}
+        Thirty_Min_Functions.priceHist = dataset["Thirty_Min"]['c']
+        Thirty_Min_Functions.highs = dataset["Thirty_Min"]['h']
+        Thirty_Min_Functions.lows = dataset["Thirty_Min"]['l']
         }
 
     static consolidationtwo(){
@@ -2067,51 +1814,11 @@ class Fifteen_Min_Functions{
     lows = []
     highs = []
     
-    static async HistoryAssigner(){
+    static HistoryAssigner(){
         let instrument = Four_Hour_Functions.instrument_name()
-        try{
-        var { data, error } = await supabase
-            .from('Fifteen_Min')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'c')
-        Fifteen_Min_Functions.priceHist = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Fifteen_Min')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'h')
-        Fifteen_Min_Functions.highs = data[0]['Data']
-        var { data, error} = await supabase
-            .from('Fifteen_Min')
-            .select('Data')
-            .eq('Instrument', instrument)
-            .eq('OHLC', 'l')
-        Fifteen_Min_Functions.lows = data[0]['Data']}
-        catch (error) {
-            console.log(error)
-        }
-        let lens = []
-        lens.push(Fifteen_Min_Functions.priceHist.length)
-        lens.push(Fifteen_Min_Functions.highs.length)
-        lens.push(Fifteen_Min_Functions.lows.length)
-        let minlens = Math.min(...lens)
-        let lists = [Fifteen_Min_Functions.priceHist, Fifteen_Min_Functions.highs, Fifteen_Min_Functions.lows]
-        let items;
-        for (items in lists){
-            if (items.length > minlens){
-                if (items == Fifteen_Min_Functions.priceHist){
-                    for(let item = 0; item < (Fifteen_Min_Functions.priceHist.length - minlens); item++){
-                        Fifteen_Min_Functions.priceHist.splice(0,1)
-                    }
-                if (items == Fifteen_Min_Functions.lows){
-                    for(let item = 0; item < (Fifteen_Min_Functions.lows.length - minlens); item++){
-                        Fifteen_Min_Functions.lows.splice(0,1)
-                    }
-                if (items == Fifteen_Min_Functions.highs){
-                    for(let item = 0; item < (Fifteen_Min_Functions.highs.length - minlens); item++){
-                        Fifteen_Min_Functions.highs.splice(0,1)
-                    }}}}}}
+        Fifteen_Min_Functions.priceHist = dataset["Fifteen_Min"]['c']
+        Fifteen_Min_Functions.highs = dataset["Fifteen_Min"]['h']
+        Fifteen_Min_Functions.lows = dataset["Fifteen_Min"]['l']
         }
 
     static consolidationtwo(){
@@ -2223,7 +1930,29 @@ function controlbox(){
     
 }
 
-Four_Hour_Nexus.controlMain()
+async function test(){
+    const fs = require('fs');
+    let rawtwo = fs.readFileSync('instrument.json')
+    let instrum = JSON.parse(rawtwo)
+    let instrument = instrum['instrument']
+    let raw = fs.readFileSync('IDS.json')
+    let ids = JSON.parse(raw)
+    const axios = require('axios');
+    axios.get('http://localhost:' + ids[instrument])
+    .then(res => {
+        console.log('Status Code:', res.status);
+
+        const data = res.data;
+        dataset = data
+        Four_Hour_Nexus.controlMain()
+
+    })
+    .catch(err => {
+        console.log('Error: ', err.message);
+    });
+}
+
+test()
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */

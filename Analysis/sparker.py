@@ -4,6 +4,7 @@ import os
 import ast
 import threading
 from subprocess import Popen, PIPE
+import HistAssign
 
 
 
@@ -33,11 +34,13 @@ class Auto:
             instrum = json.load(accinf)
             instrument = str(instrum['instrument'])
             Auto.inst = instrument
+        HistAssign.begin()
+        HistAssign.flasker()
         Auto.junction()
 
     @staticmethod
     def junction():
-        listse = ['node FifteenMin3.js', 'node ThirtyMin3.js', 'node OneHour3.js', 'node TwoHour3.js', 'node FourHour3.js', 'node Daily3.js', 'node Weekly3.js']
+        listse = ['python3 HistAssign.py', 'node FifteenMin3.js', 'node ThirtyMin3.js', 'node OneHour3.js', 'node TwoHour3.js', 'node FourHour3.js', 'node Daily3.js', 'node Weekly3.js']
         def commander():
             for item in listse:
                 Popen(item, shell = True).communicate()
