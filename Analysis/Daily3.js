@@ -340,6 +340,7 @@ class Daily_Nexus{
         Daily_Functions.rejecinit()
         Daily_Functions.HistoryAssigner()
         Daily_Functions.ValueAssigner()
+        console.log(dataset)
         Daily_Functions.stoploss()
         Daily_Functions.getPrice()
         Daily_Functions.supreslevs()

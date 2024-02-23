@@ -98,3 +98,5 @@ def flasker():
     app.run(port=id)
 
 
+begin()
+flasker()

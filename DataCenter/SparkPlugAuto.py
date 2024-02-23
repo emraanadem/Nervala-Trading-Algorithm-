@@ -2,7 +2,6 @@ import threading
 import json
 import os
 import msgspec
-import Transmission
 import time
 
 accinfo = []

@@ -2220,6 +2220,8 @@ function controlbox(){
     
 }
 
+var dataset = {}
+
 async function test(){
     const fs = require('fs');
     let rawtwo = fs.readFileSync('instrument.json')

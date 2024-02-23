@@ -1580,6 +1580,7 @@ function controlbox(){
     
 }
 
+var dataset = {}
 
 async function test(){
     const fs = require('fs');
