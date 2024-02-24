@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import sys
 from supabase import create_client, Client
 
 with open('instrument.json', 'r') as inst:
@@ -89,14 +90,11 @@ def flasker():
     with open('IDS.json', 'r') as inst:
         instrum = json.load(inst)
         id = instrum[instrument]
-
     from flask import Flask
+    cli = sys.modules['flask.cli']
+    cli.show_server_banner = lambda *x: None
     app = Flask(__name__)
     @app.route('/')
     def hello_world():
         return datas
     app.run(port=id)
-
-
-begin()
-flasker()
