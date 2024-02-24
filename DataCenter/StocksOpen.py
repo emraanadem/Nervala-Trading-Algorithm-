@@ -2,6 +2,7 @@ import requests
 import json
 import msgspec
 from datetime import date, timedelta
+
 today = date.today()
 refdayfive = today - timedelta(days = 5)
 refdayfifteen = today - timedelta(days=16.25)
@@ -11,6 +12,7 @@ refdaytwohour=today - timedelta(days=124.5)
 refdayfourhour=today - timedelta(days=248)
 refdaydaily = today - timedelta(days=1062.5)
 refdayweekly = today - timedelta(days=5115)
+
 
 accinfo = []
 with open('accinfo.json', 'r') as accinf:
@@ -24,7 +26,6 @@ from supabase import create_client, Client
 url: str = "https://nvlbmpghemfunkpnhwee.supabase.co"
 key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52bGJtcGdoZW1mdW5rcG5od2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDgxMTg3ODcsImV4cCI6MjAyMzY5NDc4N30.woZOGh5WaEcUtEyvsXaNP3Kg6BsNP8UOWhmv5RG4iMY"
 supabase: Client = create_client(url, key)
-
 
 session = requests.Session()
 
@@ -65,9 +66,18 @@ class History:
         response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+str(refdayfive)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
         resp = response.json()
         for item in resp['results']:
-            aggs.append(item['o'])
+                aggs.append(item['o'])
+        while('next_url' in resp):
+              if 'next_url' in resp:
+                id = resp['next_url'].split('/')[-2]
+                response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+str(id)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+                resp = response.json()
+                if ('results' in resp):
+                    for item in resp['results']:
+                        aggs.append(item['o'])
         History.five = aggs
         History.lenfive = len(History.five)
+        print("five_Min: " + str(History.lenfive))
         return(History.five)
 
     @staticmethod
@@ -76,9 +86,18 @@ class History:
         response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+str(refdayfifteen)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
         resp = response.json()
         for item in resp['results']:
-            aggs.append(item['o'])
+                aggs.append(item['o'])
+        while('next_url' in resp):
+              if 'next_url' in resp:
+                id = resp['next_url'].split('/')[-2]
+                response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+str(id)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+                resp = response.json()
+                if ('results' in resp):
+                    for item in resp['results']:
+                        aggs.append(item['o'])
         History.fifteen = aggs
         History.lenfifteen = len(History.fifteen)
+        print("fifteen_min: " + str(History.lenfifteen))
         return(History.fifteen)
 
 
@@ -88,21 +107,38 @@ class History:
         response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+str(refdaythirty)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
         resp = response.json()
         for item in resp['results']:
-            aggs.append(item['o'])
+                aggs.append(item['o'])
+        while('next_url' in resp):
+              if 'next_url' in resp:
+                id = resp['next_url'].split('/')[-2]
+                response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+str(id)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+                resp = response.json()
+                if ('results' in resp):
+                    for item in resp['results']:
+                        aggs.append(item['o'])
         History.thirty = aggs
         History.lenthirty = len(History.thirty)
+        print("thirty_Min: " + str(History.lenthirty))
         return(History.thirty)
         
-
     @staticmethod
     def One_Hour(instrument):
         aggs = []
         response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+str(refdayhour)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
         resp = response.json()
         for item in resp['results']:
-            aggs.append(item['o'])
+                aggs.append(item['o'])
+        while('next_url' in resp):
+              if 'next_url' in resp:
+                id = resp['next_url'].split('/')[-2]
+                response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+str(id)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+                resp = response.json()
+                if ('results' in resp):
+                    for item in resp['results']:
+                        aggs.append(item['o'])
         History.hour = aggs
         History.lenhour = len(History.hour)
+        print("onehour: " + str(History.lenhour))
         return(History.hour)
 
     @staticmethod
@@ -111,9 +147,18 @@ class History:
         response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+str(refdaytwohour)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
         resp = response.json()
         for item in resp['results']:
-            aggs.append(item['o'])
+                aggs.append(item['o'])
+        while('next_url' in resp):
+              if 'next_url' in resp:
+                id = resp['next_url'].split('/')[-2]
+                response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+str(id)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+                resp = response.json()
+                if ('results' in resp):
+                    for item in resp['results']:
+                        aggs.append(item['o'])
         History.twohour = aggs
         History.lentwohour = len(History.twohour)
+        print("twohour: " + str(History.lentwohour))
         return(History.twohour)
 
     @staticmethod
@@ -122,9 +167,18 @@ class History:
         response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+str(refdayfourhour)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
         resp = response.json()
         for item in resp['results']:
-            aggs.append(item['o'])
+                aggs.append(item['o'])
+        while('next_url' in resp):
+              if 'next_url' in resp:
+                id = resp['next_url'].split('/')[-2]
+                response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+str(id)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+                resp = response.json()
+                if ('results' in resp):
+                    for item in resp['results']:
+                        aggs.append(item['o'])
         History.fourhour = aggs
         History.lenfourhour = len(History.fourhour)
+        print("fourhour: " + str(History.lenfourhour))
         return(History.fourhour)
 
     @staticmethod
@@ -133,9 +187,18 @@ class History:
         response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+str(refdaydaily)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
         resp = response.json()
         for item in resp['results']:
-            aggs.append(item['o'])
+                aggs.append(item['o'])
+        while('next_url' in resp):
+              if 'next_url' in resp:
+                id = resp['next_url'].split('/')[-2]
+                response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+str(id)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+                resp = response.json()
+                if ('results' in resp):
+                    for item in resp['results']:
+                        aggs.append(item['o'])
         History.daily = aggs
         History.lendaily = len(History.daily)
+        print("daily: " + str(History.lendaily))
         return(History.daily)
     
     @staticmethod
@@ -144,9 +207,18 @@ class History:
         response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+str(refdayweekly)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
         resp = response.json()
         for item in resp['results']:
-            aggs.append(item['o'])
+                aggs.append(item['o'])
+        while('next_url' in resp):
+              if 'next_url' in resp:
+                id = resp['next_url'].split('/')[-2]
+                response = session.get("https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+str(id)+"/"+str(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG")
+                resp = response.json()
+                if ('results' in resp):
+                    for item in resp['results']:
+                        aggs.append(item['o'])
         History.weekly = aggs
         History.lenweekly = len(History.weekly)
+        print("weekly: " + str(History.lenweekly))
         return(History.weekly)
 
     @staticmethod 
@@ -225,7 +297,6 @@ class History:
             .update({'Data': History.weekly}) \
             .eq('id', ids) \
             .execute()
-
 
 
 
