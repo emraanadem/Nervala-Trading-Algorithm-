@@ -77,7 +77,6 @@ class History:
                         aggs.append(item['h'])
         History.five = aggs
         History.lenfive = len(History.five)
-        print("five_Min: " + str(History.lenfive))
         return(History.five)
 
     @staticmethod
@@ -97,7 +96,6 @@ class History:
                         aggs.append(item['h'])
         History.fifteen = aggs
         History.lenfifteen = len(History.fifteen)
-        print("fifteen_min: " + str(History.lenfifteen))
         return(History.fifteen)
 
 
@@ -118,7 +116,6 @@ class History:
                         aggs.append(item['h'])
         History.thirty = aggs
         History.lenthirty = len(History.thirty)
-        print("thirty_Min: " + str(History.lenthirty))
         return(History.thirty)
         
     @staticmethod
@@ -138,7 +135,6 @@ class History:
                         aggs.append(item['h'])
         History.hour = aggs
         History.lenhour = len(History.hour)
-        print("onehour: " + str(History.lenhour))
         return(History.hour)
 
     @staticmethod
@@ -158,7 +154,6 @@ class History:
                         aggs.append(item['h'])
         History.twohour = aggs
         History.lentwohour = len(History.twohour)
-        print("twohour: " + str(History.lentwohour))
         return(History.twohour)
 
     @staticmethod
@@ -178,7 +173,6 @@ class History:
                         aggs.append(item['h'])
         History.fourhour = aggs
         History.lenfourhour = len(History.fourhour)
-        print("fourhour: " + str(History.lenfourhour))
         return(History.fourhour)
 
     @staticmethod
@@ -198,7 +192,6 @@ class History:
                         aggs.append(item['h'])
         History.daily = aggs
         History.lendaily = len(History.daily)
-        print("daily: " + str(History.lendaily))
         return(History.daily)
     
     @staticmethod
@@ -218,7 +211,6 @@ class History:
                         aggs.append(item['h'])
         History.weekly = aggs
         History.lenweekly = len(History.weekly)
-        print("weekly: " + str(History.lenweekly))
         return(History.weekly)
 
     @staticmethod 
