@@ -1,6 +1,5 @@
 import threading
-from DataHub import HistAssignHub
-
+import HistAssignHub
 
 
 if __name__ == "__main__":
