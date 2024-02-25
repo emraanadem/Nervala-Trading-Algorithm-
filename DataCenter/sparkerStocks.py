@@ -35,15 +35,14 @@ class Auto:
             instrument = str(instrum['instrument'])
             Auto.inst = instrument
         import MotorStocks, Motor3Stocks, Motor4Stocks, MotorStocks2, Motor5Stocks, MotorStocksExtend, MotorStocks2Extend, Motor3ExtendStocks, Motor5ExtendStocks
-        Motor4Stocks.controller()
-        MotorStocks.controller()
-        MotorStocks2.controller()
-        Motor3Stocks.controller()
-        Motor5Stocks.controller()
-        MotorStocksExtend.controller()
-        MotorStocks2Extend.controller()
-        Motor3ExtendStocks.controller()
-        Motor5ExtendStocks.controller()
+        threading.Thread(target=MotorStocks.controller).start()
+        threading.Thread(target=MotorStocks2.controller).start()
+        threading.Thread(target=Motor3Stocks.controller).start()
+        threading.Thread(target=Motor5Stocks.controller).start()
+        threading.Thread(target=MotorStocksExtend.controller).start()
+        threading.Thread(target=MotorStocks2Extend.controller).start()
+        threading.Thread(target=Motor3ExtendStocks.controller).start()
+        threading.Thread(target=Motor5ExtendStocks.controller).start()
 
     @staticmethod
     def junction():
