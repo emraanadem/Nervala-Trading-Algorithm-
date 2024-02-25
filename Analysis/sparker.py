@@ -4,7 +4,6 @@ import os
 import ast
 import threading
 from subprocess import Popen, PIPE
-import HistAssign
 import LivePrice
 
 
@@ -36,8 +35,6 @@ class Auto:
             instrument = str(instrum['instrument'])
             Auto.inst = instrument
         threading.Thread(target=LivePrice.controlbox).start()
-        HistAssign.begin()
-        HistAssign.flasker()
         Auto.junction()
 
     @staticmethod

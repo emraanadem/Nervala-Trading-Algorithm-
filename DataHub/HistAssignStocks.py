@@ -4,10 +4,6 @@ import os
 import sys
 from supabase import create_client, Client
 
-with open('instrument.json', 'r') as inst:
-    instrum = json.load(inst)
-    instrument = instrum['instrument']
-
 url = "https://nvlbmpghemfunkpnhwee.supabase.co"
 key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52bGJtcGdoZW1mdW5rcG5od2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDgxMTg3ODcsImV4cCI6MjAyMzY5NDc4N30.woZOGh5WaEcUtEyvsXaNP3Kg6BsNP8UOWhmv5RG4iMY"
 supabase: Client = create_client(url, key)
@@ -81,12 +77,17 @@ datas['Weekly Extend']['h'] = []
 datas['Weekly Extend']['l'] = []
 
 def begin():
-    for period in timeperiods:
-        datas[period]['c'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'c').execute().data[0]['Data']
-        datas[period]['h'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'h').execute().data[0]['Data']
-        datas[period]['l'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'l').execute().data[0]['Data']
+    with open('StockInstruments.json', 'r') as inst:
+        instrum = json.load(inst)
+        instlist = instrum['instruments']
+    for instrument in instlist:
+        for period in timeperiods:
+            datas[period]['c'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'c').execute().data[0]['Data']
+            datas[period]['h'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'h').execute().data[0]['Data']
+            datas[period]['l'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'l').execute().data[0]['Data']
+            flasker(instrument)
 
-def flasker():
+def flasker(instrument):
     with open('IDS.json', 'r') as inst:
         instrum = json.load(inst)
         id = instrum[instrument]
