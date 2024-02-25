@@ -85,7 +85,7 @@ def begin():
             datas[period]['c'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'c').execute().data[0]['Data']
             datas[period]['h'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'h').execute().data[0]['Data']
             datas[period]['l'] = supabase.table(period).select('Data').eq('Instrument', instrument).eq('OHLC', 'l').execute().data[0]['Data']
-            threading.Thread(target=flasker, args=[instrument]).start()
+        threading.Thread(target=flasker, args=[instrument]).start()
 
 def flasker(instrument):
     with open('IDS.json', 'r') as inst:
