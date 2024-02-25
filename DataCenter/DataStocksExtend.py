@@ -254,38 +254,38 @@ class History:
         History.fourhour = listofitems[5]
         History.daily = listofitems[6]
         History.weekly = listofitems[7]
-        with open('idkeys.json', 'r') as inst:
+        with open('idkeysextend.json', 'r') as inst:
             datas = json.load(inst)
-        ids = datas[instrument + " Close"]
-        data = supabase.table('Five_Min') \
+        ids = datas[instrument + " Close Extend"]
+        data = supabase.table('Five_Min Extend') \
             .update({'Data': History.five}) \
             .eq('id', ids) \
             .execute()
-        data = supabase.table('Fifteen_Min') \
+        data = supabase.table('Fifteen_Min Extend') \
             .update({'Data': History.fifteen}) \
             .eq('id', ids) \
             .execute()
-        data = supabase.table('Thirty_Min') \
+        data = supabase.table('Thirty_Min Extend') \
             .update({'Data': History.thirty}) \
             .eq('id', ids) \
             .execute()
-        data = supabase.table('One_Hour') \
+        data = supabase.table('One_Hour Extend') \
             .update({'Data': History.hour}) \
             .eq('id', ids) \
             .execute()
-        data = supabase.table('Two_Hour') \
+        data = supabase.table('Two_Hour Extend') \
             .update({'Data': History.twohour}) \
             .eq('id', ids) \
             .execute()
-        data = supabase.table('Four_Hour') \
+        data = supabase.table('Four_Hour Extend') \
             .update({'Data': History.fourhour}) \
             .eq('id', ids) \
             .execute()
-        data = supabase.table('Daily') \
+        data = supabase.table('Daily Extend') \
             .update({'Data': History.daily}) \
             .eq('id', ids) \
             .execute()
-        data = supabase.table('Weekly') \
+        data = supabase.table('Weekly Extend') \
             .update({'Data': History.weekly}) \
             .eq('id', ids) \
             .execute()
