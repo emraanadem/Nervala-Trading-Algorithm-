@@ -6,8 +6,8 @@ import PistonStocksData
 
 
 if __name__ == "__main__":
-    threading.Thread(target=PistontwoData.borjan).start()
-    threading.Thread(target=PistonData.borjan).start()
+    #threading.Thread(target=PistontwoData.borjan).start()
+    #threading.Thread(target=PistonData.borjan).start()
     threading.Thread(target=PistonStocksData.borjan).start()
 
   
