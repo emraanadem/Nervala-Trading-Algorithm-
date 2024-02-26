@@ -1,0 +1,15 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "HistAssignHub.py",
+            "use": "@vercel/python3"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "HistAssignHub.py"
+        }
+    ]
+}
