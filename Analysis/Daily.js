@@ -1763,7 +1763,7 @@ async function controlbox(){
         let raw = fs.readFileSync('IDS.json')
         let ids = JSON.parse(raw)
         const axios = require('axios');
-        axios.get('http://localhost:' + ids[instrument])
+        axios.get('http://localhost:8000/' + instrument)
         .then(res => {
             console.log('Status Code:', res.status);
 
