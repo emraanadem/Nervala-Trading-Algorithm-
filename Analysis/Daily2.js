@@ -1765,23 +1765,41 @@ var dataset = {}
 async function test(){
     const fs = require('fs');
     let rawtwo = fs.readFileSync('instrument.json')
+    let rawthree = fs.readFileSync('instrumentsStocks.json')
+    let rawfour = fs.readFileSync('instrumentsForex.json')
+    let forexlist = JSON.parse(rawfour)['instruments']
+    let stocklist = JSON.parse(rawthree)['instruments']
     let instrum = JSON.parse(rawtwo)
     let instrument = instrum['instrument']
     let raw = fs.readFileSync('IDS.json')
     let ids = JSON.parse(raw)
     const axios = require('axios');
-    axios.get('http://localhost:8000/' + instrument)
-    .then(res => {
-        console.log('Status Code:', res.status);
+    if(forexlist.includes(instrument)){
+        axios.get('http://localhost:8000/' + instrument)
+        .then(res => {
+            console.log('Status Code:', res.status);
 
-        const data = res.data;
-        dataset = data
-        Daily_Nexus.controlMain()
+            const data = res.data;
+            dataset = data
+            Daily_Nexus.controlMain()
 
-    })
-    .catch(err => {
-        console.log('Error: ', err.message);
-    });
+        })
+        .catch(err => {
+            console.log('Error: ', err.message);
+    });}
+    if(stocklist.includes(instrument)){
+        axios.get('http://localhost:8000/' + instrument)
+        .then(res => {
+            console.log('Status Code:', res.status);
+
+            const data = res.data;
+            dataset = data
+            Daily_Nexus.controlMain()
+
+        })
+        .catch(err => {
+            console.log('Error: ', err.message);
+    });}
 }
 
 test()
