@@ -1145,3 +1145,6 @@ async function Assign(){
   testweekly.testweekly(values, price)
 }
 Assign()
+
+/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+ have been included with this distribution. */

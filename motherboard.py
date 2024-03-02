@@ -11,5 +11,5 @@ if __name__ == "__main__":
     threading.Thread(target=PistonStocksAnalysis.borjan).start()
 
 
-# /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+#/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */

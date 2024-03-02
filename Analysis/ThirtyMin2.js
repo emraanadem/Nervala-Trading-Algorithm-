@@ -2292,5 +2292,5 @@ depending on the type of trade, so that it doesn't result in trades that exit su
                             
 /* Bro this app is gonna take off I promise. Get that grind on bro you got this. */
 
-/* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
  have been included with this distribution. */

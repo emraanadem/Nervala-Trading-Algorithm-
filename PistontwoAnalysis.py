@@ -143,3 +143,7 @@ for val in Starters.instrument_bank:
     with open('avoidinst.json', 'r') as trades:
         if val in json.loads(trades.read())['instruments']:
             Starters.instrument_list.append(val)"""
+    
+
+#/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+# have been included with this distribution. */
