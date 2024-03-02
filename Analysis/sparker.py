@@ -4,7 +4,6 @@ import os
 import ast
 import threading
 from subprocess import Popen, PIPE
-import LivePrice
 
 
 
@@ -27,15 +26,6 @@ class Auto:
     'SGD_CHF', 'SGD_HKD', 'DE10YB_EUR', 'HKD_JPY', 'CAD_HKD', 'CAD_SGD', 'CHF_ZAR', 'CHF_HKD', 'IN50_USD', 
     'NZD_HKD']
 
-    @staticmethod
-    def controll():
-        instrument = ''
-        with open('instrument.json', 'r') as accinf:
-            instrum = json.load(accinf)
-            instrument = str(instrum['instrument'])
-            Auto.inst = instrument
-        threading.Thread(target=LivePrice.controlbox).start()
-        Auto.junction()
 
     @staticmethod
     def junction():
@@ -50,9 +40,9 @@ class Automatically:
 
     @staticmethod  
     def automatic():
-        Auto.controll()
+        Auto.junction()
 
-Auto.controll()
+Auto.junction()
 
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */

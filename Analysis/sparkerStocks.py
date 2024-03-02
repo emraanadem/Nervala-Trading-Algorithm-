@@ -2,7 +2,6 @@ import json
 import os
 import msgspec
 import threading
-import LivePriceStocks
 from subprocess import Popen, PIPE
 
 class Auto:
@@ -25,16 +24,6 @@ class Auto:
     'NZD_HKD']
 
     @staticmethod
-    def controll():
-        instrument = ''
-        with open('instrument.json', 'r') as accinf:
-            instrum = json.load(accinf)
-            instrument = str(instrum['instrument'])
-            Auto.inst = instrument
-        threading.Thread(target=LivePriceStocks.controlbox).start()
-        Auto.junction()
-
-    @staticmethod
     def junction():
         listse = ['node DataCenterStocks.js']
         def commander():
@@ -47,8 +36,9 @@ class Automatically:
 
     @staticmethod
     def automatic():
-        Auto.controll()
+        Auto.junction()
 
+Auto.junction()
 
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
