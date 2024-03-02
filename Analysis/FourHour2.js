@@ -1926,10 +1926,11 @@ class Fifteen_Min_Functions{
 
 var dataset = {}
 
-function testfourhour(data){
+module.exports = { testfourhour: function(data){
     dataset = data
     Four_Hour_Nexus.controlMain()
-}
+
+} }
 
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */

@@ -2293,10 +2293,12 @@ class Five_Min_Functions{
 
 
 var dataset = {}
-function testthirtymin(data){
+
+module.exports = { testthirtymin: function(data){
     dataset = data
     Thirty_Min_Nexus.controlMain()
-}
+
+} }
 
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */

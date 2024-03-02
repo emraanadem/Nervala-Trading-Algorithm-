@@ -2432,11 +2432,12 @@ class Five_Min_Functions{
 }
 
 var dataset = {}
-function testonehour(data){
+
+module.exports = { testonehour: function(data){
     dataset = data
     One_Hour_Nexus.controlMain()
 
-}
+} }
 
  
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
