@@ -1992,5 +1992,6 @@ async function caller(){
     testthirtymin.testthirtymin(values, Variables.price)
     testweekly.testweekly(values, Variables.price)
   
-  }}
+  }
+}
 caller()

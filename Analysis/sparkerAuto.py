@@ -29,7 +29,7 @@ class Auto:
 
     @staticmethod
     def junction():
-        listse = ['node DataCenterForex.js']
+        listse = ['node DataCenterForexAuto.js']
         def commander():
             for item in listse:
                 Popen(item, shell = True).communicate()

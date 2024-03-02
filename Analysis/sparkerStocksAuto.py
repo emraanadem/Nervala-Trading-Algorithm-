@@ -1,11 +1,8 @@
-import msgspec
 import json
 import os
-import ast
+import msgspec
 import threading
 from subprocess import Popen, PIPE
-
-
 
 class Auto:
     
@@ -26,10 +23,9 @@ class Auto:
     'SGD_CHF', 'SGD_HKD', 'DE10YB_EUR', 'HKD_JPY', 'CAD_HKD', 'CAD_SGD', 'CHF_ZAR', 'CHF_HKD', 'IN50_USD', 
     'NZD_HKD']
 
-
     @staticmethod
     def junction():
-        listse = ['node DataCenterForex.js']
+        listse = ['node DataCenterStocksAuto.js']
         def commander():
             for item in listse:
                 Popen(item, shell = True).communicate()
@@ -38,11 +34,13 @@ class Auto:
 
 class Automatically:
 
-    @staticmethod  
+    @staticmethod
     def automatic():
         Auto.junction()
 
 
 # /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
-        
+
+# /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+# have been included with this distribution. */
