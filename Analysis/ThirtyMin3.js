@@ -10,9 +10,6 @@ const tr = require('technicalindicators').ATR;
 const { createModel } = require('polynomial-regression');
 const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
-
-
-
 const createClient = require('@supabase/supabase-js').createClient;
 
 // Create a single supabase client for interacting with your database
@@ -524,13 +521,7 @@ class Thirty_Min_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Thirty_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Thirty_Min_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Thirty_Min_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1312,13 +1303,7 @@ class Four_Hour_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Four_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Four_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1951,13 +1936,7 @@ class One_Hour_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Thirty_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            One_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        One_Hour_Functions.price = liveprice
         }
     
     /* make  function */
@@ -2290,16 +2269,11 @@ class Five_Min_Functions{
     
 }
 
-
-
-
 var dataset = {}
-function testthirtymin(data){
-    dataset = data
-    Thirty_Min_Nexus.controlMain()
-}
-    
-module.exports = { testthirtymin: function(data){
+var liveprice = 0
+
+module.exports = { testthirtymin: function(data, price){
+    liveprice = price
     dataset = data
     Thirty_Min_Nexus.controlMain()
 

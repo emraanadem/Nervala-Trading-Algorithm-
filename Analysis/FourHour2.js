@@ -520,13 +520,7 @@ class Four_Hour_Functions{
         
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Four_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Four_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1295,14 +1289,8 @@ class Daily_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Daily_Functions.price = dataspecific['Price']
-        }catch (error) {}
-        }
+        Daily_Functions.price = liveprice
+    }
     
     static trend(){
         Daily_Functions.recentHist()
@@ -1463,13 +1451,7 @@ class Weekly_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Weekly_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Weekly_Functions.price = liveprice
         }
     
     /* make  function */
@@ -1925,13 +1907,15 @@ class Fifteen_Min_Functions{
 
 
 var dataset = {}
+var liveprice = 0
 
-module.exports = { testfourhour: function(data){
+
+module.exports = { testfourhour: function(data, price){
+    liveprice = price
     dataset = data
     Four_Hour_Nexus.controlMain()
 
 } }
-
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */

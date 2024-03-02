@@ -495,13 +495,7 @@ class Weekly_Functions{
         }
 /** load price from json file */
 static ValueAssigner(){
-    let instrument = Weekly_Functions.instrument_name()
-    let raw = fs.readFileSync('LivePrice.json')
-    try{
-        let data = JSON.parse(raw)
-        let dataspecific = data[instrument]
-        Weekly_Functions.price = dataspecific['Price']
-    }catch (error) {}
+    Weekly_Functions.price = liveprice
     }
 
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1574,8 +1568,10 @@ class Thirty_Min_Functions{
 
 
 var dataset = {}
+var liveprice = 0
 
-module.exports = { testweekly: function(data){
+module.exports = { testweekly: function(data, price){
+    liveprice = price
     dataset = data
     Weekly_Nexus.controlMain()
 

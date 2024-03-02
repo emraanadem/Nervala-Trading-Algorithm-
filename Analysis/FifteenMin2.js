@@ -525,13 +525,7 @@ class Fifteen_Min_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Fifteen_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Fifteen_Min_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Fifteen_Min_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1318,13 +1312,7 @@ class Four_Hour_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Four_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Four_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1963,13 +1951,7 @@ class One_Hour_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Fifteen_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            One_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        One_Hour_Functions.price = liveprice
         }
     
     /* make  function */
@@ -2212,8 +2194,10 @@ class Five_Min_Functions{
     
 }
 var dataset = {}
+var liveprice = 0
 
-module.exports = { testfifteenmin: function(data){
+module.exports = { testfifteenmin: function(data, price){
+    liveprice = price
     dataset = data
     Fifteen_Min_Nexus.controlMain()
 

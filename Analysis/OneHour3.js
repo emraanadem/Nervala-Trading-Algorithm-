@@ -12,6 +12,7 @@ const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
 const { onerror } = require('q');
 const { disconnect } = require('process');
+const Daily = require('./Daily');
 const createClient = require('@supabase/supabase-js').createClient;
 
 
@@ -520,13 +521,7 @@ class One_Hour_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = One_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            One_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        One_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1304,13 +1299,7 @@ class Daily_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = One_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Daily_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Daily_Functions.price = liveprice
         }
     
     static trend(){
@@ -1488,14 +1477,8 @@ class Four_Hour_Functions{
     }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Four_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
-        }
+        Four_Hour_Functions.price = liveprice
+    }
     
 /** second consolidation method, meant to strengthen consolidation identification */
     static consolidationtwo(){
@@ -2432,12 +2415,11 @@ class Five_Min_Functions{
 }
 
 var dataset = {}
-function testonehour(data){
-    dataset = data
-    One_Hour_Nexus.controlMain()
-}
+var liveprice = 0
 
-module.exports = { testonehour: function(data){
+
+module.exports = { testonehour: function(data, price){
+    liveprice = price
     dataset = data
     One_Hour_Nexus.controlMain()
 

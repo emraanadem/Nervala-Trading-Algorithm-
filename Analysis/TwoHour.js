@@ -12,7 +12,6 @@ const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
 const createClient = require('@supabase/supabase-js').createClient;
 
-
 // Create a single supabase client for interacting with your database
 const supabase = createClient('https://nvlbmpghemfunkpnhwee.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52bGJtcGdoZW1mdW5rcG5od2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDgxMTg3ODcsImV4cCI6MjAyMzY5NDc4N30.woZOGh5WaEcUtEyvsXaNP3Kg6BsNP8UOWhmv5RG4iMY')
 
@@ -532,13 +531,7 @@ class Two_Hour_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Two_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Two_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Two_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1320,13 +1313,7 @@ class Four_Hour_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Four_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Four_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1961,13 +1948,7 @@ class Daily_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Two_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Daily_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Daily_Functions.price = liveprice
         }
     
     static trend(){
@@ -2132,13 +2113,7 @@ class Weekly_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Two_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Weekly_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Weekly_Functions.price = liveprice
         }
     
     /* make  function */
@@ -2593,14 +2568,17 @@ class Fifteen_Min_Functions{
     }
     
 }
-var dataset = {}
 
-function controlboxtwohour(data){
+
+var dataset = {}
+var liveprice = 0
+
+module.exports = { testtwohour: function(data, price){
+    liveprice = price
     dataset = data
-    let g = 0
-    while(g == 0){
-        Two_Hour_Nexus.controlMain()
-    }}
+    Two_Hour_Nexus.controlMain()
+
+} }
 
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */

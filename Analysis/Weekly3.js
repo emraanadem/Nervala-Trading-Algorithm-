@@ -495,13 +495,7 @@ class Weekly_Functions{
         }
 /** load price from json file */
 static ValueAssigner(){
-    let instrument = Weekly_Functions.instrument_name()
-    let raw = fs.readFileSync('LivePrice.json')
-    try{
-        let data = JSON.parse(raw)
-        let dataspecific = data[instrument]
-        Weekly_Functions.price = dataspecific['Price']
-    }catch (error) {}
+    Weekly_Functions.price = liveprice
     }
 
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1572,27 +1566,17 @@ class Thirty_Min_Functions{
     
 }
 
-function controlbox(){
-    let g = 0
-    while(g == 0){
-        Weekly_Nexus.controlMain()
-    }
-    
-}
 
 var dataset = {}
+var liveprice = 0
 
-function testweekly(data){
+module.exports = { testweekly: function(data, price){
+    liveprice = price
     dataset = data
     Weekly_Nexus.controlMain()
 
-}
-
-module.exports = { testweekly: function(data){
-    dataset = data
-    Weekly_Nexus.controlMain()
-
-} }/* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
+} }
+/* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */
  /* Update: 6/04/22: Only thing left is to see how fibonnaci can be added to the program, as fibonacci 

@@ -16,6 +16,7 @@ var testweekly = require('./Weekly3.js')
 
 
   values = {}
+  let price = 0
 
   function Assigner(){
     values = {}
@@ -1054,6 +1055,20 @@ var testweekly = require('./Weekly3.js')
         }
       }
 
+  async function Price(instrument){
+    let accountID = String(accinfo[0])
+    let token = String(accinfo[1])
+    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1&granularity=M1"
+    const options = {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    };
+    const res = await fetch(url, options);
+    const data = await res.json();
+    price = data.candles[0].mid['c']
+        }
+
 async function Assign(){
   Assigner()
   await Five_Min(instrument)
@@ -1120,12 +1135,13 @@ async function Assign(){
   await Four_Hour_Extend_Low(instrument)
   await Daily_Extend_Low(instrument)
   await Weekly_Extend_Low(instrument)
-  testdaily.testdaily(values)
-  testfifteen.testfifteenmin(values)
-  testfourhour.testfourhour(values)
-  testtwohour.testtwohour(values)
-  testonehour.testonehour(values)
-  testthirtymin.testthirtymin(values)
-  testweekly.testweekly(values)
+  await Price(instrument)
+  testdaily.testdaily(values, price)
+  testfifteen.testfifteenmin(values, price)
+  testfourhour.testfourhour(values, price)
+  testtwohour.testtwohour(values, price)
+  testonehour.testonehour(values, price)
+  testthirtymin.testthirtymin(values, price)
+  testweekly.testweekly(values, price)
 }
 Assign()

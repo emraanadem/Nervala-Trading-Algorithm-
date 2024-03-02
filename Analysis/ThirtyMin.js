@@ -521,13 +521,7 @@ class Thirty_Min_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Thirty_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Thirty_Min_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Thirty_Min_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1309,13 +1303,7 @@ class Four_Hour_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Four_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Four_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1948,13 +1936,7 @@ class One_Hour_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Thirty_Min_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            One_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        One_Hour_Functions.price = liveprice
         }
     
     /* make  function */
@@ -2288,13 +2270,14 @@ class Five_Min_Functions{
 }
 
 var dataset = {}
+var liveprice = 0
 
-function controlboxthirtymin(data){
+module.exports = { testthirtymin: function(data, price){
+    liveprice = price
     dataset = data
-    let g = 0
-    while(g == 0){
-        Thirty_Min_Nexus.controlMain()
-    }}
+    Thirty_Min_Nexus.controlMain()
+
+} }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */

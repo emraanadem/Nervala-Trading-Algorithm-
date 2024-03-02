@@ -531,13 +531,7 @@ class Two_Hour_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Two_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Two_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Two_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1319,13 +1313,7 @@ class Four_Hour_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Four_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Four_Hour_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Four_Hour_Functions.price = liveprice
         }
     
 /** second consolidation method, meant to strengthen consolidation identification */
@@ -1960,13 +1948,7 @@ class Daily_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Two_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Daily_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Daily_Functions.price = liveprice
         }
     
     static trend(){
@@ -2131,13 +2113,7 @@ class Weekly_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Two_Hour_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Weekly_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Weekly_Functions.price = liveprice
         }
     
     /* make  function */
@@ -2595,8 +2571,10 @@ class Fifteen_Min_Functions{
 
 
 var dataset = {}
+var liveprice = 0
 
-module.exports = { testtwohour: function(data){
+module.exports = { testtwohour: function(data, price){
+    liveprice = price
     dataset = data
     Two_Hour_Nexus.controlMain()
 

@@ -509,14 +509,8 @@ class Daily_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Daily_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Daily_Functions.price = dataspecific['Price']
-        }catch (error) {}
-        }
+        Daily_Functions.price = liveprice
+    }
     
 /** second consolidation method, meant to strengthen consolidation identification */
     static consolidationtwo(){
@@ -1279,13 +1273,7 @@ class Weekly_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Daily_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Weekly_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Daily_Functions.price = liveprice
         }
     
     /* make  function */
@@ -1754,6 +1742,7 @@ class Fifteen_Min_Functions{
 }
 
 var dataset = {}
+var liveprice = 0
 
 function testdaily(data){
     dataset = data
@@ -1761,7 +1750,8 @@ function testdaily(data){
 
 }
 
-module.exports = { testdaily: function(data){
+module.exports = { testdaily: function(data, price){
+    liveprice = price
     dataset = data
     Daily_Nexus.controlMain()
 

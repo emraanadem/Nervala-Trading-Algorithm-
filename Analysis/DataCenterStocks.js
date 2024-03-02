@@ -1,6 +1,7 @@
 const fs = require('fs')
 const axios = require('axios')
 const fetch = require('node-fetch')
+const yfin = require("yahoo-finance2").default;
 let raw = fs.readFileSync('accinfo.json')
 let accinfo = JSON.parse(raw)
 let rawtwo = fs.readFileSync('instrument.json')
@@ -30,6 +31,7 @@ values = {}
 class Variables{
 
   five = []
+  price = 0
   lenfive = 0
   fifteen = []
   lenfifteen = 0
@@ -1643,6 +1645,11 @@ async function Weekly_Extend_Open(instrument){
     Variables.extendweeklyopen = aggs
     Variables.lenextendweeklyopen = Variables.extendweeklyopen.length
     }
+    async function Price(instrument){
+      const pricelist = await yfin.quoteSummary(instrument)
+      const prices = pricelist.price.regularMarketPrice
+      Variables.price = prices      
+      }
 
 
 
@@ -1911,6 +1918,7 @@ function equalizer(){
 
 async function caller(){
   Assigner()
+  await Price(instrument)
   await Five_Min(instrument)
   await Fifteen_Min(instrument)
   await Thirty_Min(instrument)
@@ -1976,13 +1984,13 @@ async function caller(){
   await Daily_Extend_Open(instrument)
   await Weekly_Extend_Open(instrument)
   equalizer()
-  testdaily.testdaily(values)
-  testfifteen.testfifteenmin(values)
-  testfourhour.testfourhour(values)
-  testtwohour.testtwohour(values)
-  testonehour.testonehour(values)
-  testthirtymin.testthirtymin(values)
-  testweekly.testweekly(values)
+  testdaily.testdaily(values, Variables.price)
+  testfifteen.testfifteenmin(values, Variables.price)
+  testfourhour.testfourhour(values, Variables.price)
+  testtwohour.testtwohour(values, Variables.price)
+  testonehour.testonehour(values, Variables.price)
+  testthirtymin.testthirtymin(values, Variables.price)
+  testweekly.testweekly(values, Variables.price)
 
 }
 caller()
