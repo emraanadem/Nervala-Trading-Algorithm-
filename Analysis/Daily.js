@@ -1753,32 +1753,13 @@ class Fifteen_Min_Functions{
 
 var dataset = {}
 
-async function controlbox(){
+function controlboxdaily(data){
+    dataset = data
     let g = 0
     while(g == 0){
-        const fs = require('fs');
-        let rawtwo = fs.readFileSync('instrument.json')
-        let instrum = JSON.parse(rawtwo)
-        let instrument = instrum['instrument']
-        let raw = fs.readFileSync('IDS.json')
-        let ids = JSON.parse(raw)
-        const axios = require('axios');
-        axios.get('http://localhost:8000/' + instrument)
-        .then(res => {
-            console.log('Status Code:', res.status);
+        Daily_Nexus.controlMain()
+}}
 
-            const data = res.data;
-            dataset = data
-            Daily_Nexus.controlMain()
-
-        })
-        .catch(err => {
-            console.log('Error: ', err.message);
-        });}
-
-}
-
-controlbox()
 
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */

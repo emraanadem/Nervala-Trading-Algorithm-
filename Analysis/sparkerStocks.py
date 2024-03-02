@@ -36,7 +36,7 @@ class Auto:
 
     @staticmethod
     def junction():
-        listse = ['node FifteenMin.js', 'node ThirtyMin.js', 'node OneHour.js', 'node TwoHour.js', 'node FourHour.js', 'node Daily.js', 'node Weekly.js']
+        listse = ['node DataCenterStocks.js']
         def commander():
             for item in listse:
                 Popen(item, shell = True).communicate()

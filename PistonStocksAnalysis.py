@@ -1,29 +1,19 @@
 import os
-from timeloop import Timeloop
 import subprocess
 import threading
 import msgspec
 import json
 import shutil
 import csv
-import time
-from datetime import timedelta
-from flask import *
-from datetime import date
 
-today = date.today()
-
-app = Flask(__name__)
-
-tl = Timeloop()
 
 class Starters:
     stocklist = ['MMM', 'AOS', 'ABT', 'ABBV', 'ACN', 'ADBE', 'AMD', 'AES', 'AFL', 'A', 'APD', 'ABNB', 'AKAM', 'ALB', 
                  'ARE', 'ALGN', 'ALLE', 'LNT', 'ALL', 'GOOGL', 'GOOG', 'MO', 'AMZN', 'AMCR', 'AEE', 'AAL', 'AEP', 
                  'AXP', 'AIG', 'AMT', 'AWK', 'AMP', 'AME', 'AMGN', 'APH', 'ADI', 'ANSS', 'AON', 'APA', 'AAPL', 
                  'AMAT', 'APTV', 'ACGL', 'ADM', 'ANET', 'AJG', 'AIZ', 'T', 'ATO', 'ADSK', 'ADP', 'AZO', 'AVB', 
-                 'AVY', 'AXON', 'BKR', 'BALL', 'BAC', 'BK', 'BBWI', 'BAX', 'BDX', 'BRK.B', 'BBY', 'BIO', 'TECH', 
-                 'BIIB', 'BLK', 'BX', 'BA', 'BKNG', 'BWA', 'BXP', 'BSX', 'BMY', 'AVGO', 'BR', 'BRO', 'BF.B', 'BLDR', 
+                 'AVY', 'AXON', 'BKR', 'BALL', 'BAC', 'BK', 'BBWI', 'BAX', 'BDX', 'BBY', 'BIO', 'TECH', 
+                 'BIIB', 'BLK', 'BX', 'BA', 'BKNG', 'BWA', 'BXP', 'BSX', 'BMY', 'AVGO', 'BR', 'BRO', 'BLDR', 
                  'BG', 'CDNS', 'CZR', 'CPT', 'CPB', 'COF', 'CAH', 'KMX', 'CCL', 'CARR', 'CTLT', 'CAT', 'CBOE', 'CBRE', 
                  'CDW', 'CE', 'COR', 'CNC', 'CNP', 'CDAY', 'CF', 'CHRW', 'CRL', 'SCHW', 'CHTR', 'CVX', 'CMG', 'CB', 'CHD', 
                  'CI', 'CINF', 'CTAS', 'CSCO', 'C', 'CFG', 'CLX', 'CME', 'CMS', 'KO', 'CTSH', 'CL', 'CMCSA', 'CMA', 'CAG', 
@@ -126,14 +116,10 @@ def borjan():
     notssss = {}
     notssss['instruments'] = []
     threads = []
-    with open('not instruments.json', 'w') as nots:
-        nots.write(json.dumps(notinst))
-    with open('StockInstruments.json', 'rb') as insts:
+    with open('instrumentsStocks.json', 'rb') as insts:
             instrum = msgspec.json.decode(insts.read(), type=object)
             info = instrum['instruments']
             Starters.instrument_bank = info
-    with open('avoidinst.json', 'w+') as instss:
-            instss.write(json.dumps(notssss))
     threadsss = []
     for val in Starters.instrument_bank:
         t = threading.Thread(target=Starters.begin, args = [val])

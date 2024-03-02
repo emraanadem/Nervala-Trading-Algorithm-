@@ -2211,40 +2211,18 @@ class Five_Min_Functions{
     }
     
 }
-
-function controlbox(){
-    let g = 0
-    while(g == 0){
-        Fifteen_Min_Nexus.controlMain()
-    }
-    
-}
-
 var dataset = {}
 
-async function test(){
-    const fs = require('fs');
-    let rawtwo = fs.readFileSync('instrument.json')
-    let instrum = JSON.parse(rawtwo)
-    let instrument = instrum['instrument']
-    let raw = fs.readFileSync('IDS.json')
-    let ids = JSON.parse(raw)
-    const axios = require('axios');
-    axios.get('http://localhost:8000/' + instrument)
-    .then(res => {
-        console.log('Status Code:', res.status);
-
-        const data = res.data;
-        dataset = data
-        Fifteen_Min_Nexus.controlMain()
-
-    })
-    .catch(err => {
-        console.log('Error: ', err.message);
-    });
+function testfifteen(data){
+    dataset = data
+    Fifteen_Min_Nexus.controlMain()
 }
 
-test()
+module.exports = { testfifteenmin: function(data){
+    dataset = data
+    Fifteen_Min_Nexus.controlMain()
+
+} }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */

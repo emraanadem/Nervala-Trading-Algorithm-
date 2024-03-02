@@ -1,6 +1,7 @@
 {
   "name": "analysis",
   "version": "1.0.0",
+  "type": "commonjs",
   "description": "",
   "main": "Daily.js",
   "scripts": {
@@ -9,8 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ajax": "^0.0.4",
+    "axios": "^1.6.7",
     "child_process": "^1.0.2",
     "express": "^4.18.2",
-    "node-fetch": "^3.3.2"
+    "json": "^11.0.0",
+    "moment": "^2.30.1",
+    "node-fetch": "^2.6.1"
   }
 }

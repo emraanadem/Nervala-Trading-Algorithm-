@@ -10,6 +10,7 @@ const tr = require('technicalindicators').ATR;
 const { createModel } = require('polynomial-regression');
 const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
+var json = require('json');
 const createClient = require('@supabase/supabase-js').createClient;
 
 // Create a single supabase client for interacting with your database
@@ -340,7 +341,6 @@ class Daily_Nexus{
         Daily_Functions.rejecinit()
         Daily_Functions.HistoryAssigner()
         Daily_Functions.ValueAssigner()
-        console.log(dataset)
         Daily_Functions.stoploss()
         Daily_Functions.getPrice()
         Daily_Functions.supreslevs()
@@ -1753,37 +1753,19 @@ class Fifteen_Min_Functions{
     
 }
 
-function controlbox(){
-    let g = 0
-    while(g == 0){
-        Daily_Nexus.controlMain()
-    }
-    
+var dataset = {}
+
+function testdaily(data){
+    dataset = data
+    Daily_Nexus.controlMain()
+
 }
 
-async function test(){
-    const fs = require('fs');
-    let rawtwo = fs.readFileSync('instrument.json')
-    let instrum = JSON.parse(rawtwo)
-    let instrument = instrum['instrument']
-    let raw = fs.readFileSync('IDS.json')
-    let ids = JSON.parse(raw)
-    const axios = require('axios');
-    axios.get('http://localhost:8000/' + instrument)
-    .then(res => {
-        console.log('Status Code:', res.status);
+module.exports = { testdaily: function(data){
+    dataset = data
+    Daily_Nexus.controlMain()
 
-        const data = res.data;
-        dataset = data
-        Daily_Nexus.controlMain()
-
-    })
-    .catch(err => {
-        console.log('Error: ', err.message);
-    });
-}
-
-test()
+} }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */
