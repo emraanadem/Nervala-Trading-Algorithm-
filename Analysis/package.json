@@ -1,7 +1,6 @@
 {
   "name": "analysis",
   "version": "1.0.0",
-  "type": "commonjs",
   "description": "",
   "main": "Daily.js",
   "scripts": {
