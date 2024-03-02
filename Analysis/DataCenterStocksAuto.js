@@ -172,10 +172,10 @@ function Assigner(){
   let timeperiods = ["Five_Min", "Fifteen_Min", "Thirty_Min", "One_Hour", "Two_Hour", "Four_Hour", "Daily", "Weekly", "Five_Min Extend", "Fifteen_Min Extend", "Thirty_Min Extend", "One_Hour Extend", "Two_Hour Extend", "Four_Hour Extend", "Daily Extend", "Weekly Extend"]
   for(let item = 0; item < timeperiods.length; item++){
   values[timeperiods[item]] = {}
-  values[timeperiods[item]]['c'] = []
   values[timeperiods[item]]['o'] = []
   values[timeperiods[item]]['h'] = []
   values[timeperiods[item]]['l'] = []
+  values[timeperiods[item]]['c'] = []
 
 }
 }
@@ -186,7 +186,7 @@ async function Five_Min(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Five_Min"]['c'].push(data['results'][item]['c'])
+        values["Five_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -196,7 +196,7 @@ async function Five_Min(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Five_Min"]['c'].push(item['c'])
+                  values["Five_Min"]['c'].push(parseFloat(item['c']))
                   }
                 }}}
   Variables.five = aggs
@@ -209,7 +209,7 @@ async function Fifteen_Min(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Fifteen_Min"]['c'].push(data['results'][item]['c'])
+        values["Fifteen_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -219,7 +219,7 @@ async function Fifteen_Min(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Fifteen_Min"]['c'].push(item['c'])
+                  values["Fifteen_Min"]['c'].push(parseFloat(item['c']))
                   }
                 }}}
   Variables.fifteen = aggs
@@ -232,7 +232,7 @@ async function Thirty_Min(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Thirty_Min"]['c'].push(data['results'][item]['c'])
+        values["Thirty_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -242,7 +242,7 @@ async function Thirty_Min(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Thirty_Min"]['c'].push(item['c'])
+                  values["Thirty_Min"]['c'].push(parseFloat(item['c']))
                   }
                 }}}
   Variables.thirty = aggs
@@ -255,7 +255,7 @@ async function One_Hour(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["One_Hour"]['c'].push(data['results'][item]['c'])
+        values["One_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -265,7 +265,7 @@ async function One_Hour(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["One_Hour"]['c'].push(item['c'])
+                  values["One_Hour"]['c'].push(parseFloat(item['c']))
                   }
                 }}}
   Variables.hour = aggs
@@ -278,7 +278,7 @@ async function Two_Hour(instrument){
   var res = await fetch(url);
   var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
-      values["Two_Hour"]['c'].push(data['results'][item]['c'])
+      values["Two_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
@@ -288,7 +288,7 @@ async function Two_Hour(instrument){
         var data = await res.json();
         if ('results' in data){
             for(const item in data['results']){
-                values["Two_Hour"]['c'].push(item['c'])
+                values["Two_Hour"]['c'].push(parseFloat(item['c']))
                 }
               }}}
   Variables.twohour = aggs
@@ -301,7 +301,7 @@ async function Four_Hour(instrument){
   var res = await fetch(url);
   var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
-      values["Four_Hour"]['c'].push(data['results'][item]['c'])
+      values["Four_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
@@ -311,7 +311,7 @@ async function Four_Hour(instrument){
         var data = await res.json();
         if ('results' in data){
             for(const item in data['results']){
-                values["Four_Hour"]['c'].push(item['c'])
+                values["Four_Hour"]['c'].push(parseFloat(item['c']))
                 }
               }}}
   Variables.fourhour = aggs
@@ -324,7 +324,7 @@ async function Daily(instrument){
   var res = await fetch(url);
   var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
-      values["Daily"]['c'].push(data['results'][item]['c'])
+      values["Daily"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
@@ -334,7 +334,7 @@ async function Daily(instrument){
         var data = await res.json();
         if ('results' in data){
             for(const item in data['results']){
-                values["Daily"]['c'].push(item['c'])
+                values["Daily"]['c'].push(parseFloat(item['c']))
                 }
               }}}
   Variables.daily = aggs
@@ -347,7 +347,7 @@ async function Weekly(instrument){
   var res = await fetch(url);
   var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
-      values["Weekly"]['c'].push(data['results'][item]['c'])
+      values["Weekly"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
@@ -357,7 +357,7 @@ async function Weekly(instrument){
         var data = await res.json();
         if ('results' in data){
             for(const item in data['results']){
-                values["Weekly"]['c'].push(item['c'])
+                values["Weekly"]['c'].push(parseFloat(item['c']))
                 }
               }}}
   Variables.weekly = aggs
@@ -369,7 +369,7 @@ async function Five_Min_Extend(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Five_Min Extend"]['c'].push(data['results'][item]['c'])
+        values["Five_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -379,7 +379,7 @@ async function Five_Min_Extend(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Five_Min Extend"]['c'].push(item['c'])
+                  values["Five_Min Extend"]['c'].push(parseFloat(item['c']))
                   }
                 }}}
   Variables.extendfive = aggs
@@ -392,7 +392,7 @@ async function Fifteen_Min_Extend(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Fifteen_Min Extend"]['c'].push(data['results'][item]['c'])
+        values["Fifteen_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -402,7 +402,7 @@ async function Fifteen_Min_Extend(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Fifteen_Min Extend"]['c'].push(item['c'])
+                  values["Fifteen_Min Extend"]['c'].push(parseFloat(item['c']))
                   }
                 }}}
   Variables.extendfifteen = aggs
@@ -415,7 +415,7 @@ async function Thirty_Min_Extend(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Thirty_Min Extend"]['c'].push(data['results'][item]['c'])
+        values["Thirty_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -425,7 +425,7 @@ async function Thirty_Min_Extend(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Thirty_Min Extend"]['c'].push(item['c'])
+                  values["Thirty_Min Extend"]['c'].push(parseFloat(item['c']))
                   }
                 }}}
   Variables.extendthirty = aggs
@@ -438,7 +438,7 @@ async function One_Hour_Extend(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["One_Hour Extend"]['c'].push(data['results'][item]['c'])
+        values["One_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -448,7 +448,7 @@ async function One_Hour_Extend(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["One_Hour Extend"]['c'].push(item['c'])
+                  values["One_Hour Extend"]['c'].push(parseFloat(item['c']))
                   }
                 }}}
   Variables.extendhour = aggs
@@ -461,7 +461,7 @@ async function Two_Hour_Extend(instrument){
   var res = await fetch(url);
   var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
-      values["Two_Hour Extend"]['c'].push(data['results'][item]['c'])
+      values["Two_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
@@ -471,7 +471,7 @@ async function Two_Hour_Extend(instrument){
         var data = await res.json();
         if ('results' in data){
             for(const item in data['results']){
-                values["Two_Hour Extend"]['c'].push(item['c'])
+                values["Two_Hour Extend"]['c'].push(parseFloat(item['c']))
                 }
               }}}
   Variables.extendtwohour = aggs
@@ -484,7 +484,7 @@ async function Four_Hour_Extend(instrument){
   var res = await fetch(url);
   var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
-      values["Four_Hour_Extend"]['c'].push(data['results'][item]['c'])
+      values["Four_Hour_Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
@@ -494,7 +494,7 @@ async function Four_Hour_Extend(instrument){
         var data = await res.json();
         if ('results' in data){
             for(const item in data['results']){
-                values["Four_Hour_Extend"]['c'].push(item['c'])
+                values["Four_Hour_Extend"]['c'].push(parseFloat(item['c']))
                 }
               }}}
   Variables.extendfourhour = aggs
@@ -507,7 +507,7 @@ async function Daily_Extend(instrument){
   var res = await fetch(url);
   var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
-      values["Daily Extend"]['c'].push(data['results'][item]['c'])
+      values["Daily Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
@@ -517,7 +517,7 @@ async function Daily_Extend(instrument){
         var data = await res.json();
         if ('results' in data){
             for(const item in data['results']){
-                values["Daily Extend"]['c'].push(item['c'])
+                values["Daily Extend"]['c'].push(parseFloat(item['c']))
                 }
               }}}
   Variables.extenddaily = aggs
@@ -530,7 +530,7 @@ async function Weekly_Extend(instrument){
   var res = await fetch(url);
   var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
-      values["Weekly Extend"]['c'].push(data['results'][item]['c'])
+      values["Weekly Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
@@ -540,7 +540,7 @@ async function Weekly_Extend(instrument){
         var data = await res.json();
         if ('results' in data){
             for(const item in data['results']){
-                values["Weekly Extend"]['c'].push(item['c'])
+                values["Weekly Extend"]['c'].push(parseFloat(item['c']))
                 }
               }}}
   Variables.extendweekly = aggs
@@ -552,7 +552,7 @@ async function Five_Min_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Five_Min"]['l'].push(data['results'][item]['l'])
+          values["Five_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -562,7 +562,7 @@ async function Five_Min_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Five_Min"]['l'].push(item['l'])
+                    values["Five_Min"]['l'].push(parseFloat(item['l']))
                     }
                   }}}
     Variables.fivelow = aggs
@@ -575,7 +575,7 @@ async function Fifteen_Min_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Fifteen_Min"]['l'].push(data['results'][item]['l'])
+          values["Fifteen_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -585,7 +585,7 @@ async function Fifteen_Min_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Fifteen_Min"]['l'].push(item['l'])
+                    values["Fifteen_Min"]['l'].push(parseFloat(item['l']))
                     }
                   }}} 
     Variables.fifteenlow = aggs
@@ -598,7 +598,7 @@ async function Thirty_Min_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Thirty_Min"]['l'].push(data['results'][item]['l'])
+          values["Thirty_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -608,7 +608,7 @@ async function Thirty_Min_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Thirty_Min"]['l'].push(item['l'])
+                    values["Thirty_Min"]['l'].push(parseFloat(item['l']))
                     }
                   }}}
     Variables.thirtylow = aggs
@@ -621,7 +621,7 @@ async function One_Hour_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["One_Hour"]['l'].push(data['results'][item]['l'])
+          values["One_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -631,7 +631,7 @@ async function One_Hour_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["One_Hour"]['l'].push(item['l'])
+                    values["One_Hour"]['l'].push(parseFloat(item['l']))
                     }
                   }}}
     Variables.hourlow = aggs
@@ -644,7 +644,7 @@ async function Two_Hour_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Two_Hour"]['l'].push(data['results'][item]['l'])
+        values["Two_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -654,7 +654,7 @@ async function Two_Hour_Low(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Two_Hour"]['l'].push(item['l'])
+                  values["Two_Hour"]['l'].push(parseFloat(item['l']))
                   }
                 }}}
     Variables.twohourlow = aggs
@@ -667,7 +667,7 @@ async function Four_Hour_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Four_Hour"]['l'].push(data['results'][item]['l'])
+        values["Four_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -677,7 +677,7 @@ async function Four_Hour_Low(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Four_Hour"]['l'].push(item['l'])
+                  values["Four_Hour"]['l'].push(parseFloat(item['l']))
                   }
                 }}}
     Variables.fourhourlow = aggs
@@ -690,7 +690,7 @@ async function Daily_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Daily"]['l'].push(data['results'][item]['l'])
+        values["Daily"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -700,7 +700,7 @@ async function Daily_Low(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Daily"]['l'].push(item['l'])
+                  values["Daily"]['l'].push(parseFloat(item['l']))
                   }
                 }}}
     Variables.dailylow = aggs
@@ -713,7 +713,7 @@ async function Weekly_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Weekly"]['l'].push(data['results'][item]['l'])
+        values["Weekly"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -723,7 +723,7 @@ async function Weekly_Low(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Weekly"]['l'].push(item['l'])
+                  values["Weekly"]['l'].push(parseFloat(item['l']))
                   }
                 }}}
     Variables.weeklylow = aggs
@@ -735,7 +735,7 @@ async function Five_Min_Extend_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Five_Min Extend"]['l'].push(data['results'][item]['l'])
+          values["Five_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -745,7 +745,7 @@ async function Five_Min_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Five_Min Extend"]['l'].push(item['l'])
+                    values["Five_Min Extend"]['l'].push(parseFloat(item['l']))
                     }
                   }}}
     Variables.extendfivelow = aggs
@@ -758,7 +758,7 @@ async function Fifteen_Min_Extend_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Fifteen_Min Extend"]['l'].push(data['results'][item]['l'])
+          values["Fifteen_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -768,7 +768,7 @@ async function Fifteen_Min_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Fifteen_Min Extend"]['l'].push(item['l'])
+                    values["Fifteen_Min Extend"]['l'].push(parseFloat(item['l']))
                     }
                   }}}
     Variables.extendfifteenlow = aggs
@@ -781,7 +781,7 @@ async function Thirty_Min_Extend_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Thirty_Min Extend"]['l'].push(data['results'][item]['l'])
+          values["Thirty_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -791,7 +791,7 @@ async function Thirty_Min_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Thirty_Min Extend"]['l'].push(item['l'])
+                    values["Thirty_Min Extend"]['l'].push(parseFloat(item['l']))
                     }
                   }}}
     Variables.extendthirtylow = aggs
@@ -804,7 +804,7 @@ async function One_Hour_Extend_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["One_Hour Extend"]['l'].push(data['results'][item]['l'])
+          values["One_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -814,7 +814,7 @@ async function One_Hour_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["One_Hour Extend"]['l'].push(item['l'])
+                    values["One_Hour Extend"]['l'].push(parseFloat(item['l']))
                     }
                   }}}
     Variables.extendhourlow = aggs
@@ -827,7 +827,7 @@ async function Two_Hour_Extend_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Two_Hour Extend"]['l'].push(data['results'][item]['l'])
+        values["Two_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -837,7 +837,7 @@ async function Two_Hour_Extend_Low(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Two_Hour Extend"]['l'].push(item['l'])
+                  values["Two_Hour Extend"]['l'].push(parseFloat(item['l']))
                   }
                 }}}
     Variables.extendtwohourlow = aggs
@@ -850,7 +850,7 @@ async function Four_Hour_Extend_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Four_Hour_Extend"]['l'].push(data['results'][item]['l'])
+        values["Four_Hour_Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -860,7 +860,7 @@ async function Four_Hour_Extend_Low(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Four_Hour_Extend"]['l'].push(item['l'])
+                  values["Four_Hour_Extend"]['l'].push(parseFloat(item['l']))
                   }
                 }}}
     Variables.extendfourhourlow = aggs
@@ -873,7 +873,7 @@ async function Daily_Extend_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Daily Extend"]['l'].push(data['results'][item]['l'])
+        values["Daily Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -883,7 +883,7 @@ async function Daily_Extend_Low(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Daily Extend"]['l'].push(item['l'])
+                  values["Daily Extend"]['l'].push(parseFloat(item['l']))
                   }
                 }}}
     Variables.extenddailylow = aggs
@@ -896,7 +896,7 @@ async function Weekly_Extend_Low(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Weekly Extend"]['l'].push(data['results'][item]['l'])
+        values["Weekly Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -906,7 +906,7 @@ async function Weekly_Extend_Low(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Weekly Extend"]['l'].push(item['l'])
+                  values["Weekly Extend"]['l'].push(parseFloat(item['l']))
                   }
                 }}}
     Variables.extendweeklylow = aggs
@@ -919,7 +919,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
-            values["Five_Min"]['h'].push(data['results'][item]['h'])
+            values["Five_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
@@ -929,7 +929,7 @@ async function Weekly_Extend_Low(instrument){
               var data = await res.json();
               if ('results' in data){
                   for(const item in data['results']){
-                      values["Five_Min"]['h'].push(item['h'])
+                      values["Five_Min"]['h'].push(parseFloat(item['h']))
                       }
                     }}}
       Variables.fivehigh = aggs
@@ -942,7 +942,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
-            values["Fifteen_Min"]['h'].push(data['results'][item]['h'])
+            values["Fifteen_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
@@ -952,7 +952,7 @@ async function Weekly_Extend_Low(instrument){
               var data = await res.json();
               if ('results' in data){
                   for(const item in data['results']){
-                      values["Fifteen_Min"]['h'].push(item['h'])
+                      values["Fifteen_Min"]['h'].push(parseFloat(item['h']))
                       }
                     }}} 
       Variables.fifteenhigh = aggs
@@ -965,7 +965,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
-            values["Thirty_Min"]['h'].push(data['results'][item]['h'])
+            values["Thirty_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
@@ -975,7 +975,7 @@ async function Weekly_Extend_Low(instrument){
               var data = await res.json();
               if ('results' in data){
                   for(const item in data['results']){
-                      values["Thirty_Min"]['h'].push(item['h'])
+                      values["Thirty_Min"]['h'].push(parseFloat(item['h']))
                       }
                     }}}
       Variables.thirtyhigh = aggs
@@ -988,7 +988,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
-            values["One_Hour"]['h'].push(data['results'][item]['h'])
+            values["One_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
@@ -998,7 +998,7 @@ async function Weekly_Extend_Low(instrument){
               var data = await res.json();
               if ('results' in data){
                   for(const item in data['results']){
-                      values["One_Hour"]['h'].push(item['h'])
+                      values["One_Hour"]['h'].push(parseFloat(item['h']))
                       }
                     }}}
       Variables.hourhigh = aggs
@@ -1011,7 +1011,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Two_Hour"]['h'].push(data['results'][item]['h'])
+          values["Two_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
@@ -1021,7 +1021,7 @@ async function Weekly_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Two_Hour"]['h'].push(item['h'])
+                    values["Two_Hour"]['h'].push(parseFloat(item['h']))
                     }
                   }}}
       Variables.twohourhigh = aggs
@@ -1034,7 +1034,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Four_Hour"]['h'].push(data['results'][item]['h'])
+          values["Four_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
@@ -1044,7 +1044,7 @@ async function Weekly_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Four_Hour"]['h'].push(item['h'])
+                    values["Four_Hour"]['h'].push(parseFloat(item['h']))
                     }
                   }}}
       Variables.fourhourhigh = aggs
@@ -1057,7 +1057,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Daily"]['h'].push(data['results'][item]['h'])
+          values["Daily"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
@@ -1067,7 +1067,7 @@ async function Weekly_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Daily"]['h'].push(item['h'])
+                    values["Daily"]['h'].push(parseFloat(item['h']))
                     }
                   }}}
       Variables.dailyhigh = aggs
@@ -1080,7 +1080,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Weekly"]['h'].push(data['results'][item]['h'])
+          values["Weekly"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
@@ -1090,7 +1090,7 @@ async function Weekly_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Weekly"]['h'].push(item['h'])
+                    values["Weekly"]['h'].push(parseFloat(item['h']))
                     }
                   }}}
       Variables.weeklyhigh = aggs
@@ -1102,7 +1102,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
-            values["Five_Min Extend"]['h'].push(data['results'][item]['h'])
+            values["Five_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
@@ -1112,7 +1112,7 @@ async function Weekly_Extend_Low(instrument){
               var data = await res.json();
               if ('results' in data){
                   for(const item in data['results']){
-                      values["Five_Min Extend"]['h'].push(item['h'])
+                      values["Five_Min Extend"]['h'].push(parseFloat(item['h']))
                       }
                     }}}
       Variables.extendfivehigh = aggs
@@ -1125,7 +1125,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
-            values["Fifteen_Min Extend"]['h'].push(data['results'][item]['h'])
+            values["Fifteen_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
@@ -1135,7 +1135,7 @@ async function Weekly_Extend_Low(instrument){
               var data = await res.json();
               if ('results' in data){
                   for(const item in data['results']){
-                      values["Fifteen_Min Extend"]['h'].push(item['h'])
+                      values["Fifteen_Min Extend"]['h'].push(parseFloat(item['h']))
                       }
                     }}}
       Variables.extendfifteenhigh = aggs
@@ -1148,7 +1148,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
-            values["Thirty_Min Extend"]['h'].push(data['results'][item]['h'])
+            values["Thirty_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
@@ -1158,7 +1158,7 @@ async function Weekly_Extend_Low(instrument){
               var data = await res.json();
               if ('results' in data){
                   for(const item in data['results']){
-                      values["Thirty_Min Extend"]['h'].push(item['h'])
+                      values["Thirty_Min Extend"]['h'].push(parseFloat(item['h']))
                       }
                     }}}
       Variables.extendthirtyhigh = aggs
@@ -1171,7 +1171,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
-            values["One_Hour Extend"]['h'].push(data['results'][item]['h'])
+            values["One_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
@@ -1181,7 +1181,7 @@ async function Weekly_Extend_Low(instrument){
               var data = await res.json();
               if ('results' in data){
                   for(const item in data['results']){
-                      values["One_Hour Extend"]['h'].push(item['h'])
+                      values["One_Hour Extend"]['h'].push(parseFloat(item['h']))
                       }
                     }}}
       Variables.extendhourhigh = aggs
@@ -1194,7 +1194,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Two_Hour Extend"]['h'].push(data['results'][item]['h'])
+          values["Two_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
@@ -1204,7 +1204,7 @@ async function Weekly_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Two_Hour Extend"]['h'].push(item['h'])
+                    values["Two_Hour Extend"]['h'].push(parseFloat(item['h']))
                     }
                   }}}
       Variables.extendtwohourhigh = aggs
@@ -1217,7 +1217,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Four_Hour_Extend"]['h'].push(data['results'][item]['h'])
+          values["Four_Hour_Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
@@ -1227,7 +1227,7 @@ async function Weekly_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Four_Hour_Extend"]['h'].push(item['h'])
+                    values["Four_Hour_Extend"]['h'].push(parseFloat(item['h']))
                     }
                   }}}
       Variables.extendfourhourhigh = aggs
@@ -1240,7 +1240,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Daily Extend"]['h'].push(data['results'][item]['h'])
+          values["Daily Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
@@ -1250,7 +1250,7 @@ async function Weekly_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Daily Extend"]['h'].push(item['h'])
+                    values["Daily Extend"]['h'].push(parseFloat(item['h']))
                     }
                   }}}
       Variables.extenddailyhigh = aggs
@@ -1263,7 +1263,7 @@ async function Weekly_Extend_Low(instrument){
       var res = await fetch(url);
       var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Weekly Extend"]['h'].push(data['results'][item]['h'])
+          values["Weekly Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
@@ -1273,7 +1273,7 @@ async function Weekly_Extend_Low(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Weekly Extend"]['h'].push(item['h'])
+                    values["Weekly Extend"]['h'].push(parseFloat(item['h']))
                     }
                   }}}
       Variables.extendweeklyhigh = aggs
@@ -1285,7 +1285,7 @@ async function Five_Min_Open(instrument){
   var res = await fetch(url);
   var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Five_Min"]['o'].push(data['results'][item]['o'])
+        values["Five_Min"]['o'].push(parseFloat(data['results'][item]['o']))
       }
   while('next_url' in data){
         if('next_url' in data){
@@ -1295,7 +1295,7 @@ async function Five_Min_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Five_Min"]['o'].push(item['o'])
+                  values["Five_Min"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
   Variables.fiveopen = aggs
@@ -1308,7 +1308,7 @@ async function Fifteen_Min_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Fifteen_Min"]['o'].push(data['results'][item]['o'])
+          values["Fifteen_Min"]['o'].push(parseFloat(data['results'][item]['o']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -1318,7 +1318,7 @@ async function Fifteen_Min_Open(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Fifteen_Min"]['o'].push(item['o'])
+                    values["Fifteen_Min"]['o'].push(parseFloat(item['o']))
                     }
                   }}} 
     Variables.fifteenopen = aggs
@@ -1331,7 +1331,7 @@ async function Thirty_Min_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Thirty_Min"]['o'].push(data['results'][item]['o'])
+          values["Thirty_Min"]['o'].push(parseFloat(data['results'][item]['o']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -1341,7 +1341,7 @@ async function Thirty_Min_Open(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Thirty_Min"]['o'].push(item['o'])
+                    values["Thirty_Min"]['o'].push(parseFloat(item['o']))
                     }
                   }}}
     Variables.thirtyopen = aggs
@@ -1354,7 +1354,7 @@ async function One_Hour_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["One_Hour"]['o'].push(data['results'][item]['o'])
+          values["One_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -1364,7 +1364,7 @@ async function One_Hour_Open(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["One_Hour"]['o'].push(item['o'])
+                    values["One_Hour"]['o'].push(parseFloat(item['o']))
                     }
                   }}}
     Variables.houropen = aggs
@@ -1377,7 +1377,7 @@ async function Two_Hour_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Two_Hour"]['o'].push(data['results'][item]['o'])
+        values["Two_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -1387,7 +1387,7 @@ async function Two_Hour_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Two_Hour"]['o'].push(item['o'])
+                  values["Two_Hour"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
     Variables.twohouropen = aggs
@@ -1400,7 +1400,7 @@ async function Four_Hour_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Four_Hour"]['o'].push(data['results'][item]['o'])
+        values["Four_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -1410,7 +1410,7 @@ async function Four_Hour_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Four_Hour"]['o'].push(item['o'])
+                  values["Four_Hour"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
     Variables.fourhouropen = aggs
@@ -1423,7 +1423,7 @@ async function Daily_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Daily"]['o'].push(data['results'][item]['o'])
+        values["Daily"]['o'].push(parseFloat(data['results'][item]['o']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -1433,7 +1433,7 @@ async function Daily_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Daily"]['o'].push(item['o'])
+                  values["Daily"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
     Variables.dailyopen = aggs
@@ -1446,7 +1446,7 @@ async function Weekly_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Weekly"]['o'].push(data['results'][item]['o'])
+        values["Weekly"]['o'].push(parseFloat(data['results'][item]['o']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -1456,7 +1456,7 @@ async function Weekly_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Weekly"]['o'].push(item['o'])
+                  values["Weekly"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
     Variables.weeklyopen = aggs
@@ -1468,7 +1468,7 @@ async function Five_Min_Extend_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Five_Min Extend"]['o'].push(data['results'][item]['o'])
+          values["Five_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -1478,7 +1478,7 @@ async function Five_Min_Extend_Open(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Five_Min Extend"]['o'].push(item['o'])
+                    values["Five_Min Extend"]['o'].push(parseFloat(item['o']))
                     }
                   }}}
     Variables.extendfiveopen = aggs
@@ -1491,7 +1491,7 @@ async function Fifteen_Min_Extend_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Fifteen_Min Extend"]['o'].push(data['results'][item]['o'])
+          values["Fifteen_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -1501,7 +1501,7 @@ async function Fifteen_Min_Extend_Open(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Fifteen_Min Extend"]['o'].push(item['o'])
+                    values["Fifteen_Min Extend"]['o'].push(parseFloat(item['o']))
                     }
                   }}}
     Variables.extendfifteenopen = aggs
@@ -1514,7 +1514,7 @@ async function Thirty_Min_Extend_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["Thirty_Min Extend"]['o'].push(data['results'][item]['o'])
+          values["Thirty_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -1524,7 +1524,7 @@ async function Thirty_Min_Extend_Open(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["Thirty_Min Extend"]['o'].push(item['o'])
+                    values["Thirty_Min Extend"]['o'].push(parseFloat(item['o']))
                     }
                   }}}
     Variables.extendthirtyopen = aggs
@@ -1537,7 +1537,7 @@ async function One_Hour_Extend_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
-          values["One_Hour Extend"]['o'].push(data['results'][item]['o'])
+          values["One_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
         }
     while('next_url' in data){
           if('next_url' in data){
@@ -1547,7 +1547,7 @@ async function One_Hour_Extend_Open(instrument){
             var data = await res.json();
             if ('results' in data){
                 for(const item in data['results']){
-                    values["One_Hour Extend"]['o'].push(item['o'])
+                    values["One_Hour Extend"]['o'].push(parseFloat(item['o']))
                     }
                   }}}
     Variables.extendhouropen = aggs
@@ -1560,7 +1560,7 @@ async function Two_Hour_Extend_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Two_Hour Extend"]['o'].push(data['results'][item]['o'])
+        values["Two_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -1570,7 +1570,7 @@ async function Two_Hour_Extend_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Two_Hour Extend"]['o'].push(item['o'])
+                  values["Two_Hour Extend"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
     Variables.extendtwohouropen = aggs
@@ -1583,7 +1583,7 @@ async function Four_Hour_Extend_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Four_Hour_Extend"]['o'].push(data['results'][item]['o'])
+        values["Four_Hour_Extend"]['o'].push(parseFloat(data['results'][item]['o']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -1593,7 +1593,7 @@ async function Four_Hour_Extend_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Four_Hour_Extend"]['o'].push(item['o'])
+                  values["Four_Hour_Extend"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
     Variables.extendfourhouropen = aggs
@@ -1606,7 +1606,7 @@ async function Daily_Extend_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Daily Extend"]['o'].push(data['results'][item]['o'])
+        values["Daily Extend"]['o'].push(parseFloat(data['results'][item]['o']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -1616,7 +1616,7 @@ async function Daily_Extend_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Daily Extend"]['o'].push(item['o'])
+                  values["Daily Extend"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
     Variables.extenddailyopen = aggs
@@ -1629,7 +1629,7 @@ async function Weekly_Extend_Open(instrument){
     var res = await fetch(url);
     var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
-        values["Weekly Extend"]['o'].push(data['results'][item]['o'])
+        values["Weekly Extend"]['o'].push(parseFloat(data['results'][item]['o']))
       }
     while('next_url' in data){
         if('next_url' in data){
@@ -1639,17 +1639,19 @@ async function Weekly_Extend_Open(instrument){
           var data = await res.json();
           if ('results' in data){
               for(const item in data['results']){
-                  values["Weekly Extend"]['o'].push(item['o'])
+                  values["Weekly Extend"]['o'].push(parseFloat(item['o']))
                   }
                 }}}
     Variables.extendweeklyopen = aggs
     Variables.lenextendweeklyopen = Variables.extendweeklyopen.length
     }
-    async function Price(instrument){
-      const pricelist = await yfin.quoteSummary(instrument)
-      const prices = pricelist.price.regularMarketPrice
-      Variables.price = prices      
-      }
+async function Price(instrument){
+  const pricelist = await yfin.quoteSummary(instrument)
+  const prices = pricelist.price.regularMarketPrice
+  Variables.price = parseFloat(prices)
+  }
+
+
 
 
 
@@ -1922,69 +1924,7 @@ async function caller(){
     Assigner()
     await Price(instrument)
     await Five_Min(instrument)
-    await Fifteen_Min(instrument)
-    await Thirty_Min(instrument)
-    await One_Hour(instrument)
-    await Two_Hour(instrument)
-    await Four_Hour(instrument)
-    await Daily(instrument)
-    await Weekly(instrument)
-    await Five_Min_Extend(instrument)
-    await Fifteen_Min_Extend(instrument)
-    await Thirty_Min_Extend(instrument)
-    await One_Hour_Extend(instrument)
-    await Two_Hour_Extend(instrument)
-    await Four_Hour_Extend(instrument)
-    await Daily_Extend(instrument)
-    await Weekly_Extend(instrument)
-    await Five_Min_Low(instrument)
-    await Fifteen_Min_Low(instrument)
-    await Thirty_Min_Low(instrument)
-    await One_Hour_Low(instrument)
-    await Two_Hour_Low(instrument)
-    await Four_Hour_Low(instrument)
-    await Daily_Low(instrument)
-    await Weekly_Low(instrument)
-    await Five_Min_Extend_Low(instrument)
-    await Fifteen_Min_Extend_Low(instrument)
-    await Thirty_Min_Extend_Low(instrument)
-    await One_Hour_Extend_Low(instrument)
-    await Two_Hour_Extend_Low(instrument)
-    await Four_Hour_Extend_Low(instrument)
-    await Daily_Extend_Low(instrument)
-    await Weekly_Extend_Low(instrument)
-    await Five_Min_High(instrument)
-    await Fifteen_Min_High(instrument)
-    await Thirty_Min_High(instrument)
-    await One_Hour_High(instrument)
-    await Two_Hour_High(instrument)
-    await Four_Hour_High(instrument)
-    await Daily_High(instrument)
-    await Weekly_High(instrument)
-    await Five_Min_Extend_High(instrument)
-    await Fifteen_Min_Extend_High(instrument)
-    await Thirty_Min_Extend_High(instrument)
-    await One_Hour_Extend_High(instrument)
-    await Two_Hour_Extend_High(instrument)
-    await Four_Hour_Extend_High(instrument)
-    await Daily_Extend_High(instrument)
-    await Weekly_Extend_High(instrument)
-    await Five_Min_Open(instrument)
-    await Fifteen_Min_Open(instrument)
-    await Thirty_Min_Open(instrument)
-    await One_Hour_Open(instrument)
-    await Two_Hour_Open(instrument)
-    await Four_Hour_Open(instrument)
-    await Daily_Open(instrument)
-    await Weekly_Open(instrument)
-    await Five_Min_Extend_Open(instrument)
-    await Fifteen_Min_Extend_Open(instrument)
-    await Thirty_Min_Extend_Open(instrument)
-    await One_Hour_Extend_Open(instrument)
-    await Two_Hour_Extend_Open(instrument)
-    await Four_Hour_Extend_Open(instrument)
-    await Daily_Extend_Open(instrument)
-    await Weekly_Extend_Open(instrument)
+    console.log9VOzz
     equalizer()
     testdaily.testdaily(values, Variables.price)
     testfifteen.testfifteenmin(values, Variables.price)

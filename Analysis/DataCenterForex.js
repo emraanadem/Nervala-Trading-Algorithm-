@@ -23,10 +23,10 @@ var testweekly = require('./Weekly3.js')
     let timeperiods = ["Five_Min", "Fifteen_Min", "Thirty_Min", "One_Hour", "Two_Hour", "Four_Hour", "Daily", "Weekly", "Five_Min Extend", "Fifteen_Min Extend", "Thirty_Min Extend", "One_Hour Extend", "Two_Hour Extend", "Four_Hour Extend", "Daily Extend", "Weekly Extend"]
     for(let item = 0; item < timeperiods.length; item++){
     values[timeperiods[item]] = {}
-    values[timeperiods[item]]['c'] = []
     values[timeperiods[item]]['o'] = []
     values[timeperiods[item]]['h'] = []
     values[timeperiods[item]]['l'] = []
+    values[timeperiods[item]]['c'] = []
 
     }
   }
@@ -43,7 +43,7 @@ var testweekly = require('./Weekly3.js')
       const res = await fetch(url, options);
       const data = await res.json();
           for(let item = 0; item < data.candles.length; item++){
-            values["Five_Min"]['c'].push(data.candles[item].mid['c'])
+            values["Five_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
           }
           
         }
@@ -59,7 +59,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Fifteen_Min"]['c'].push(data.candles[item].mid['c'])
+          values["Fifteen_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -75,7 +75,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Thirty_Min"]['c'].push(data.candles[item].mid['c'])
+          values["Thirty_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -91,7 +91,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["One_Hour"]['c'].push(data.candles[item].mid['c'])
+          values["One_Hour"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -107,7 +107,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values['Two_Hour']['c'].push(data.candles[item].mid['c'])
+          values['Two_Hour']['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -123,7 +123,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Four_Hour"]['c'].push(data.candles[item].mid['c'])
+          values["Four_Hour"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -139,7 +139,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Daily"]['c'].push(data.candles[item].mid['c'])
+          values["Daily"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -155,7 +155,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Weekly"]['c'].push(data.candles[item].mid['c'])
+          values["Weekly"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -171,7 +171,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Five_Min Extend"]['c'].push(data.candles[item].mid['c'])
+          values["Five_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -187,7 +187,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Fifteen_Min Extend"]['c'].push(data.candles[item].mid['c'])
+          values["Fifteen_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -203,7 +203,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Thirty_Min Extend"]['c'].push(data.candles[item].mid['c'])
+          values["Thirty_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -219,7 +219,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["One_Hour Extend"]['c'].push(data.candles[item].mid['c'])
+          values["One_Hour Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -235,7 +235,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Two_Hour Extend"]['c'].push(data.candles[item].mid['c'])
+          values["Two_Hour Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -251,7 +251,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values['Four_Hour Extend']['c'].push(data.candles[item].mid['c'])
+          values['Four_Hour Extend']['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -267,7 +267,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values['Daily Extend']['c'].push(data.candles[item].mid['c'])
+          values['Daily Extend']['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -283,7 +283,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Weekly Extend"]['c'].push(data.candles[item].mid['c'])
+          values["Weekly Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
         
       }
@@ -299,7 +299,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Five_Min"]['h'].push(data.candles[item].mid['h'])
+          values["Five_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -315,7 +315,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Fifteen_Min"]['h'].push(data.candles[item].mid['h'])
+          values["Fifteen_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -331,7 +331,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Thirty_Min"]['h'].push(data.candles[item].mid['h'])
+          values["Thirty_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -347,7 +347,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["One_Hour"]['h'].push(data.candles[item].mid['h'])
+          values["One_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -363,7 +363,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Two_Hour"]['h'].push(data.candles[item].mid['h'])
+          values["Two_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -379,7 +379,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Four_Hour"]['h'].push(data.candles[item].mid['h'])
+          values["Four_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -395,7 +395,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Daily"]['h'].push(data.candles[item].mid['h'])
+          values["Daily"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -411,7 +411,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Weekly"]['h'].push(data.candles[item].mid['h'])
+          values["Weekly"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -427,7 +427,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Five_Min Extend"]['h'].push(data.candles[item].mid['h'])
+          values["Five_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -443,7 +443,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Fifteen_Min Extend"]['h'].push(data.candles[item].mid['h'])
+          values["Fifteen_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -459,7 +459,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Thirty_Min Extend"]['h'].push(data.candles[item].mid['h'])
+          values["Thirty_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -475,7 +475,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["One_Hour Extend"]['h'].push(data.candles[item].mid['h'])
+          values["One_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -491,7 +491,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Two_Hour Extend"]['h'].push(data.candles[item].mid['h'])
+          values["Two_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -507,7 +507,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Four_Hour Extend"]['h'].push(data.candles[item].mid['h'])
+          values["Four_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -523,7 +523,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Daily Extend"]['h'].push(data.candles[item].mid['h'])
+          values["Daily Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -539,7 +539,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Weekly Extend"]['h'].push(data.candles[item].mid['h'])
+          values["Weekly Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
         
       }
@@ -555,7 +555,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Five_Min"]['o'].push(data.candles[item].mid['o'])
+          values["Five_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -571,7 +571,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Fifteen_Min"]['o'].push(data.candles[item].mid['o'])
+          values["Fifteen_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -587,7 +587,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Thirty_Min"]['o'].push(data.candles[item].mid['o'])
+          values["Thirty_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -603,7 +603,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["One_Hour"]['o'].push(data.candles[item].mid['o'])
+          values["One_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -619,7 +619,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Two_Hour"]['o'].push(data.candles[item].mid['o'])
+          values["Two_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -635,7 +635,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Four_Hour"]['o'].push(data.candles[item].mid['o'])
+          values["Four_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -651,7 +651,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Daily"]['o'].push(data.candles[item].mid['o'])
+          values["Daily"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -667,7 +667,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Weekly"]['o'].push(data.candles[item].mid['o'])
+          values["Weekly"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -683,7 +683,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Five_Min Extend"]['o'].push(data.candles[item].mid['o'])
+          values["Five_Min Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -699,7 +699,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Fifteen_Min Extend"]['o'].push(data.candles[item].mid['o'])
+          values["Fifteen_Min Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -715,7 +715,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values['Thirty_Min Extend']['o'].push(data.candles[item].mid['o'])
+          values['Thirty_Min Extend']['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -731,7 +731,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["One_Hour Extend"]['o'].push(data.candles[item].mid['o'])
+          values["One_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -747,7 +747,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Two_Hour Extend"]['o'].push(data.candles[item].mid['o'])
+          values["Two_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -763,7 +763,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Four_Hour Extend"]['o'].push(data.candles[item].mid['o'])
+          values["Four_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -779,7 +779,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Daily Extend"]['o'].push(data.candles[item].mid['o'])
+          values["Daily Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -795,7 +795,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Weekly Extend"]['o'].push(data.candles[item].mid['o'])
+          values["Weekly Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
         
       }
@@ -811,7 +811,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Five_Min"]['l'].push(data.candles[item].mid['l'])
+          values["Five_Min"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -827,7 +827,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Fifteen_Min"]['l'].push(data.candles[item].mid['l'])
+          values["Fifteen_Min"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -843,7 +843,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Thirty_Min"]["l"].push(data.candles[item].mid['l'])
+          values["Thirty_Min"]["l"].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -859,7 +859,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["One_Hour"]['l'].push(data.candles[item].mid['l'])
+          values["One_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -875,7 +875,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Two_Hour"]['l'].push(data.candles[item].mid['l'])
+          values["Two_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -891,7 +891,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Four_Hour"]['l'].push(data.candles[item].mid['l'])
+          values["Four_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -907,7 +907,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Daily"]['l'].push(data.candles[item].mid['l'])
+          values["Daily"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -923,7 +923,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Weekly"]['l'].push(data.candles[item].mid['l'])
+          values["Weekly"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -939,7 +939,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Five_Min Extend"]['l'].push(data.candles[item].mid['l'])
+          values["Five_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -955,7 +955,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Fifteen_Min Extend"]['l'].push(data.candles[item].mid['l'])
+          values["Fifteen_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -971,7 +971,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Thirty_Min Extend"]['l'].push(data.candles[item].mid['l'])
+          values["Thirty_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -987,7 +987,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["One_Hour Extend"]['l'].push(data.candles[item].mid['l'])
+          values["One_Hour Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -1003,7 +1003,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values['Two_Hour Extend']['l'].push(data.candles[item].mid['l'])
+          values['Two_Hour Extend']['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -1019,7 +1019,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Four_Hour Extend"]['l'].push(data.candles[item].mid['l'])
+          values["Four_Hour Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -1035,7 +1035,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Daily Extend"]['l'].push(data.candles[item].mid['l'])
+          values["Daily Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
         
       }
@@ -1051,7 +1051,7 @@ var testweekly = require('./Weekly3.js')
     const res = await fetch(url, options);
     const data = await res.json();
         for(let item = 0; item < data.candles.length; item++){
-          values["Weekly Extend"]['l'].push(data.candles[item].mid['l'])
+          values["Weekly Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
       }
 
@@ -1066,7 +1066,7 @@ var testweekly = require('./Weekly3.js')
     };
     const res = await fetch(url, options);
     const data = await res.json();
-    price = data.candles[0].mid['c']
+    price = parseFloat(data.candles[0].mid['c'])
         }
 
 async function Assign(){
