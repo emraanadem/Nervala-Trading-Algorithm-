@@ -1120,7 +1120,6 @@ async function Assign(){
   await Four_Hour_Extend_Low(instrument)
   await Daily_Extend_Low(instrument)
   await Weekly_Extend_Low(instrument)
-  console.log(values)
   testdaily.testdaily(values)
   testfifteen.testfifteenmin(values)
   testfourhour.testfourhour(values)

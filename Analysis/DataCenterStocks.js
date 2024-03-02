@@ -1976,7 +1976,6 @@ async function caller(){
   await Daily_Extend_Open(instrument)
   await Weekly_Extend_Open(instrument)
   equalizer()
-  console.log(values)
   testdaily.testdaily(values)
   testfifteen.testfifteenmin(values)
   testfourhour.testfourhour(values)
