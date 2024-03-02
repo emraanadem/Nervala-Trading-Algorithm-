@@ -1645,11 +1645,7 @@ async function Weekly_Extend_Open(instrument){
     Variables.extendweeklyopen = aggs
     Variables.lenextendweeklyopen = Variables.extendweeklyopen.length
     }
-async function Price(instrument){
-  const pricelist = await yfin.quoteSummary(instrument)
-  const prices = pricelist.price.regularMarketPrice
-  Variables.price = parseFloat(prices)
-  }
+Z
 
 
 
@@ -1922,9 +1918,71 @@ async function caller(){
   let g = 0
   while(g == 0){
     Assigner()
-    await Price(instrument)
-    await Five_Min(instrument)
-    console.log9VOzz
+    Price(instrument)
+    Five_Min(instrument)
+    Fifteen_Min(instrument)
+    Thirty_Min(instrument)
+    One_Hour(instrument)
+    Two_Hour(instrument)
+    Four_Hour(instrument)
+    Daily(instrument)
+    Weekly(instrument)
+    Five_Min_Extend(instrument)
+    Fifteen_Min_Extend(instrument)
+    Thirty_Min_Extend(instrument)
+    One_Hour_Extend(instrument)
+    Two_Hour_Extend(instrument)
+    Four_Hour_Extend(instrument)
+    Daily_Extend(instrument)
+    Weekly_Extend(instrument)
+    Five_Min_Low(instrument)
+    Fifteen_Min_Low(instrument)
+    Thirty_Min_Low(instrument)
+    One_Hour_Low(instrument)
+    Two_Hour_Low(instrument)
+    Four_Hour_Low(instrument)
+    Daily_Low(instrument)
+    Weekly_Low(instrument)
+    Five_Min_Extend_Low(instrument)
+    Fifteen_Min_Extend_Low(instrument)
+    Thirty_Min_Extend_Low(instrument)
+    One_Hour_Extend_Low(instrument)
+    Two_Hour_Extend_Low(instrument)
+    Four_Hour_Extend_Low(instrument)
+    Daily_Extend_Low(instrument)
+    Weekly_Extend_Low(instrument)
+    Five_Min_High(instrument)
+    Fifteen_Min_High(instrument)
+    Thirty_Min_High(instrument)
+    One_Hour_High(instrument)
+    Two_Hour_High(instrument)
+    Four_Hour_High(instrument)
+    Daily_High(instrument)
+    Weekly_High(instrument)
+    Five_Min_Extend_High(instrument)
+    Fifteen_Min_Extend_High(instrument)
+    Thirty_Min_Extend_High(instrument)
+    One_Hour_Extend_High(instrument)
+    Two_Hour_Extend_High(instrument)
+    Four_Hour_Extend_High(instrument)
+    Daily_Extend_High(instrument)
+    Weekly_Extend_High(instrument)
+    Five_Min_Open(instrument)
+    Fifteen_Min_Open(instrument)
+    Thirty_Min_Open(instrument)
+    One_Hour_Open(instrument)
+    Two_Hour_Open(instrument)
+    Four_Hour_Open(instrument)
+    Daily_Open(instrument)
+    Weekly_Open(instrument)
+    Five_Min_Extend_Open(instrument)
+    Fifteen_Min_Extend_Open(instrument)
+    Thirty_Min_Extend_Open(instrument)
+    One_Hour_Extend_Open(instrument)
+    Two_Hour_Extend_Open(instrument)
+    await Four_Hour_Extend_Open(instrument)
+    await Daily_Extend_Open(instrument)
+    await Weekly_Extend_Open(instrument)
     equalizer()
     testdaily.testdaily(values, Variables.price)
     testfifteen.testfifteenmin(values, Variables.price)
@@ -1933,6 +1991,6 @@ async function caller(){
     testonehour.testonehour(values, Variables.price)
     testthirtymin.testthirtymin(values, Variables.price)
     testweekly.testweekly(values, Variables.price)
-  }
-}
+  
+  }}
 caller()
