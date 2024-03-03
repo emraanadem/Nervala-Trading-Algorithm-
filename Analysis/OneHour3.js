@@ -2421,6 +2421,7 @@ var liveprice = 0
 module.exports = { testonehour: function(data, price){
     liveprice = price
     dataset = data
+    console.log(dataset)
     One_Hour_Nexus.controlMain()
 
 } }

@@ -1,6 +1,7 @@
 const fs = require('fs')
 const axios = require('axios')
-const fetch = require('node-fetch')
+const http = require('node:http')
+const https = require('node:https')
 let raw = fs.readFileSync('accinfo.json')
 let accinfo = JSON.parse(raw)
 let rawtwo = fs.readFileSync('instrument.json')
@@ -12,6 +13,17 @@ var testonehour = require('./OneHour3.js')
 var testtwohour = require('./TwoHour3.js')
 var testfourhour = require('./FourHour3.js')
 var testweekly = require('./Weekly3.js')
+
+let accountID = String(accinfo[0])
+let token = String(accinfo[1])
+
+const instance = axios.create({
+  baseURL: "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?",
+  headers: {
+    Authorization: "Bearer " + token
+  }
+  })
+
 
 
 
@@ -34,14 +46,14 @@ var testweekly = require('./Weekly3.js')
   async function Five_Min(instrument){
       let accountID = String(accinfo[0])
       let token = String(accinfo[1])
-      let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M5"
+      let url = "count=1000&granularity=M5"
       const options = {
         headers: {
           Authorization: "Bearer " + token
         }
       };
-      const res = await fetch(url, options);
-      const data = await res.json();
+      const res = await instance.get(url, options);
+      const data = await res.data;
           for(let item = 0; item < data.candles.length; item++){
             values["Five_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
           }
@@ -50,14 +62,14 @@ var testweekly = require('./Weekly3.js')
   async function Fifteen_Min(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M15"
+    let url = "count=1000&granularity=M15"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -66,14 +78,14 @@ var testweekly = require('./Weekly3.js')
   async function Thirty_Min(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M30"
+    let url = "count=1000&granularity=M30"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -82,14 +94,14 @@ var testweekly = require('./Weekly3.js')
   async function One_Hour(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H1"
+    let url = "count=1000&granularity=H1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -98,14 +110,14 @@ var testweekly = require('./Weekly3.js')
   async function Two_Hour(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H2"
+    let url = "count=1000&granularity=H2"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Two_Hour']['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -114,14 +126,14 @@ var testweekly = require('./Weekly3.js')
   async function Four_Hour(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H4"
+    let url = "count=1000&granularity=H4"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -130,14 +142,14 @@ var testweekly = require('./Weekly3.js')
   async function Daily(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=D"
+    let url = "count=1000&granularity=D"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -146,14 +158,14 @@ var testweekly = require('./Weekly3.js')
   async function Weekly(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=W"
+    let url = "count=1000&granularity=W"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -162,14 +174,14 @@ var testweekly = require('./Weekly3.js')
   async function Five_Min_Extend(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M5"
+    let url = "count=2500&granularity=M5"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -178,14 +190,14 @@ var testweekly = require('./Weekly3.js')
   async function Fifteen_Min_Extend(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M15"
+    let url = "count=2500&granularity=M15"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -194,14 +206,14 @@ var testweekly = require('./Weekly3.js')
   async function Thirty_Min_Extend(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M30"
+    let url = "count=2500&granularity=M30"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -210,14 +222,14 @@ var testweekly = require('./Weekly3.js')
   async function One_Hour_Extend(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H1"
+    let url = "count=2500&granularity=H1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -226,14 +238,14 @@ var testweekly = require('./Weekly3.js')
   async function Two_Hour_Extend(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H2"
+    let url = "count=2500&granularity=H2"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -242,14 +254,14 @@ var testweekly = require('./Weekly3.js')
   async function Four_Hour_Extend(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H4"
+    let url = "count=2500&granularity=H4"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Four_Hour Extend']['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -258,14 +270,14 @@ var testweekly = require('./Weekly3.js')
   async function Daily_Extend(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=D"
+    let url = "count=2500&granularity=D"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Daily Extend']['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -274,14 +286,14 @@ var testweekly = require('./Weekly3.js')
   async function Weekly_Extend(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=W"
+    let url = "count=2500&granularity=W"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
         }
@@ -290,14 +302,14 @@ var testweekly = require('./Weekly3.js')
   async function Five_Min_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M5"
+    let url = "count=1000&granularity=M5"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -306,14 +318,14 @@ var testweekly = require('./Weekly3.js')
   async function Fifteen_Min_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M15"
+    let url = "count=1000&granularity=M15"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -322,14 +334,14 @@ var testweekly = require('./Weekly3.js')
   async function Thirty_Min_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M30"
+    let url = "count=1000&granularity=M30"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -338,14 +350,14 @@ var testweekly = require('./Weekly3.js')
   async function One_Hour_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H1"
+    let url = "count=1000&granularity=H1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -354,14 +366,14 @@ var testweekly = require('./Weekly3.js')
   async function Two_Hour_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H2"
+    let url = "count=1000&granularity=H2"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -370,14 +382,14 @@ var testweekly = require('./Weekly3.js')
   async function Four_Hour_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H4"
+    let url = "count=1000&granularity=H4"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -386,14 +398,14 @@ var testweekly = require('./Weekly3.js')
   async function Daily_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=D"
+    let url = "count=1000&granularity=D"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -402,14 +414,14 @@ var testweekly = require('./Weekly3.js')
   async function Weekly_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=W"
+    let url = "count=1000&granularity=W"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -418,14 +430,14 @@ var testweekly = require('./Weekly3.js')
   async function Five_Min_Extend_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M5"
+    let url = "count=2500&granularity=M5"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -434,14 +446,14 @@ var testweekly = require('./Weekly3.js')
   async function Fifteen_Min_Extend_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M15"
+    let url = "count=2500&granularity=M15"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -450,14 +462,14 @@ var testweekly = require('./Weekly3.js')
   async function Thirty_Min_Extend_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M30"
+    let url = "count=2500&granularity=M30"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -466,14 +478,14 @@ var testweekly = require('./Weekly3.js')
   async function One_Hour_Extend_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H1"
+    let url = "count=2500&granularity=H1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -482,14 +494,14 @@ var testweekly = require('./Weekly3.js')
   async function Two_Hour_Extend_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H2"
+    let url = "count=2500&granularity=H2"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -498,14 +510,14 @@ var testweekly = require('./Weekly3.js')
   async function Four_Hour_Extend_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H4"
+    let url = "count=2500&granularity=H4"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -514,14 +526,14 @@ var testweekly = require('./Weekly3.js')
   async function Daily_Extend_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=D"
+    let url = "count=2500&granularity=D"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -530,14 +542,14 @@ var testweekly = require('./Weekly3.js')
   async function Weekly_Extend_High(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=W"
+    let url = "count=2500&granularity=W"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
         }
@@ -546,14 +558,14 @@ var testweekly = require('./Weekly3.js')
   async function Five_Min_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M5"
+    let url = "count=1000&granularity=M5"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -562,14 +574,14 @@ var testweekly = require('./Weekly3.js')
   async function Fifteen_Min_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M15"
+    let url = "count=1000&granularity=M15"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -578,14 +590,14 @@ var testweekly = require('./Weekly3.js')
   async function Thirty_Min_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M30"
+    let url = "count=1000&granularity=M30"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -594,14 +606,14 @@ var testweekly = require('./Weekly3.js')
   async function One_Hour_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H1"
+    let url = "count=1000&granularity=H1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -610,14 +622,14 @@ var testweekly = require('./Weekly3.js')
   async function Two_Hour_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H2"
+    let url = "count=1000&granularity=H2"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -626,14 +638,14 @@ var testweekly = require('./Weekly3.js')
   async function Four_Hour_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H4"
+    let url = "count=1000&granularity=H4"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -642,14 +654,14 @@ var testweekly = require('./Weekly3.js')
   async function Daily_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=D"
+    let url = "count=1000&granularity=D"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -658,14 +670,14 @@ var testweekly = require('./Weekly3.js')
   async function Weekly_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=W"
+    let url = "count=1000&granularity=W"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -674,14 +686,14 @@ var testweekly = require('./Weekly3.js')
   async function Five_Min_Extend_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M5"
+    let url = "count=2500&granularity=M5"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -690,14 +702,14 @@ var testweekly = require('./Weekly3.js')
   async function Fifteen_Min_Extend_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M15"
+    let url = "count=2500&granularity=M15"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -706,14 +718,14 @@ var testweekly = require('./Weekly3.js')
   async function Thirty_Min_Extend_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M30"
+    let url = "count=2500&granularity=M30"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Thirty_Min Extend']['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -722,14 +734,14 @@ var testweekly = require('./Weekly3.js')
   async function One_Hour_Extend_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H1"
+    let url = "count=2500&granularity=H1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -738,14 +750,14 @@ var testweekly = require('./Weekly3.js')
   async function Two_Hour_Extend_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H2"
+    let url = "count=2500&granularity=H2"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -754,14 +766,14 @@ var testweekly = require('./Weekly3.js')
   async function Four_Hour_Extend_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H4"
+    let url = "count=2500&granularity=H4"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -770,14 +782,14 @@ var testweekly = require('./Weekly3.js')
   async function Daily_Extend_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=D"
+    let url = "count=2500&granularity=D"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -786,14 +798,14 @@ var testweekly = require('./Weekly3.js')
   async function Weekly_Extend_Open(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=W"
+    let url = "count=2500&granularity=W"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
         }
@@ -802,14 +814,14 @@ var testweekly = require('./Weekly3.js')
   async function Five_Min_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M5"
+    let url = "count=1000&granularity=M5"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -818,14 +830,14 @@ var testweekly = require('./Weekly3.js')
   async function Fifteen_Min_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M15"
+    let url = "count=1000&granularity=M15"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -834,14 +846,14 @@ var testweekly = require('./Weekly3.js')
   async function Thirty_Min_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=M30"
+    let url = "count=1000&granularity=M30"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min"]["l"].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -850,14 +862,14 @@ var testweekly = require('./Weekly3.js')
   async function One_Hour_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H1"
+    let url = "count=1000&granularity=H1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -866,14 +878,14 @@ var testweekly = require('./Weekly3.js')
   async function Two_Hour_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H2"
+    let url = "count=1000&granularity=H2"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -882,14 +894,14 @@ var testweekly = require('./Weekly3.js')
   async function Four_Hour_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=H4"
+    let url = "count=1000&granularity=H4"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -898,14 +910,14 @@ var testweekly = require('./Weekly3.js')
   async function Daily_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=D"
+    let url = "count=1000&granularity=D"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -914,14 +926,14 @@ var testweekly = require('./Weekly3.js')
   async function Weekly_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1000&granularity=W"
+    let url = "count=1000&granularity=W"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -930,14 +942,14 @@ var testweekly = require('./Weekly3.js')
   async function Five_Min_Extend_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M5"
+    let url = "count=2500&granularity=M5"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -946,14 +958,14 @@ var testweekly = require('./Weekly3.js')
   async function Fifteen_Min_Extend_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M15"
+    let url = "count=2500&granularity=M15"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -962,14 +974,14 @@ var testweekly = require('./Weekly3.js')
   async function Thirty_Min_Extend_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=M30"
+    let url = "count=2500&granularity=M30"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -978,14 +990,14 @@ var testweekly = require('./Weekly3.js')
   async function One_Hour_Extend_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H1"
+    let url = "count=2500&granularity=H1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -994,14 +1006,14 @@ var testweekly = require('./Weekly3.js')
   async function Two_Hour_Extend_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H2"
+    let url = "count=2500&granularity=H2"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Two_Hour Extend']['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -1010,14 +1022,14 @@ var testweekly = require('./Weekly3.js')
   async function Four_Hour_Extend_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=H4"
+    let url = "count=2500&granularity=H4"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -1026,14 +1038,14 @@ var testweekly = require('./Weekly3.js')
   async function Daily_Extend_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=D"
+    let url = "count=2500&granularity=D"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -1042,14 +1054,14 @@ var testweekly = require('./Weekly3.js')
   async function Weekly_Extend_Low(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=2500&granularity=W"
+    let url = "count=2500&granularity=W"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
+    const res = await instance.get(url, options);
+    const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
         }
@@ -1058,17 +1070,17 @@ var testweekly = require('./Weekly3.js')
   async function Price(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
-    let url = "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?count=1&granularity=M1"
+    let url = "count=1&granularity=M1"
     const options = {
       headers: {
         Authorization: "Bearer " + token
       }
     };
-    const res = await fetch(url, options);
-    const data = await res.json();
-    price = parseFloat(data.candles[0].mid['c'])
+    const res = await instance.get(url, options);
+    const data = await res.data;
+    price = parseFloat(data.candles[0].mid['c']
+    )
         }
-
 
 async function Assign(){
   let g = 0
@@ -1139,13 +1151,15 @@ async function Assign(){
     await Daily_Extend_Open(instrument)
     await Weekly_Extend_Open(instrument)
     await Price(instrument)
-    testdaily.testdaily(values, Variables.price)
-    testfifteen.testfifteenmin(values, Variables.price)
-    testfourhour.testfourhour(values, Variables.price)
-    testtwohour.testtwohour(values, Variables.price)
-    testonehour.testonehour(values, Variables.price)
-    testthirtymin.testthirtymin(values, Variables.price)
-    testweekly.testweekly(values, Variables.price)
+    console.log(values)
+    console.log(price)
+    testdaily.testdaily(values, price)
+    testfifteen.testfifteenmin(values, price)
+    testfourhour.testfourhour(values, price)
+    testtwohour.testtwohour(values, price)
+    testonehour.testonehour(values, price)
+    testthirtymin.testthirtymin(values, price)
+    testweekly.testweekly(values, price)
   
   }
 }

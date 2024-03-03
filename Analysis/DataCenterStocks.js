@@ -1,6 +1,5 @@
 const fs = require('fs')
 const axios = require('axios')
-const fetch = require('node-fetch')
 const yfin = require("yahoo-finance2").default;
 let raw = fs.readFileSync('accinfo.json')
 let accinfo = JSON.parse(raw)
@@ -24,6 +23,11 @@ let refdaytwohour = moment().subtract(124.5, 'days').format().split('T')[0];
 let refdayfourhour = moment().subtract(248, 'days').format().split('T')[0];
 let refdaydaily = moment().subtract(1062.5, 'days').format().split('T')[0];
 let refdayweekly = moment().subtract(5115, 'days').format().split('T')[0];
+
+const instance = axios.create({
+  baseURL: "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/"
+  })
+
 
 
 values = {}
@@ -182,1469 +186,1470 @@ function Assigner(){
 
 async function Five_Min(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Five_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Five_Min"]['c'].push(parseFloat(item['c']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Five_Min"]['c'].push(parseFloat(data['results'][item]['c']))
                   }
                 }}}
-  Variables.five = aggs
+  Variables.five = values['Five_Min']['c']
   Variables.lenfive = Variables.five.length
   }
 
 async function Fifteen_Min(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Fifteen_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Fifteen_Min"]['c'].push(parseFloat(item['c']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Fifteen_Min"]['c'].push(parseFloat(data['results'][item]['c']))
                   }
                 }}}
-  Variables.fifteen = aggs
+  Variables.fifteen = values["Fifteen_Min"]['c']
   Variables.lenfifteen = Variables.fifteen.length
 }
 
 async function Thirty_Min(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Thirty_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Thirty_Min"]['c'].push(parseFloat(item['c']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Thirty_Min"]['c'].push(parseFloat(data['results'][item]['c']))
                   }
                 }}}
-  Variables.thirty = aggs
+  Variables.thirty = values["Thirty_Min"]['c']
   Variables.lenthirty = Variables.thirty.length
 }
 
 async function One_Hour(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["One_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
-      }
+  let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
+    for(let item = 0; item < data['results'].length; item++){
+      values["One_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
+    }
   while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["One_Hour"]['c'].push(parseFloat(item['c']))
-                  }
-                }}}
-  Variables.hour = aggs
-  Variables.lenhour = Variables.hour.length
-  }
+      if('next_url' in data){
+        let id = data['next_url'].split('/')[10]
+        url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+        if ('results' in data){
+            for(let item = 0; item < data['results'].length; item++){
+                values["One_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
+                }
+              }}}
+  Variables.onehour = values["One_Hour"]['c']
+  Variables.lenonehour = Variables.onehour.length
+            }
+
 
 async function Two_Hour(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Two_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
-        url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await fetch(url);
-        var data = await res.json();
+        url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
         if ('results' in data){
-            for(const item in data['results']){
-                values["Two_Hour"]['c'].push(parseFloat(item['c']))
+            for(let item = 0; item < data['results'].length; item++){
+                values["Two_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
                 }
               }}}
-  Variables.twohour = aggs
+  Variables.twohour = values["Two_Hour"]['c']
   Variables.lentwohour = Variables.twohour.length
 }
 
 async function Four_Hour(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Four_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
-        url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await fetch(url);
-        var data = await res.json();
+        url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
         if ('results' in data){
-            for(const item in data['results']){
-                values["Four_Hour"]['c'].push(parseFloat(item['c']))
+            for(let item = 0; item < data['results'].length; item++){
+                values["Four_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
                 }
               }}}
-  Variables.fourhour = aggs
+  Variables.fourhour = values["Four_Hour"]['c']
   Variables.lenfourhour = Variables.fourhour.length
 }
 
 async function Daily(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Daily"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
-        url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await fetch(url);
-        var data = await res.json();
+        url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
         if ('results' in data){
-            for(const item in data['results']){
-                values["Daily"]['c'].push(parseFloat(item['c']))
+            for(let item = 0; item < data['results'].length; item++){
+                values["Daily"]['c'].push(parseFloat(data['results'][item]['c']))
                 }
               }}}
-  Variables.daily = aggs
+  Variables.daily = values["Daily"]['c']
   Variables.lendaily = Variables.daily.length
 }
 
 async function Weekly(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Weekly"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
-        url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await fetch(url);
-        var data = await res.json();
+        url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
         if ('results' in data){
-            for(const item in data['results']){
-                values["Weekly"]['c'].push(parseFloat(item['c']))
+            for(let item = 0; item < data['results'].length; item++){
+                values["Weekly"]['c'].push(parseFloat(data['results'][item]['c']))
                 }
               }}}
-  Variables.weekly = aggs
+  Variables.weekly = values["Weekly"]['c']
   Variables.lenweekly = Variables.weekly.length
 }
 async function Five_Min_Extend(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Five_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Five_Min Extend"]['c'].push(parseFloat(item['c']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Five_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
                   }
                 }}}
-  Variables.extendfive = aggs
+  Variables.extendfive = values["Five_Min Extend"]['c']
   Variables.lenextendfive = Variables.extendfive.length
     }
 
 async function Fifteen_Min_Extend(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Fifteen_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Fifteen_Min Extend"]['c'].push(parseFloat(item['c']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Fifteen_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
                   }
                 }}}
-  Variables.extendfifteen = aggs
+  Variables.extendfifteen = values["Fifteen_Min Extend"]['c']
   Variables.lenextendfifteen = Variables.extendfifteen.length
 }
 
 async function Thirty_Min_Extend(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Thirty_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Thirty_Min Extend"]['c'].push(parseFloat(item['c']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Thirty_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
                   }
                 }}}
-  Variables.extendthirty = aggs
+  Variables.extendthirty = values["Thirty_Min Extend"]['c']
   Variables.lenextendthirty = Variables.extendthirty.length
 }
 
 async function One_Hour_Extend(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["One_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
   while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["One_Hour Extend"]['c'].push(parseFloat(item['c']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["One_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
                   }
                 }}}
-  Variables.extendhour = aggs
+  Variables.extendhour = values["One_Hour Extend"]['c']
   Variables.lenextendhour = Variables.extendhour.length
 }
 
 async function Two_Hour_Extend(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Two_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
-        url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await fetch(url);
-        var data = await res.json();
+        url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
         if ('results' in data){
-            for(const item in data['results']){
-                values["Two_Hour Extend"]['c'].push(parseFloat(item['c']))
+            for(let item = 0; item < data['results'].length; item++){
+                values["Two_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
                 }
               }}}
-  Variables.extendtwohour = aggs
+  Variables.extendtwohour = values["Two_Hour Extend"]['c']
   Variables.lenextendtwohour = Variables.extendtwohour.length
 }
 
 async function Four_Hour_Extend(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
-      values["Four_Hour_Extend"]['c'].push(parseFloat(data['results'][item]['c']))
+      values["Four_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
-        url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await fetch(url);
-        var data = await res.json();
+        url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
         if ('results' in data){
-            for(const item in data['results']){
-                values["Four_Hour_Extend"]['c'].push(parseFloat(item['c']))
+            for(let item = 0; item < data['results'].length; item++){
+                values["Four_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
                 }
               }}}
-  Variables.extendfourhour = aggs
+  Variables.extendfourhour = values["Four_Hour Extend"]['c']
   Variables.lenextendfourhour = Variables.extendfourhour.length
 }
 
 async function Daily_Extend(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Daily Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
-        url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await fetch(url);
-        var data = await res.json();
+        url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
         if ('results' in data){
-            for(const item in data['results']){
-                values["Daily Extend"]['c'].push(parseFloat(item['c']))
+            for(let item = 0; item < data['results'].length; item++){
+                values["Daily Extend"]['c'].push(parseFloat(data['results'][item]['c']))
                 }
               }}}
-  Variables.extenddaily = aggs
+  Variables.extenddaily = values["Daily Extend"]['c']
   Variables.lenextenddaily = Variables.extenddaily.length
   }
 
 async function Weekly_Extend(instrument){
   let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
+  let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+  var res = await instance.get(url);
+  var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Weekly Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
   while('next_url' in data){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
-        url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await fetch(url);
-        var data = await res.json();
+        url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
         if ('results' in data){
-            for(const item in data['results']){
-                values["Weekly Extend"]['c'].push(parseFloat(item['c']))
+            for(let item = 0; item < data['results'].length; item++){
+                values["Weekly Extend"]['c'].push(parseFloat(data['results'][item]['c']))
                 }
               }}}
-  Variables.extendweekly = aggs
+  Variables.extendweekly = values["Weekly Extend"]['c']
   Variables.lenextendweekly = Variables.extendweekly.length
   }
 async function Five_Min_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Five_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Five_Min"]['l'].push(parseFloat(item['l']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Five_Min"]['l'].push(parseFloat(data['results'][item]['l']))
                     }
                   }}}
-    Variables.fivelow = aggs
+    Variables.fivelow = values["Five_Min"]['l']
     Variables.lenfivelow = Variables.fivelow.length
     }
   
 async function Fifteen_Min_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Fifteen_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Fifteen_Min"]['l'].push(parseFloat(item['l']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Fifteen_Min"]['l'].push(parseFloat(data['results'][item]['l']))
                     }
                   }}} 
-    Variables.fifteenlow = aggs
+    Variables.fifteenlow = values["Fifteen_Min"]['l']
     Variables.lenfifteenlow = Variables.fifteenlow.length
   }
   
 async function Thirty_Min_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Thirty_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Thirty_Min"]['l'].push(parseFloat(item['l']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Thirty_Min"]['l'].push(parseFloat(data['results'][item]['l']))
                     }
                   }}}
-    Variables.thirtylow = aggs
+    Variables.thirtylow = values["Thirty_Min"]['l']
     Variables.lenthirtylow = Variables.thirtylow.length
   }
   
 async function One_Hour_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["One_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["One_Hour"]['l'].push(parseFloat(item['l']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["One_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
                     }
                   }}}
-    Variables.hourlow = aggs
+    Variables.hourlow = values["One_Hour"]['l']
     Variables.lenhourlow = Variables.hourlow.length
     }
   
 async function Two_Hour_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Two_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Two_Hour"]['l'].push(parseFloat(item['l']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Two_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
                   }
                 }}}
-    Variables.twohourlow = aggs
+    Variables.twohourlow = values["Two_Hour"]['l']
     Variables.lentwohourlow = Variables.twohourlow.length
   }
   
 async function Four_Hour_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Four_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Four_Hour"]['l'].push(parseFloat(item['l']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Four_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
                   }
                 }}}
-    Variables.fourhourlow = aggs
+    Variables.fourhourlow = values["Four_Hour"]['l']
     Variables.lenfourhourlow = Variables.fourhourlow.length
   }
   
 async function Daily_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Daily"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Daily"]['l'].push(parseFloat(item['l']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Daily"]['l'].push(parseFloat(data['results'][item]['l']))
                   }
                 }}}
-    Variables.dailylow = aggs
+    Variables.dailylow = values["Daily"]['l']
     Variables.lendailylow = Variables.dailylow.length
   }
   
 async function Weekly_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Weekly"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Weekly"]['l'].push(parseFloat(item['l']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Weekly"]['l'].push(parseFloat(data['results'][item]['l']))
                   }
                 }}}
-    Variables.weeklylow = aggs
+    Variables.weeklylow = values["Weekly"]['l']
     Variables.lenweeklylow = Variables.weeklylow.length
   }
 async function Five_Min_Extend_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Five_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Five_Min Extend"]['l'].push(parseFloat(item['l']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Five_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
                     }
                   }}}
-    Variables.extendfivelow = aggs
+    Variables.extendfivelow = values["Five_Min Extend"]['l']
     Variables.lenextendfivelow = Variables.extendfivelow.length
       }
   
 async function Fifteen_Min_Extend_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Fifteen_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Fifteen_Min Extend"]['l'].push(parseFloat(item['l']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Fifteen_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
                     }
                   }}}
-    Variables.extendfifteenlow = aggs
+    Variables.extendfifteenlow = values["Fifteen_Min Extend"]['l']
     Variables.lenextendfifteenlow = Variables.extendfifteenlow.length
   }
   
 async function Thirty_Min_Extend_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Thirty_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Thirty_Min Extend"]['l'].push(parseFloat(item['l']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Thirty_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
                     }
                   }}}
-    Variables.extendthirtylow = aggs
+    Variables.extendthirtylow = values["Thirty_Min Extend"]['l']
     Variables.lenextendthirtylow = Variables.extendthirtylow.length
   }
   
 async function One_Hour_Extend_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["One_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
     while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["One_Hour Extend"]['l'].push(parseFloat(item['l']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["One_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
                     }
                   }}}
-    Variables.extendhourlow = aggs
+    Variables.extendhourlow = values["One_Hour Extend"]['l']
     Variables.lenextendhourlow = Variables.extendhourlow.length
   }
   
 async function Two_Hour_Extend_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Two_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Two_Hour Extend"]['l'].push(parseFloat(item['l']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Two_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
                   }
                 }}}
-    Variables.extendtwohourlow = aggs
+    Variables.extendtwohourlow = values["Two_Hour Extend"]['l']
     Variables.lenextendtwohourlow = Variables.extendtwohourlow.length
   }
   
 async function Four_Hour_Extend_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
-        values["Four_Hour_Extend"]['l'].push(parseFloat(data['results'][item]['l']))
+        values["Four_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Four_Hour_Extend"]['l'].push(parseFloat(item['l']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Four_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
                   }
                 }}}
-    Variables.extendfourhourlow = aggs
+    Variables.extendfourhourlow = values["Four_Hour Extend"]['l']
     Variables.lenextendfourhourlow = Variables.extendfourhourlow.length
   }
   
 async function Daily_Extend_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Daily Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Daily Extend"]['l'].push(parseFloat(item['l']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Daily Extend"]['l'].push(parseFloat(data['results'][item]['l']))
                   }
                 }}}
-    Variables.extenddailylow = aggs
+    Variables.extenddailylow = values["Daily Extend"]['l']
     Variables.lenextenddailylow = Variables.extenddailylow.length
     }
   
 async function Weekly_Extend_Low(instrument){
     let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
+    let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+    var res = await instance.get(url);
+    var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Weekly Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
     while('next_url' in data){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
+          url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+          var res = await instance.get(url);
+          var data = await res.data;
           if ('results' in data){
-              for(const item in data['results']){
-                  values["Weekly Extend"]['l'].push(parseFloat(item['l']))
+              for(let item = 0; item < data['results'].length; item++){
+                  values["Weekly Extend"]['l'].push(parseFloat(data['results'][item]['l']))
                   }
                 }}}
-    Variables.extendweeklylow = aggs
+    Variables.extendweeklylow = values["Weekly Extend"]['l']
     Variables.lenextendweeklylow = Variables.extendweeklylow.length
     }
 
     async function Five_Min_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Five_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
-              url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await fetch(url);
-              var data = await res.json();
+              url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
               if ('results' in data){
-                  for(const item in data['results']){
-                      values["Five_Min"]['h'].push(parseFloat(item['h']))
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Five_Min"]['h'].push(parseFloat(data['results'][item]['h']))
                       }
                     }}}
-      Variables.fivehigh = aggs
+      Variables.fivehigh = values["Five_Min"]['h']
       Variables.lenfivehigh = Variables.fivehigh.length
       }
     
   async function Fifteen_Min_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Fifteen_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
-              url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await fetch(url);
-              var data = await res.json();
+              url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
               if ('results' in data){
-                  for(const item in data['results']){
-                      values["Fifteen_Min"]['h'].push(parseFloat(item['h']))
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Fifteen_Min"]['h'].push(parseFloat(data['results'][item]['h']))
                       }
                     }}} 
-      Variables.fifteenhigh = aggs
+      Variables.fifteenhigh = values["Fifteen_Min"]['h']
       Variables.lenfifteenhigh = Variables.fifteenhigh.length
     }
     
   async function Thirty_Min_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Thirty_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
-              url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await fetch(url);
-              var data = await res.json();
+              url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
               if ('results' in data){
-                  for(const item in data['results']){
-                      values["Thirty_Min"]['h'].push(parseFloat(item['h']))
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Thirty_Min"]['h'].push(parseFloat(data['results'][item]['h']))
                       }
                     }}}
-      Variables.thirtyhigh = aggs
+      Variables.thirtyhigh = values["Thirty_Min"]['h']
       Variables.lenthirtyhigh = Variables.thirtyhigh.length
     }
     
   async function One_Hour_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["One_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
-              url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await fetch(url);
-              var data = await res.json();
+              url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
               if ('results' in data){
-                  for(const item in data['results']){
-                      values["One_Hour"]['h'].push(parseFloat(item['h']))
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["One_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
                       }
                     }}}
-      Variables.hourhigh = aggs
+      Variables.hourhigh = values["One_Hour"]['h']
       Variables.lenhourhigh = Variables.hourhigh.length
       }
     
   async function Two_Hour_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Two_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Two_Hour"]['h'].push(parseFloat(item['h']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Two_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
                     }
                   }}}
-      Variables.twohourhigh = aggs
+      Variables.twohourhigh = values["Two_Hour"]['h']
       Variables.lentwohourhigh = Variables.twohourhigh.length
     }
     
   async function Four_Hour_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Four_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Four_Hour"]['h'].push(parseFloat(item['h']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Four_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
                     }
                   }}}
-      Variables.fourhourhigh = aggs
+      Variables.fourhourhigh = values["Four_Hour"]['h']
       Variables.lenfourhourhigh = Variables.fourhourhigh.length
     }
     
   async function Daily_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Daily"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Daily"]['h'].push(parseFloat(item['h']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Daily"]['h'].push(parseFloat(data['results'][item]['h']))
                     }
                   }}}
-      Variables.dailyhigh = aggs
+      Variables.dailyhigh = values["Daily"]['h']
       Variables.lendailyhigh = Variables.dailyhigh.length
     }
     
   async function Weekly_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Weekly"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Weekly"]['h'].push(parseFloat(item['h']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Weekly"]['h'].push(parseFloat(data['results'][item]['h']))
                     }
                   }}}
-      Variables.weeklyhigh = aggs
+      Variables.weeklyhigh = values["Weekly"]['h']
       Variables.lenweeklyhigh = Variables.weeklyhigh.length
     }
   async function Five_Min_Extend_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Five_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
-              url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await fetch(url);
-              var data = await res.json();
+              url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
               if ('results' in data){
-                  for(const item in data['results']){
-                      values["Five_Min Extend"]['h'].push(parseFloat(item['h']))
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Five_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
                       }
                     }}}
-      Variables.extendfivehigh = aggs
+      Variables.extendfivehigh = values["Five_Min Extend"]['h']
       Variables.lenextendfivehigh = Variables.extendfivehigh.length
         }
     
   async function Fifteen_Min_Extend_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Fifteen_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
-              url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await fetch(url);
-              var data = await res.json();
+              url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
               if ('results' in data){
-                  for(const item in data['results']){
-                      values["Fifteen_Min Extend"]['h'].push(parseFloat(item['h']))
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Fifteen_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
                       }
                     }}}
-      Variables.extendfifteenhigh = aggs
+      Variables.extendfifteenhigh = values["Fifteen_Min Extend"]['h']
       Variables.lenextendfifteenhigh = Variables.extendfifteenhigh.length
     }
     
   async function Thirty_Min_Extend_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Thirty_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
-              url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await fetch(url);
-              var data = await res.json();
+              url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
               if ('results' in data){
-                  for(const item in data['results']){
-                      values["Thirty_Min Extend"]['h'].push(parseFloat(item['h']))
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Thirty_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
                       }
                     }}}
-      Variables.extendthirtyhigh = aggs
+      Variables.extendthirtyhigh = values["Thirty_Min Extend"]['h']
       Variables.lenextendthirtyhigh = Variables.extendthirtyhigh.length
     }
     
   async function One_Hour_Extend_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["One_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
       while('next_url' in data){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
-              url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await fetch(url);
-              var data = await res.json();
+              url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
               if ('results' in data){
-                  for(const item in data['results']){
-                      values["One_Hour Extend"]['h'].push(parseFloat(item['h']))
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["One_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
                       }
                     }}}
-      Variables.extendhourhigh = aggs
+      Variables.extendhourhigh = values["One_Hour Extend"]['h']
       Variables.lenextendhourhigh = Variables.extendhourhigh.length
     }
     
   async function Two_Hour_Extend_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Two_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Two_Hour Extend"]['h'].push(parseFloat(item['h']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Two_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
                     }
                   }}}
-      Variables.extendtwohourhigh = aggs
+      Variables.extendtwohourhigh = values["Two_Hour Extend"]['h']
       Variables.lenextendtwohourhigh = Variables.extendtwohourhigh.length
     }
     
   async function Four_Hour_Extend_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
-          values["Four_Hour_Extend"]['h'].push(parseFloat(data['results'][item]['h']))
+          values["Four_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Four_Hour_Extend"]['h'].push(parseFloat(item['h']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Four_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
                     }
                   }}}
-      Variables.extendfourhourhigh = aggs
+      Variables.extendfourhourhigh = values["Four_Hour Extend"]['h']
       Variables.lenextendfourhourhigh = Variables.extendfourhourhigh.length
     }
     
   async function Daily_Extend_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Daily Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Daily Extend"]['h'].push(parseFloat(item['h']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Daily Extend"]['h'].push(parseFloat(data['results'][item]['h']))
                     }
                   }}}
-      Variables.extenddailyhigh = aggs
+      Variables.extenddailyhigh = values["Daily Extend"]['h']
       Variables.lenextenddailyhigh = Variables.extenddailyhigh.length
       }
     
-  async function Weekly_Extend_High(instrument){
+    async function Weekly_Extend_High(instrument){
       let aggs = []
-      let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await fetch(url);
-      var data = await res.json();
+      let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+      var res = await instance.get(url);
+      var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Weekly Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
       while('next_url' in data){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
+            url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+            var res = await instance.get(url);
+            var data = await res.data;
             if ('results' in data){
-                for(const item in data['results']){
-                    values["Weekly Extend"]['h'].push(parseFloat(item['h']))
+                for(let item = 0; item < data['results'].length; item++){
+                    values["Weekly Extend"]['h'].push(parseFloat(data['results'][item]['h']))
                     }
                   }}}
-      Variables.extendweeklyhigh = aggs
+      Variables.extendweeklyhigh = values["Weekly Extend"]['h']
       Variables.lenextendweeklyhigh = Variables.extendweeklyhigh.length
       }
-async function Five_Min_Open(instrument){
-  let aggs = []
-  let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await fetch(url);
-  var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Five_Min"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-  while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Five_Min"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-  Variables.fiveopen = aggs
-  Variables.lenfiveopen = Variables.fiveopen.length
-  }
-  
-async function Fifteen_Min_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-        for(let item = 0; item < data['results'].length; item++){
-          values["Fifteen_Min"]['o'].push(parseFloat(data['results'][item]['o']))
+    async function Five_Min_Open(instrument){
+        let aggs = []
+        let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+            for(let item = 0; item < data['results'].length; item++){
+              values["Five_Min"]['o'].push(parseFloat(data['results'][item]['o']))
+            }
+        while('next_url' in data){
+              if('next_url' in data){
+                let id = data['next_url'].split('/')[10]
+                url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+                var res = await instance.get(url);
+                var data = await res.data;
+                if ('results' in data){
+                    for(let item = 0; item < data['results'].length; item++){
+                        values["Five_Min"]['o'].push(parseFloat(data['results'][item]['o']))
+                        }
+                      }}}
+        Variables.fiveopen = values["Five_Min"]['o']
+        Variables.lenfiveopen = Variables.fiveopen.length
         }
-    while('next_url' in data){
-          if('next_url' in data){
-            let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
-            if ('results' in data){
-                for(const item in data['results']){
-                    values["Fifteen_Min"]['o'].push(parseFloat(item['o']))
-                    }
-                  }}} 
-    Variables.fifteenopen = aggs
-    Variables.lenfifteenopen = Variables.fifteenopen.length
-  }
-  
-async function Thirty_Min_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-        for(let item = 0; item < data['results'].length; item++){
-          values["Thirty_Min"]['o'].push(parseFloat(data['results'][item]['o']))
+      
+    async function Fifteen_Min_Open(instrument){
+        let aggs = []
+        let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+            for(let item = 0; item < data['results'].length; item++){
+              values["Fifteen_Min"]['o'].push(parseFloat(data['results'][item]['o']))
+            }
+        while('next_url' in data){
+              if('next_url' in data){
+                let id = data['next_url'].split('/')[10]
+                url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+                var res = await instance.get(url);
+                var data = await res.data;
+                if ('results' in data){
+                    for(let item = 0; item < data['results'].length; item++){
+                        values["Fifteen_Min"]['o'].push(parseFloat(data['results'][item]['o']))
+                        }
+                      }}} 
+        Variables.fifteenopen = values["Fifteen_Min"]['o']
+        Variables.lenfifteenopen = Variables.fifteenopen.length
+      }
+      
+    async function Thirty_Min_Open(instrument){
+        let aggs = []
+        let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+            for(let item = 0; item < data['results'].length; item++){
+              values["Thirty_Min"]['o'].push(parseFloat(data['results'][item]['o']))
+            }
+        while('next_url' in data){
+              if('next_url' in data){
+                let id = data['next_url'].split('/')[10]
+                url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+                var res = await instance.get(url);
+                var data = await res.data;
+                if ('results' in data){
+                    for(let item = 0; item < data['results'].length; item++){
+                        values["Thirty_Min"]['o'].push(parseFloat(data['results'][item]['o']))
+                        }
+                      }}}
+        Variables.thirtyopen = values["Thirty_Min"]['o']
+        Variables.lenthirtyopen = Variables.thirtyopen.length
+      }
+      
+    async function One_Hour_Open(instrument){
+        let aggs = []
+        let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+            for(let item = 0; item < data['results'].length; item++){
+              values["One_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
+            }
+        while('next_url' in data){
+              if('next_url' in data){
+                let id = data['next_url'].split('/')[10]
+                url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+                var res = await instance.get(url);
+                var data = await res.data;
+                if ('results' in data){
+                    for(let item = 0; item < data['results'].length; item++){
+                        values["One_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
+                        }
+                      }}}
+        Variables.houropen = values["One_Hour"]['o']
+        Variables.lenhouropen = Variables.houropen.length
         }
-    while('next_url' in data){
-          if('next_url' in data){
-            let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
-            if ('results' in data){
-                for(const item in data['results']){
-                    values["Thirty_Min"]['o'].push(parseFloat(item['o']))
-                    }
-                  }}}
-    Variables.thirtyopen = aggs
-    Variables.lenthirtyopen = Variables.thirtyopen.length
-  }
-  
-async function One_Hour_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-        for(let item = 0; item < data['results'].length; item++){
-          values["One_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
+      
+    async function Two_Hour_Open(instrument){
+        let aggs = []
+        let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+          for(let item = 0; item < data['results'].length; item++){
+            values["Two_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
+          }
+        while('next_url' in data){
+            if('next_url' in data){
+              let id = data['next_url'].split('/')[10]
+              url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
+              if ('results' in data){
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Two_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
+                      }
+                    }}}
+        Variables.twohouropen = values["Two_Hour"]['o']
+        Variables.lentwohouropen = Variables.twohouropen.length
+      }
+      
+    async function Four_Hour_Open(instrument){
+        let aggs = []
+        let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+          for(let item = 0; item < data['results'].length; item++){
+            values["Four_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
+          }
+        while('next_url' in data){
+            if('next_url' in data){
+              let id = data['next_url'].split('/')[10]
+              url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
+              if ('results' in data){
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Four_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
+                      }
+                    }}}
+        Variables.fourhouropen = values["Four_Hour"]['o']
+        Variables.lenfourhouropen = Variables.fourhouropen.length
+      }
+      
+    async function Daily_Open(instrument){
+        let aggs = []
+        let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+          for(let item = 0; item < data['results'].length; item++){
+            values["Daily"]['o'].push(parseFloat(data['results'][item]['o']))
+          }
+        while('next_url' in data){
+            if('next_url' in data){
+              let id = data['next_url'].split('/')[10]
+              url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
+              if ('results' in data){
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Daily"]['o'].push(parseFloat(data['results'][item]['o']))
+                      }
+                    }}}
+        Variables.dailyopen = values["Daily"]['o']
+        Variables.lendailyopen = Variables.dailyopen.length
+      }
+      
+    async function Weekly_Open(instrument){
+        let aggs = []
+        let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+          for(let item = 0; item < data['results'].length; item++){
+            values["Weekly"]['o'].push(parseFloat(data['results'][item]['o']))
+          }
+        while('next_url' in data){
+            if('next_url' in data){
+              let id = data['next_url'].split('/')[10]
+              url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
+              if ('results' in data){
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Weekly"]['o'].push(parseFloat(data['results'][item]['o']))
+                      }
+                    }}}
+        Variables.weeklyopen = values["Weekly"]['o']
+        Variables.lenweeklyopen = Variables.weeklyopen.length
+      }
+    async function Five_Min_Extend_Open(instrument){
+        let aggs = []
+        let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+            for(let item = 0; item < data['results'].length; item++){
+              values["Five_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+            }
+        while('next_url' in data){
+              if('next_url' in data){
+                let id = data['next_url'].split('/')[10]
+                url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+                var res = await instance.get(url);
+                var data = await res.data;
+                if ('results' in data){
+                    for(let item = 0; item < data['results'].length; item++){
+                        values["Five_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+                        }
+                      }}}
+        Variables.extendfiveopen = values["Five_Min Extend"]['o']
+        Variables.lenextendfiveopen = Variables.extendfiveopen.length
+          }
+      
+    async function Fifteen_Min_Extend_Open(instrument){
+        let aggs = []
+        let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+            for(let item = 0; item < data['results'].length; item++){
+              values["Fifteen_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+            }
+        while('next_url' in data){
+              if('next_url' in data){
+                let id = data['next_url'].split('/')[10]
+                url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+                var res = await instance.get(url);
+                var data = await res.data;
+                if ('results' in data){
+                    for(let item = 0; item < data['results'].length; item++){
+                        values["Fifteen_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+                        }
+                      }}}
+        Variables.extendfifteenopen = values["Fifteen_Min Extend"]['o']
+        Variables.lenextendfifteenopen = Variables.extendfifteenopen.length
+      }
+      
+    async function Thirty_Min_Extend_Open(instrument){
+        let aggs = []
+        let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+            for(let item = 0; item < data['results'].length; item++){
+              values["Thirty_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+            }
+        while('next_url' in data){
+              if('next_url' in data){
+                let id = data['next_url'].split('/')[10]
+                url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+                var res = await instance.get(url);
+                var data = await res.data;
+                if ('results' in data){
+                    for(let item = 0; item < data['results'].length; item++){
+                        values["Thirty_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+                        }
+                      }}}
+        Variables.extendthirtyopen = values["Thirty_Min Extend"]['o']
+        Variables.lenextendthirtyopen = Variables.extendthirtyopen.length
+      }
+      
+    async function One_Hour_Extend_Open(instrument){
+        let aggs = []
+        let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+            for(let item = 0; item < data['results'].length; item++){
+              values["One_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+            }
+        while('next_url' in data){
+              if('next_url' in data){
+                let id = data['next_url'].split('/')[10]
+                url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+                var res = await instance.get(url);
+                var data = await res.data;
+                if ('results' in data){
+                    for(let item = 0; item < data['results'].length; item++){
+                        values["One_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+                        }
+                      }}}
+        Variables.extendhouropen = values["One_Hour Extend"]['o']
+        Variables.lenextendhouropen = Variables.extendhouropen.length
+      }
+      
+    async function Two_Hour_Extend_Open(instrument){
+        let aggs = []
+        let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+          for(let item = 0; item < data['results'].length; item++){
+            values["Two_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+          }
+        while('next_url' in data){
+            if('next_url' in data){
+              let id = data['next_url'].split('/')[10]
+              url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
+              if ('results' in data){
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Two_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+                      }
+                    }}}
+        Variables.extendtwohouropen = values["Two_Hour Extend"]['o']
+        Variables.lenextendtwohouropen = Variables.extendtwohouropen.length
+      }
+      
+    async function Four_Hour_Extend_Open(instrument){
+        let aggs = []
+        let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+          for(let item = 0; item < data['results'].length; item++){
+            values["Four_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+          }
+        while('next_url' in data){
+            if('next_url' in data){
+              let id = data['next_url'].split('/')[10]
+              url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
+              if ('results' in data){
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Four_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+                      }
+                    }}}
+        Variables.extendfourhouropen = values["Four_Hour Extend"]['o']
+        Variables.lenextendfourhouropen = Variables.extendfourhouropen.length
+      }
+      
+    async function Daily_Extend_Open(instrument){
+        let aggs = []
+        let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+          for(let item = 0; item < data['results'].length; item++){
+            values["Daily Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+          }
+        while('next_url' in data){
+            if('next_url' in data){
+              let id = data['next_url'].split('/')[10]
+              url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
+              if ('results' in data){
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Daily Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+                      }
+                    }}}
+        Variables.extenddailyopen = values["Daily Extend"]['o']
+        Variables.lenextenddailyopen = Variables.extenddailyopen.length
         }
-    while('next_url' in data){
-          if('next_url' in data){
-            let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
-            if ('results' in data){
-                for(const item in data['results']){
-                    values["One_Hour"]['o'].push(parseFloat(item['o']))
-                    }
-                  }}}
-    Variables.houropen = aggs
-    Variables.lenhouropen = Variables.houropen.length
-    }
-  
-async function Two_Hour_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Two_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-    while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Two_Hour"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-    Variables.twohouropen = aggs
-    Variables.lentwohouropen = Variables.twohouropen.length
-  }
-  
-async function Four_Hour_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Four_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-    while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Four_Hour"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-    Variables.fourhouropen = aggs
-    Variables.lenfourhouropen = Variables.fourhouropen.length
-  }
-  
-async function Daily_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Daily"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-    while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Daily"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-    Variables.dailyopen = aggs
-    Variables.lendailyopen = Variables.dailyopen.length
-  }
-  
-async function Weekly_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Weekly"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-    while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Weekly"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-    Variables.weeklyopen = aggs
-    Variables.lenweeklyopen = Variables.weeklyopen.length
-  }
-async function Five_Min_Extend_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-        for(let item = 0; item < data['results'].length; item++){
-          values["Five_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+      
+    async function Weekly_Extend_Open(instrument){
+        let aggs = []
+        let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+        var res = await instance.get(url);
+        var data = await res.data;
+          for(let item = 0; item < data['results'].length; item++){
+            values["Weekly Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+          }
+        while('next_url' in data){
+            if('next_url' in data){
+              let id = data['next_url'].split('/')[10]
+              url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
+              var res = await instance.get(url);
+              var data = await res.data;
+              if ('results' in data){
+                  for(let item = 0; item < data['results'].length; item++){
+                      values["Weekly Extend"]['o'].push(parseFloat(data['results'][item]['o']))
+                      }
+                    }}}
+        Variables.extendweeklyopen = values["Weekly Extend"]['o']
+        Variables.lenextendweeklyopen = Variables.extendweeklyopen.length
         }
-    while('next_url' in data){
-          if('next_url' in data){
-            let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
-            if ('results' in data){
-                for(const item in data['results']){
-                    values["Five_Min Extend"]['o'].push(parseFloat(item['o']))
-                    }
-                  }}}
-    Variables.extendfiveopen = aggs
-    Variables.lenextendfiveopen = Variables.extendfiveopen.length
-      }
-  
-async function Fifteen_Min_Extend_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-        for(let item = 0; item < data['results'].length; item++){
-          values["Fifteen_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
-        }
-    while('next_url' in data){
-          if('next_url' in data){
-            let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
-            if ('results' in data){
-                for(const item in data['results']){
-                    values["Fifteen_Min Extend"]['o'].push(parseFloat(item['o']))
-                    }
-                  }}}
-    Variables.extendfifteenopen = aggs
-    Variables.lenextendfifteenopen = Variables.extendfifteenopen.length
-  }
-  
-async function Thirty_Min_Extend_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-        for(let item = 0; item < data['results'].length; item++){
-          values["Thirty_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
-        }
-    while('next_url' in data){
-          if('next_url' in data){
-            let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
-            if ('results' in data){
-                for(const item in data['results']){
-                    values["Thirty_Min Extend"]['o'].push(parseFloat(item['o']))
-                    }
-                  }}}
-    Variables.extendthirtyopen = aggs
-    Variables.lenextendthirtyopen = Variables.extendthirtyopen.length
-  }
-  
-async function One_Hour_Extend_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-        for(let item = 0; item < data['results'].length; item++){
-          values["One_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
-        }
-    while('next_url' in data){
-          if('next_url' in data){
-            let id = data['next_url'].split('/')[10]
-            url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await fetch(url);
-            var data = await res.json();
-            if ('results' in data){
-                for(const item in data['results']){
-                    values["One_Hour Extend"]['o'].push(parseFloat(item['o']))
-                    }
-                  }}}
-    Variables.extendhouropen = aggs
-    Variables.lenextendhouropen = Variables.extendhouropen.length
-  }
-  
-async function Two_Hour_Extend_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Two_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-    while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Two_Hour Extend"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-    Variables.extendtwohouropen = aggs
-    Variables.lenextendtwohouropen = Variables.extendtwohouropen.length
-  }
-  
-async function Four_Hour_Extend_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Four_Hour_Extend"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-    while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Four_Hour_Extend"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-    Variables.extendfourhouropen = aggs
-    Variables.lenextendfourhouropen = Variables.extendfourhouropen.length
-  }
-  
-async function Daily_Extend_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Daily Extend"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-    while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Daily Extend"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-    Variables.extenddailyopen = aggs
-    Variables.lenextenddailyopen = Variables.extenddailyopen.length
-    }
-  
-async function Weekly_Extend_Open(instrument){
-    let aggs = []
-    let url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await fetch(url);
-    var data = await res.json();
-      for(let item = 0; item < data['results'].length; item++){
-        values["Weekly Extend"]['o'].push(parseFloat(data['results'][item]['o']))
-      }
-    while('next_url' in data){
-        if('next_url' in data){
-          let id = data['next_url'].split('/')[10]
-          url = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await fetch(url);
-          var data = await res.json();
-          if ('results' in data){
-              for(const item in data['results']){
-                  values["Weekly Extend"]['o'].push(parseFloat(item['o']))
-                  }
-                }}}
-    Variables.extendweeklyopen = aggs
-    Variables.lenextendweeklyopen = Variables.extendweeklyopen.length
-    }
     async function Price(instrument){
       const pricelist = await yfin.quoteSummary(instrument)
       const prices = pricelist.price.regularMarketPrice
@@ -1655,28 +1660,28 @@ async function Weekly_Extend_Open(instrument){
 
 function equalizer(){
   let listoflens = []
-  listoflens.append(Variables.lenfivehigh)
-  listoflens.append(Variables.lenfifteenhigh)
-  listoflens.append(Variables.lenthirtyhigh)
-  listoflens.append(Variables.lenhourhigh)
-  listoflens.append(Variables.lentwohourhigh)
-  listoflens.append(Variables.lenfourhourhigh)
-  listoflens.append(Variables.lendailyhigh)
-  listoflens.append(Variables.lenweeklyhigh)
+  listoflens.push(Variables.lenfivehigh)
+  listoflens.push(Variables.lenfifteenhigh)
+  listoflens.push(Variables.lenthirtyhigh)
+  listoflens.push(Variables.lenhourhigh)
+  listoflens.push(Variables.lentwohourhigh)
+  listoflens.push(Variables.lenfourhourhigh)
+  listoflens.push(Variables.lendailyhigh)
+  listoflens.push(Variables.lenweeklyhigh)
   let listofitems = []
-  listofitems.append(Variables.fivehigh)
-  listofitems.append(Variables.fifteenhigh)
-  listofitems.append(Variables.thirtyhigh)
-  listofitems.append(Variables.hourhigh)
-  listofitems.append(Variables.twohourhigh)
-  listofitems.append(Variables.fourhourhigh)
-  listofitems.append(Variables.dailyhigh)
-  listofitems.append(Variables.weeklyhigh)
-  minlen = min(listoflens)
-  for(item in listofitems){
+  listofitems.push(Variables.fivehigh)
+  listofitems.push(Variables.fifteenhigh)
+  listofitems.push(Variables.thirtyhigh)
+  listofitems.push(Variables.hourhigh)
+  listofitems.push(Variables.twohourhigh)
+  listofitems.push(Variables.fourhourhigh)
+  listofitems.push(Variables.dailyhigh)
+  listofitems.push(Variables.weeklyhigh)
+  minlen = Math.min(...listoflens)
+  for(const item in listofitems){
       if(item.length > minlen){
-          for(const x = 0; x < item.length-minlen; x++){
-              item.splice(0, 1)
+          for(let x = 0; x < item.length-minlen; x++){
+            item.splice(0, 1)
           }}}
   values["Five_Min"]['h'] = listofitems[0]
   values["Fifteen_Min"]['h'] = listofitems[1]
@@ -1687,27 +1692,27 @@ function equalizer(){
   values["Daily"]['h'] = listofitems[6]
   values["Weekly"]['h'] = listofitems[7]
   listoflens = []
-  listoflens.append(Variables.extendlenfivehigh)
-  listoflens.append(Variables.extendlenfifteenhigh)
-  listoflens.append(Variables.extendlenthirtyhigh)
-  listoflens.append(Variables.extendlenhourhigh)
-  listoflens.append(Variables.extendlentwohourhigh)
-  listoflens.append(Variables.extendlenfourhourhigh)
-  listoflens.append(Variables.extendlendailyhigh)
-  listoflens.append(Variables.extendlenweeklyhigh)
+  listoflens.push(Variables.extendlenfivehigh)
+  listoflens.push(Variables.extendlenfifteenhigh)
+  listoflens.push(Variables.extendlenthirtyhigh)
+  listoflens.push(Variables.extendlenhourhigh)
+  listoflens.push(Variables.extendlentwohourhigh)
+  listoflens.push(Variables.extendlenfourhourhigh)
+  listoflens.push(Variables.extendlendailyhigh)
+  listoflens.push(Variables.extendlenweeklyhigh)
   listofitems = []
-  listofitems.append(Variables.extendfivehigh)
-  listofitems.append(Variables.extendfifteenhigh)
-  listofitems.append(Variables.extendthirtyhigh)
-  listofitems.append(Variables.extendhourhigh)
-  listofitems.append(Variables.extendtwohourhigh)
-  listofitems.append(Variables.extendfourhourhigh)
-  listofitems.append(Variables.extenddailyhigh)
-  listofitems.append(Variables.extendweeklyhigh)
-  minlen = min(listoflens)
-  for(item in listofitems){
+  listofitems.push(Variables.extendfivehigh)
+  listofitems.push(Variables.extendfifteenhigh)
+  listofitems.push(Variables.extendthirtyhigh)
+  listofitems.push(Variables.extendhourhigh)
+  listofitems.push(Variables.extendtwohourhigh)
+  listofitems.push(Variables.extendfourhourhigh)
+  listofitems.push(Variables.extenddailyhigh)
+  listofitems.push(Variables.extendweeklyhigh)
+  minlen = Math.min(...listoflens)
+  for(const item in listofitems){
       if(item.length > minlen){
-        for(const x = 0; x < item.length-minlen; x++){
+        for(let x = 0; x < item.length-minlen; x++){
           item.splice(0, 1)
           }}}
   values["Five_Min Extend"]['h'] = listofitems[0]
@@ -1719,27 +1724,27 @@ function equalizer(){
   values["Daily Extend"]['h'] = listofitems[6]
   values["Weekly Extend"]['h'] = listofitems[7]
   listoflens = []
-  listoflens.append(Variables.lenfivelow)
-  listoflens.append(Variables.lenfifteenlow)
-  listoflens.append(Variables.lenthirtylow)
-  listoflens.append(Variables.lenhourlow)
-  listoflens.append(Variables.lentwohourlow)
-  listoflens.append(Variables.lenfourhourlow)
-  listoflens.append(Variables.lendailylow)
-  listoflens.append(Variables.lenweeklylow)
+  listoflens.push(Variables.lenfivelow)
+  listoflens.push(Variables.lenfifteenlow)
+  listoflens.push(Variables.lenthirtylow)
+  listoflens.push(Variables.lenhourlow)
+  listoflens.push(Variables.lentwohourlow)
+  listoflens.push(Variables.lenfourhourlow)
+  listoflens.push(Variables.lendailylow)
+  listoflens.push(Variables.lenweeklylow)
   listofitems = []
-  listofitems.append(Variables.fivelow)
-  listofitems.append(Variables.fifteenlow)
-  listofitems.append(Variables.thirtylow)
-  listofitems.append(Variables.hourlow)
-  listofitems.append(Variables.twohourlow)
-  listofitems.append(Variables.fourhourlow)
-  listofitems.append(Variables.dailylow)
-  listofitems.append(Variables.weeklylow)
-  minlen = min(listoflens)
-  for(item in listofitems){
+  listofitems.push(Variables.fivelow)
+  listofitems.push(Variables.fifteenlow)
+  listofitems.push(Variables.thirtylow)
+  listofitems.push(Variables.hourlow)
+  listofitems.push(Variables.twohourlow)
+  listofitems.push(Variables.fourhourlow)
+  listofitems.push(Variables.dailylow)
+  listofitems.push(Variables.weeklylow)
+  minlen = Math.min(...listoflens)
+  for(const item in listofitems){
       if(item.length > minlen){
-        for(const x = 0; x < item.length-minlen; x++){
+        for(let x = 0; x < item.length-minlen; x++){
           item.splice(0, 1)
           }}}
   values["Five_Min"]['l'] = listofitems[0]
@@ -1751,27 +1756,27 @@ function equalizer(){
   values["Daily"]['l'] = listofitems[6]
   values["Weekly"]['l'] = listofitems[7]
   listoflens = []
-  listoflens.append(Variables.extendlenfivelow)
-  listoflens.append(Variables.extendlenfifteenlow)
-  listoflens.append(Variables.extendlenthirtylow)
-  listoflens.append(Variables.extendlenhourlow)
-  listoflens.append(Variables.extendlentwohourlow)
-  listoflens.append(Variables.extendlenfourhourlow)
-  listoflens.append(Variables.extendlendailylow)
-  listoflens.append(Variables.extendlenweeklylow)
+  listoflens.push(Variables.extendlenfivelow)
+  listoflens.push(Variables.extendlenfifteenlow)
+  listoflens.push(Variables.extendlenthirtylow)
+  listoflens.push(Variables.extendlenhourlow)
+  listoflens.push(Variables.extendlentwohourlow)
+  listoflens.push(Variables.extendlenfourhourlow)
+  listoflens.push(Variables.extendlendailylow)
+  listoflens.push(Variables.extendlenweeklylow)
   listofitems = []
-  listofitems.append(Variables.extendfivelow)
-  listofitems.append(Variables.extendfifteenlow)
-  listofitems.append(Variables.extendthirtylow)
-  listofitems.append(Variables.extendhourlow)
-  listofitems.append(Variables.extendtwohourlow)
-  listofitems.append(Variables.extendfourhourlow)
-  listofitems.append(Variables.extenddailylow)
-  listofitems.append(Variables.extendweeklylow)
-  minlen = min(listoflens)
-  for(item in listofitems){
+  listofitems.push(Variables.extendfivelow)
+  listofitems.push(Variables.extendfifteenlow)
+  listofitems.push(Variables.extendthirtylow)
+  listofitems.push(Variables.extendhourlow)
+  listofitems.push(Variables.extendtwohourlow)
+  listofitems.push(Variables.extendfourhourlow)
+  listofitems.push(Variables.extenddailylow)
+  listofitems.push(Variables.extendweeklylow)
+  minlen = Math.min(...listoflens)
+  for(const item in listofitems){
       if(item.length > minlen){
-        for(const x = 0; x < item.length-minlen; x++){
+        for(let x = 0; x < item.length-minlen; x++){
           item.splice(0, 1)
           }}}
   values["Five_Min Extend"]['l'] = listofitems[0]
@@ -1783,27 +1788,27 @@ function equalizer(){
   values["Daily Extend"]['l'] = listofitems[6]
   values["Weekly Extend"]['l'] = listofitems[7]
   listoflens = []
-  listoflens.append(Variables.lenfiveopen)
-  listoflens.append(Variables.lenfifteenopen)
-  listoflens.append(Variables.lenthirtyopen)
-  listoflens.append(Variables.lenhouropen)
-  listoflens.append(Variables.lentwohouropen)
-  listoflens.append(Variables.lenfourhouropen)
-  listoflens.append(Variables.lendailyopen)
-  listoflens.append(Variables.lenweeklyopen)
+  listoflens.push(Variables.lenfiveopen)
+  listoflens.push(Variables.lenfifteenopen)
+  listoflens.push(Variables.lenthirtyopen)
+  listoflens.push(Variables.lenhouropen)
+  listoflens.push(Variables.lentwohouropen)
+  listoflens.push(Variables.lenfourhouropen)
+  listoflens.push(Variables.lendailyopen)
+  listoflens.push(Variables.lenweeklyopen)
   listofitems = []
-  listofitems.append(Variables.fiveopen)
-  listofitems.append(Variables.fifteenopen)
-  listofitems.append(Variables.thirtyopen)
-  listofitems.append(Variables.houropen)
-  listofitems.append(Variables.twohouropen)
-  listofitems.append(Variables.fourhouropen)
-  listofitems.append(Variables.dailyopen)
-  listofitems.append(Variables.weeklyopen)
-  minlen = min(listoflens)
-  for(item in listofitems){
+  listofitems.push(Variables.fiveopen)
+  listofitems.push(Variables.fifteenopen)
+  listofitems.push(Variables.thirtyopen)
+  listofitems.push(Variables.houropen)
+  listofitems.push(Variables.twohouropen)
+  listofitems.push(Variables.fourhouropen)
+  listofitems.push(Variables.dailyopen)
+  listofitems.push(Variables.weeklyopen)
+  minlen = Math.min(...listoflens)
+  for(const item in listofitems){
       if(item.length > minlen){
-        for(const x = 0; x < item.length-minlen; x++){
+        for(let x = 0; x < item.length-minlen; x++){
           item.splice(0, 1)
           }}}
   values["Five_Min"]['o'] = listofitems[0]
@@ -1815,27 +1820,27 @@ function equalizer(){
   values["Daily"]['o'] = listofitems[6]
   values["Weekly"]['o'] = listofitems[7]
   listoflens = []
-  listoflens.append(Variables.extendlenfiveopen)
-  listoflens.append(Variables.extendlenfifteenopen)
-  listoflens.append(Variables.extendlenthirtyopen)
-  listoflens.append(Variables.extendlenhouropen)
-  listoflens.append(Variables.extendlentwohouropen)
-  listoflens.append(Variables.extendlenfourhouropen)
-  listoflens.append(Variables.extendlendailyopen)
-  listoflens.append(Variables.extendlenweeklyopen)
+  listoflens.push(Variables.extendlenfiveopen)
+  listoflens.push(Variables.extendlenfifteenopen)
+  listoflens.push(Variables.extendlenthirtyopen)
+  listoflens.push(Variables.extendlenhouropen)
+  listoflens.push(Variables.extendlentwohouropen)
+  listoflens.push(Variables.extendlenfourhouropen)
+  listoflens.push(Variables.extendlendailyopen)
+  listoflens.push(Variables.extendlenweeklyopen)
   listofitems = []
-  listofitems.append(Variables.extendfiveopen)
-  listofitems.append(Variables.extendfifteenopen)
-  listofitems.append(Variables.extendthirtyopen)
-  listofitems.append(Variables.extendhouropen)
-  listofitems.append(Variables.extendtwohouropen)
-  listofitems.append(Variables.extendfourhouropen)
-  listofitems.append(Variables.extenddailyopen)
-  listofitems.append(Variables.extendweeklyopen)
-  minlen = min(listoflens)
-  for(item in listofitems){
+  listofitems.push(Variables.extendfiveopen)
+  listofitems.push(Variables.extendfifteenopen)
+  listofitems.push(Variables.extendthirtyopen)
+  listofitems.push(Variables.extendhouropen)
+  listofitems.push(Variables.extendtwohouropen)
+  listofitems.push(Variables.extendfourhouropen)
+  listofitems.push(Variables.extenddailyopen)
+  listofitems.push(Variables.extendweeklyopen)
+  minlen = Math.min(...listoflens)
+  for(const item in listofitems){
       if(item.length > minlen){
-        for(const x = 0; x < item.length-minlen; x++){
+        for(let x = 0; x < item.length-minlen; x++){
           item.splice(0, 1)
           }}}
   values["Five_Min Extend"]['o'] = listofitems[0]
@@ -1847,27 +1852,27 @@ function equalizer(){
   values["Daily Extend"]['o'] = listofitems[6]
   values["Weekly Extend"]['o'] = listofitems[7]
   listoflens = []
-  listoflens.append(Variables.lenfive)
-  listoflens.append(Variables.lenfifteen)
-  listoflens.append(Variables.lenthirty)
-  listoflens.append(Variables.lenhour)
-  listoflens.append(Variables.lentwohour)
-  listoflens.append(Variables.lenfourhour)
-  listoflens.append(Variables.lendaily)
-  listoflens.append(Variables.lenweekly)
+  listoflens.push(Variables.lenfive)
+  listoflens.push(Variables.lenfifteen)
+  listoflens.push(Variables.lenthirty)
+  listoflens.push(Variables.lenonehour)
+  listoflens.push(Variables.lentwohour)
+  listoflens.push(Variables.lenfourhour)
+  listoflens.push(Variables.lendaily)
+  listoflens.push(Variables.lenweekly)
   listofitems = []
-  listofitems.append(Variables.five)
-  listofitems.append(Variables.fifteen)
-  listofitems.append(Variables.thirty)
-  listofitems.append(Variables.hour)
-  listofitems.append(Variables.twohour)
-  listofitems.append(Variables.fourhour)
-  listofitems.append(Variables.daily)
-  listofitems.append(Variables.weekly)
-  minlen = min(listoflens)
-  for(item in listofitems){
+  listofitems.push(Variables.five)
+  listofitems.push(Variables.fifteen)
+  listofitems.push(Variables.thirty)
+  listofitems.push(Variables.onehour)
+  listofitems.push(Variables.twohour)
+  listofitems.push(Variables.fourhour)
+  listofitems.push(Variables.daily)
+  listofitems.push(Variables.weekly)
+  minlen = Math.min(...listoflens)
+  for(const item in listofitems){
       if(item.length > minlen){
-        for(const x = 0; x < item.length-minlen; x++){
+        for(let x = 0; x < item.length-minlen; x++){
           item.splice(0, 1)
           }}}
   values["Five_Min"]['c'] = listofitems[0]
@@ -1879,27 +1884,27 @@ function equalizer(){
   values["Daily"]['c'] = listofitems[6]
   values["Weekly"]['c'] = listofitems[7]
   listoflens = []
-  listoflens.append(Variables.extendlenfive)
-  listoflens.append(Variables.extendlenfifteen)
-  listoflens.append(Variables.extendlenthirty)
-  listoflens.append(Variables.extendlenhour)
-  listoflens.append(Variables.extendlentwohour)
-  listoflens.append(Variables.extendlenfourhour)
-  listoflens.append(Variables.extendlendaily)
-  listoflens.append(Variables.extendlenweekly)
+  listoflens.push(Variables.extendlenfive)
+  listoflens.push(Variables.extendlenfifteen)
+  listoflens.push(Variables.extendlenthirty)
+  listoflens.push(Variables.extendlenhour)
+  listoflens.push(Variables.extendlentwohour)
+  listoflens.push(Variables.extendlenfourhour)
+  listoflens.push(Variables.extendlendaily)
+  listoflens.push(Variables.extendlenweekly)
   listofitems = []
-  listofitems.append(Variables.extendfive)
-  listofitems.append(Variables.extendfifteen)
-  listofitems.append(Variables.extendthirty)
-  listofitems.append(Variables.extendhour)
-  listofitems.append(Variables.extendtwohour)
-  listofitems.append(Variables.extendfourhour)
-  listofitems.append(Variables.extenddaily)
-  listofitems.append(Variables.extendweekly)
-  minlen = min(listoflens)
-  for(item in listofitems){
+  listofitems.push(Variables.extendfive)
+  listofitems.push(Variables.extendfifteen)
+  listofitems.push(Variables.extendthirty)
+  listofitems.push(Variables.extendhour)
+  listofitems.push(Variables.extendtwohour)
+  listofitems.push(Variables.extendfourhour)
+  listofitems.push(Variables.extenddaily)
+  listofitems.push(Variables.extendweekly)
+  minlen = Math.min(...listoflens)
+  for(const item in listofitems){
       if(item.length > minlen){
-        for(const x = 0; x < item.length-minlen; x++){
+        for(let x = 0; x < item.length-minlen; x++){
           item.splice(0, 1)
           }}}
   values["Five_Min Extend"]['c'] = listofitems[0]
@@ -1994,6 +1999,5 @@ async function caller(){
 
 }
 caller()
-
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
  have been included with this distribution. */
