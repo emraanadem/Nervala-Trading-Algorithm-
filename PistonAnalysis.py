@@ -32,11 +32,11 @@ class Starters:
             for row in datas:
                 Starters.accinfo.append([str(row[0]), str(row[1]), rowid])
                 rowid+=1 
-        with open(path + '/proxies.txt', 'r') as infor:
+        with open(path + '/proxylist2.txt', 'r') as infor:
             datas = list(csv.reader(infor, delimiter = ' '))
             rowid = 0
             for row in datas:
-                Starters.proxyinfo.append([row[0].split(":")[0],row[0].split(":")[1].replace("//",""), row[0].split(":")[2], rowid])
+                Starters.proxyinfo.append([row[0].replace(",", "").replace("[", "").replace("'", ""), row[1].replace(",", "").replace("'", ""), int(row[2].replace(",","")), rowid])
                 rowid+=1 
         with open('instrumentsAll.json', 'rb') as insts:
             instrum = msgspec.json.decode(insts.read(), type=object)

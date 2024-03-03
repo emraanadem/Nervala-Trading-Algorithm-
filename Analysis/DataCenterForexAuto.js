@@ -19,19 +19,15 @@ let token = String(accinfo[1])
 let rawthree = fs.readFileSync('proxyinfo.json')
 let proxyinfo = JSON.parse(rawthree)
 let proxyval =   {
-  proxy: {
       protocol: proxyinfo[1],
       host: proxyinfo[2],
-      port: proxyinfo[3]
-  }
+      port: parseInt(proxyinfo[3])
 }
-
 const instance = axios.create({
   baseURL: "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?",
   headers: {
     Authorization: "Bearer " + token
-  }
-  })
+  }, proxy: proxyval})
 
 
 
@@ -51,7 +47,6 @@ const instance = axios.create({
 
     }
   }
-
   async function Five_Min(instrument){
       let accountID = String(accinfo[0])
       let token = String(accinfo[1])
@@ -61,7 +56,7 @@ const instance = axios.create({
           Authorization: "Bearer " + token
         }
       };
-      const res = await instance.get(url, options, proxyval);
+      const res = await instance.get(url, options);
       const data = await res.data;
           for(let item = 0; item < data.candles.length; item++){
             values["Five_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -77,7 +72,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -93,7 +88,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -109,7 +104,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -125,7 +120,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Two_Hour']['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -141,7 +136,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -157,7 +152,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -173,7 +168,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -189,7 +184,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -205,7 +200,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -221,7 +216,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -237,7 +232,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -253,7 +248,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -269,7 +264,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Four_Hour Extend']['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -285,7 +280,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Daily Extend']['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -301,7 +296,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly Extend"]['c'].push(parseFloat(data.candles[item].mid['c']))
@@ -317,7 +312,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -333,7 +328,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -349,7 +344,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -365,7 +360,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -381,7 +376,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -397,7 +392,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -413,7 +408,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -429,7 +424,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -445,7 +440,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -461,7 +456,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -477,7 +472,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -493,7 +488,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -509,7 +504,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -525,7 +520,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -541,7 +536,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -557,7 +552,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly Extend"]['h'].push(parseFloat(data.candles[item].mid['h']))
@@ -573,7 +568,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -589,7 +584,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -605,7 +600,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -621,7 +616,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -637,7 +632,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -653,7 +648,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -669,7 +664,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -685,7 +680,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -701,7 +696,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -717,7 +712,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -733,7 +728,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Thirty_Min Extend']['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -749,7 +744,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -765,7 +760,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -781,7 +776,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -797,7 +792,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -813,7 +808,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly Extend"]['o'].push(parseFloat(data.candles[item].mid['o']))
@@ -829,7 +824,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -845,7 +840,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -861,7 +856,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min"]["l"].push(parseFloat(data.candles[item].mid['l']))
@@ -877,7 +872,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -893,7 +888,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Two_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -909,7 +904,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -925,7 +920,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -941,7 +936,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -957,7 +952,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Five_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -973,7 +968,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Fifteen_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -989,7 +984,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Thirty_Min Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -1005,7 +1000,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["One_Hour Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -1021,7 +1016,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values['Two_Hour Extend']['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -1037,7 +1032,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Four_Hour Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -1053,7 +1048,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Daily Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -1069,7 +1064,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
         for(let item = 0; item < data.candles.length; item++){
           values["Weekly Extend"]['l'].push(parseFloat(data.candles[item].mid['l']))
@@ -1085,7 +1080,7 @@ const instance = axios.create({
         Authorization: "Bearer " + token
       }
     };
-    const res = await instance.get(url, options, proxyval);
+    const res = await instance.get(url, options);
     const data = await res.data;
     price = parseFloat(data.candles[0].mid['c']
     )

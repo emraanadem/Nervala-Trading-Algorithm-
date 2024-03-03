@@ -26,14 +26,12 @@ let refdayweekly = moment().subtract(5115, 'days').format().split('T')[0];
 let rawthree = fs.readFileSync('proxyinfo.json')
 let proxyinfo = JSON.parse(rawthree)
 let proxyval =   {
-  proxy: {
       protocol: proxyinfo[1],
       host: proxyinfo[2],
-      port: proxyinfo[3]
-  }
+      port: parseInt(proxyinfo[3])
 }
 const instance = axios.create({
-  baseURL: "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/"
+  baseURL: "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/", proxy: proxyval
   })
 
 
@@ -195,7 +193,7 @@ function Assigner(){
 async function Five_Min(instrument){
   let aggs = []
   let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Five_Min"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -204,7 +202,7 @@ async function Five_Min(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -218,7 +216,7 @@ async function Five_Min(instrument){
 async function Fifteen_Min(instrument){
   let aggs = []
   let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Fifteen_Min"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -227,7 +225,7 @@ async function Fifteen_Min(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -241,7 +239,7 @@ async function Fifteen_Min(instrument){
 async function Thirty_Min(instrument){
   let aggs = []
   let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Thirty_Min"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -250,7 +248,7 @@ async function Thirty_Min(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -264,7 +262,7 @@ async function Thirty_Min(instrument){
 async function One_Hour(instrument){
   let aggs = []
   let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["One_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -273,7 +271,7 @@ async function One_Hour(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -288,7 +286,7 @@ async function One_Hour(instrument){
 async function Two_Hour(instrument){
   let aggs = []
   let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Two_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -297,7 +295,7 @@ async function Two_Hour(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -311,7 +309,7 @@ async function Two_Hour(instrument){
 async function Four_Hour(instrument){
   let aggs = []
   let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Four_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -320,7 +318,7 @@ async function Four_Hour(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -334,7 +332,7 @@ async function Four_Hour(instrument){
 async function Daily(instrument){
   let aggs = []
   let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Daily"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -343,7 +341,7 @@ async function Daily(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -357,7 +355,7 @@ async function Daily(instrument){
 async function Weekly(instrument){
   let aggs = []
   let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Weekly"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -366,7 +364,7 @@ async function Weekly(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -379,7 +377,7 @@ async function Weekly(instrument){
 async function Five_Min_Extend(instrument){
   let aggs = []
   let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Five_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -388,7 +386,7 @@ async function Five_Min_Extend(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -402,7 +400,7 @@ async function Five_Min_Extend(instrument){
 async function Fifteen_Min_Extend(instrument){
   let aggs = []
   let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Fifteen_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -411,7 +409,7 @@ async function Fifteen_Min_Extend(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -425,7 +423,7 @@ async function Fifteen_Min_Extend(instrument){
 async function Thirty_Min_Extend(instrument){
   let aggs = []
   let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Thirty_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -434,7 +432,7 @@ async function Thirty_Min_Extend(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -448,7 +446,7 @@ async function Thirty_Min_Extend(instrument){
 async function One_Hour_Extend(instrument){
   let aggs = []
   let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["One_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -457,7 +455,7 @@ async function One_Hour_Extend(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -471,7 +469,7 @@ async function One_Hour_Extend(instrument){
 async function Two_Hour_Extend(instrument){
   let aggs = []
   let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Two_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -480,7 +478,7 @@ async function Two_Hour_Extend(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -494,7 +492,7 @@ async function Two_Hour_Extend(instrument){
 async function Four_Hour_Extend(instrument){
   let aggs = []
   let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Four_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -503,7 +501,7 @@ async function Four_Hour_Extend(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -517,7 +515,7 @@ async function Four_Hour_Extend(instrument){
 async function Daily_Extend(instrument){
   let aggs = []
   let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Daily Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -526,7 +524,7 @@ async function Daily_Extend(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -540,7 +538,7 @@ async function Daily_Extend(instrument){
 async function Weekly_Extend(instrument){
   let aggs = []
   let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url, proxyval);
+  var res = await instance.get(url);
   var data = await res.data;
     for(let item = 0; item < data['results'].length; item++){
       values["Weekly Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -549,7 +547,7 @@ async function Weekly_Extend(instrument){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
@@ -562,7 +560,7 @@ async function Weekly_Extend(instrument){
 async function Five_Min_Low(instrument){
     let aggs = []
     let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Five_Min"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -571,7 +569,7 @@ async function Five_Min_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -585,7 +583,7 @@ async function Five_Min_Low(instrument){
 async function Fifteen_Min_Low(instrument){
     let aggs = []
     let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Fifteen_Min"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -594,7 +592,7 @@ async function Fifteen_Min_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -608,7 +606,7 @@ async function Fifteen_Min_Low(instrument){
 async function Thirty_Min_Low(instrument){
     let aggs = []
     let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Thirty_Min"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -617,7 +615,7 @@ async function Thirty_Min_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -631,7 +629,7 @@ async function Thirty_Min_Low(instrument){
 async function One_Hour_Low(instrument){
     let aggs = []
     let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["One_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -640,7 +638,7 @@ async function One_Hour_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -654,7 +652,7 @@ async function One_Hour_Low(instrument){
 async function Two_Hour_Low(instrument){
     let aggs = []
     let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Two_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -663,7 +661,7 @@ async function Two_Hour_Low(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -677,7 +675,7 @@ async function Two_Hour_Low(instrument){
 async function Four_Hour_Low(instrument){
     let aggs = []
     let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Four_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -686,7 +684,7 @@ async function Four_Hour_Low(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -700,7 +698,7 @@ async function Four_Hour_Low(instrument){
 async function Daily_Low(instrument){
     let aggs = []
     let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Daily"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -709,7 +707,7 @@ async function Daily_Low(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -723,7 +721,7 @@ async function Daily_Low(instrument){
 async function Weekly_Low(instrument){
     let aggs = []
     let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Weekly"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -732,7 +730,7 @@ async function Weekly_Low(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -745,7 +743,7 @@ async function Weekly_Low(instrument){
 async function Five_Min_Extend_Low(instrument){
     let aggs = []
     let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Five_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -754,7 +752,7 @@ async function Five_Min_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -768,7 +766,7 @@ async function Five_Min_Extend_Low(instrument){
 async function Fifteen_Min_Extend_Low(instrument){
     let aggs = []
     let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Fifteen_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -777,7 +775,7 @@ async function Fifteen_Min_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -791,7 +789,7 @@ async function Fifteen_Min_Extend_Low(instrument){
 async function Thirty_Min_Extend_Low(instrument){
     let aggs = []
     let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Thirty_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -800,7 +798,7 @@ async function Thirty_Min_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -814,7 +812,7 @@ async function Thirty_Min_Extend_Low(instrument){
 async function One_Hour_Extend_Low(instrument){
     let aggs = []
     let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["One_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -823,7 +821,7 @@ async function One_Hour_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -837,7 +835,7 @@ async function One_Hour_Extend_Low(instrument){
 async function Two_Hour_Extend_Low(instrument){
     let aggs = []
     let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Two_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -846,7 +844,7 @@ async function Two_Hour_Extend_Low(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -860,7 +858,7 @@ async function Two_Hour_Extend_Low(instrument){
 async function Four_Hour_Extend_Low(instrument){
     let aggs = []
     let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Four_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -869,7 +867,7 @@ async function Four_Hour_Extend_Low(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -883,7 +881,7 @@ async function Four_Hour_Extend_Low(instrument){
 async function Daily_Extend_Low(instrument){
     let aggs = []
     let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Daily Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -892,7 +890,7 @@ async function Daily_Extend_Low(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -906,7 +904,7 @@ async function Daily_Extend_Low(instrument){
 async function Weekly_Extend_Low(instrument){
     let aggs = []
     let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url, proxyval);
+    var res = await instance.get(url);
     var data = await res.data;
       for(let item = 0; item < data['results'].length; item++){
         values["Weekly Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -915,7 +913,7 @@ async function Weekly_Extend_Low(instrument){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url, proxyval);
+          var res = await instance.get(url);
           var data = await res.data;
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
@@ -929,7 +927,7 @@ async function Weekly_Extend_Low(instrument){
     async function Five_Min_High(instrument){
       let aggs = []
       let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Five_Min"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -938,7 +936,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -952,7 +950,7 @@ async function Weekly_Extend_Low(instrument){
   async function Fifteen_Min_High(instrument){
       let aggs = []
       let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Fifteen_Min"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -961,7 +959,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -975,7 +973,7 @@ async function Weekly_Extend_Low(instrument){
   async function Thirty_Min_High(instrument){
       let aggs = []
       let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Thirty_Min"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -984,7 +982,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -998,7 +996,7 @@ async function Weekly_Extend_Low(instrument){
   async function One_Hour_High(instrument){
       let aggs = []
       let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["One_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1007,7 +1005,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1021,7 +1019,7 @@ async function Weekly_Extend_Low(instrument){
   async function Two_Hour_High(instrument){
       let aggs = []
       let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Two_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1030,7 +1028,7 @@ async function Weekly_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -1044,7 +1042,7 @@ async function Weekly_Extend_Low(instrument){
   async function Four_Hour_High(instrument){
       let aggs = []
       let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Four_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1053,7 +1051,7 @@ async function Weekly_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -1067,7 +1065,7 @@ async function Weekly_Extend_Low(instrument){
   async function Daily_High(instrument){
       let aggs = []
       let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Daily"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1076,7 +1074,7 @@ async function Weekly_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -1090,7 +1088,7 @@ async function Weekly_Extend_Low(instrument){
   async function Weekly_High(instrument){
       let aggs = []
       let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Weekly"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1099,7 +1097,7 @@ async function Weekly_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -1112,7 +1110,7 @@ async function Weekly_Extend_Low(instrument){
   async function Five_Min_Extend_High(instrument){
       let aggs = []
       let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Five_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1121,7 +1119,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1135,7 +1133,7 @@ async function Weekly_Extend_Low(instrument){
   async function Fifteen_Min_Extend_High(instrument){
       let aggs = []
       let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Fifteen_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1144,7 +1142,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1158,7 +1156,7 @@ async function Weekly_Extend_Low(instrument){
   async function Thirty_Min_Extend_High(instrument){
       let aggs = []
       let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Thirty_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1167,7 +1165,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1181,7 +1179,7 @@ async function Weekly_Extend_Low(instrument){
   async function One_Hour_Extend_High(instrument){
       let aggs = []
       let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["One_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1190,7 +1188,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1204,7 +1202,7 @@ async function Weekly_Extend_Low(instrument){
   async function Two_Hour_Extend_High(instrument){
       let aggs = []
       let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Two_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1213,7 +1211,7 @@ async function Weekly_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -1227,7 +1225,7 @@ async function Weekly_Extend_Low(instrument){
   async function Four_Hour_Extend_High(instrument){
       let aggs = []
       let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Four_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1236,7 +1234,7 @@ async function Weekly_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -1250,7 +1248,7 @@ async function Weekly_Extend_Low(instrument){
   async function Daily_Extend_High(instrument){
       let aggs = []
       let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Daily Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1259,7 +1257,7 @@ async function Weekly_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -1273,7 +1271,7 @@ async function Weekly_Extend_Low(instrument){
     async function Weekly_Extend_High(instrument){
       let aggs = []
       let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url, proxyval);
+      var res = await instance.get(url);
       var data = await res.data;
         for(let item = 0; item < data['results'].length; item++){
           values["Weekly Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1282,7 +1280,7 @@ async function Weekly_Extend_Low(instrument){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url, proxyval);
+            var res = await instance.get(url);
             var data = await res.data;
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
@@ -1295,7 +1293,7 @@ async function Weekly_Extend_Low(instrument){
     async function Five_Min_Open(instrument){
         let aggs = []
         let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
             for(let item = 0; item < data['results'].length; item++){
               values["Five_Min"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1304,7 +1302,7 @@ async function Weekly_Extend_Low(instrument){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url, proxyval);
+                var res = await instance.get(url);
                 var data = await res.data;
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
@@ -1318,7 +1316,7 @@ async function Weekly_Extend_Low(instrument){
     async function Fifteen_Min_Open(instrument){
         let aggs = []
         let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
             for(let item = 0; item < data['results'].length; item++){
               values["Fifteen_Min"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1327,7 +1325,7 @@ async function Weekly_Extend_Low(instrument){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url, proxyval);
+                var res = await instance.get(url);
                 var data = await res.data;
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
@@ -1341,7 +1339,7 @@ async function Weekly_Extend_Low(instrument){
     async function Thirty_Min_Open(instrument){
         let aggs = []
         let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
             for(let item = 0; item < data['results'].length; item++){
               values["Thirty_Min"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1350,7 +1348,7 @@ async function Weekly_Extend_Low(instrument){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url, proxyval);
+                var res = await instance.get(url);
                 var data = await res.data;
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
@@ -1364,7 +1362,7 @@ async function Weekly_Extend_Low(instrument){
     async function One_Hour_Open(instrument){
         let aggs = []
         let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
             for(let item = 0; item < data['results'].length; item++){
               values["One_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1373,7 +1371,7 @@ async function Weekly_Extend_Low(instrument){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url, proxyval);
+                var res = await instance.get(url);
                 var data = await res.data;
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
@@ -1387,7 +1385,7 @@ async function Weekly_Extend_Low(instrument){
     async function Two_Hour_Open(instrument){
         let aggs = []
         let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Two_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1396,7 +1394,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1410,7 +1408,7 @@ async function Weekly_Extend_Low(instrument){
     async function Four_Hour_Open(instrument){
         let aggs = []
         let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Four_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1419,7 +1417,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1433,7 +1431,7 @@ async function Weekly_Extend_Low(instrument){
     async function Daily_Open(instrument){
         let aggs = []
         let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Daily"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1442,7 +1440,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1456,7 +1454,7 @@ async function Weekly_Extend_Low(instrument){
     async function Weekly_Open(instrument){
         let aggs = []
         let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Weekly"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1465,7 +1463,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1478,7 +1476,7 @@ async function Weekly_Extend_Low(instrument){
     async function Five_Min_Extend_Open(instrument){
         let aggs = []
         let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
             for(let item = 0; item < data['results'].length; item++){
               values["Five_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1487,7 +1485,7 @@ async function Weekly_Extend_Low(instrument){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url, proxyval);
+                var res = await instance.get(url);
                 var data = await res.data;
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
@@ -1501,7 +1499,7 @@ async function Weekly_Extend_Low(instrument){
     async function Fifteen_Min_Extend_Open(instrument){
         let aggs = []
         let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
             for(let item = 0; item < data['results'].length; item++){
               values["Fifteen_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1510,7 +1508,7 @@ async function Weekly_Extend_Low(instrument){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url, proxyval);
+                var res = await instance.get(url);
                 var data = await res.data;
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
@@ -1524,7 +1522,7 @@ async function Weekly_Extend_Low(instrument){
     async function Thirty_Min_Extend_Open(instrument){
         let aggs = []
         let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
             for(let item = 0; item < data['results'].length; item++){
               values["Thirty_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1533,7 +1531,7 @@ async function Weekly_Extend_Low(instrument){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url, proxyval);
+                var res = await instance.get(url);
                 var data = await res.data;
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
@@ -1547,7 +1545,7 @@ async function Weekly_Extend_Low(instrument){
     async function One_Hour_Extend_Open(instrument){
         let aggs = []
         let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
             for(let item = 0; item < data['results'].length; item++){
               values["One_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1556,7 +1554,7 @@ async function Weekly_Extend_Low(instrument){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url, proxyval);
+                var res = await instance.get(url);
                 var data = await res.data;
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
@@ -1570,7 +1568,7 @@ async function Weekly_Extend_Low(instrument){
     async function Two_Hour_Extend_Open(instrument){
         let aggs = []
         let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Two_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1579,7 +1577,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1593,7 +1591,7 @@ async function Weekly_Extend_Low(instrument){
     async function Four_Hour_Extend_Open(instrument){
         let aggs = []
         let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Four_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1602,7 +1600,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1616,7 +1614,7 @@ async function Weekly_Extend_Low(instrument){
     async function Daily_Extend_Open(instrument){
         let aggs = []
         let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Daily Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1625,7 +1623,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1639,7 +1637,7 @@ async function Weekly_Extend_Low(instrument){
     async function Weekly_Extend_Open(instrument){
         let aggs = []
         let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url, proxyval);
+        var res = await instance.get(url);
         var data = await res.data;
           for(let item = 0; item < data['results'].length; item++){
             values["Weekly Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1648,7 +1646,7 @@ async function Weekly_Extend_Low(instrument){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url, proxyval);
+              var res = await instance.get(url);
               var data = await res.data;
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
@@ -1663,7 +1661,6 @@ async function Weekly_Extend_Low(instrument){
       const prices = pricelist.price.regularMarketPrice
       Variables.price = parseFloat(prices)
       }
-
 
 
 function equalizer(){
