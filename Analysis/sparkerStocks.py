@@ -2,7 +2,6 @@ import json
 import os
 import msgspec
 import threading
-import LivePriceStocks
 from subprocess import Popen, PIPE
 
 class Auto:
@@ -25,18 +24,8 @@ class Auto:
     'NZD_HKD']
 
     @staticmethod
-    def controll():
-        instrument = ''
-        with open('instrument.json', 'r') as accinf:
-            instrum = json.load(accinf)
-            instrument = str(instrum['instrument'])
-            Auto.inst = instrument
-        threading.Thread(target=LivePriceStocks.controlbox).start()
-        Auto.junction()
-
-    @staticmethod
     def junction():
-        listse = ['node FifteenMin.js', 'node ThirtyMin.js', 'node OneHour.js', 'node TwoHour.js', 'node FourHour.js', 'node Daily.js', 'node Weekly.js']
+        listse = ['node DataCenterStocks.js']
         def commander():
             for item in listse:
                 Popen(item, shell = True).communicate()
@@ -47,11 +36,8 @@ class Automatically:
 
     @staticmethod
     def automatic():
-        Auto.controll()
+        Auto.junction()
 
 
-# /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
-# have been included with this distribution. */
-
-# /* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+# /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */

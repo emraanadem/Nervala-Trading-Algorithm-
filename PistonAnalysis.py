@@ -15,6 +15,8 @@ class Starters:
     current_val = ''
     current_dir = os.getcwd()
     accinfo = []
+    proxyinfo = []
+    instrumentproxy = []
     paths = []
     importantinfo = []
     impinfo = []
@@ -30,15 +32,33 @@ class Starters:
             for row in datas:
                 Starters.accinfo.append([str(row[0]), str(row[1]), rowid])
                 rowid+=1 
+        with open(path + '/proxylist2.txt', 'r') as infor:
+            datas = list(csv.reader(infor, delimiter = ' '))
+            rowid = 0
+            for row in datas:
+                Starters.proxyinfo.append([row[0].replace(",", "").replace("[", "").replace("'", ""), row[1].replace(",", "").replace("'", ""), int(row[2].replace(",","")), rowid])
+                rowid+=1 
+        with open('instrumentsAll.json', 'rb') as insts:
+            instrum = msgspec.json.decode(insts.read(), type=object)
+            info = instrum['instruments']
+        for item in range(0, len(info)):
+            Starters.instrumentproxy.append([info[item], Starters.proxyinfo[item][0], Starters.proxyinfo[item][1], Starters.proxyinfo[item][2], Starters.proxyinfo[item][3]])
         redo = True
         Starters.current_val = val
         pathtwo = str(pathlib.Path(__file__).parent.resolve()) + "/" + val + "_Analysis"
+        proxyitems = []
+        for item in Starters.instrumentproxy:
+            if val == item[0]:
+                proxyitems = item
+                break
         #path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         if os.path.isdir(pathtwo):
             dict = {}
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
                 json.dump(dict, inst)
+            with open(pathtwo + '/proxyinfo.json', 'w') as inst:
+                json.dump(proxyitems, inst)
             for valss in Starters.accinfo:
                 for vals in Starters.impinfo:
                     if valss[2] == vals[1]:
@@ -64,6 +84,8 @@ class Starters:
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
                 json.dump(dict, inst)
+            with open(pathtwo + '/proxyinfo.json', 'w') as inst:
+                json.dump(proxyitems, inst)
             for valss in Starters.accinfo:
                 for vals in Starters.impinfo:
                     if valss[2] == vals[1]:
@@ -104,9 +126,7 @@ def borjan():
     notssss = {}
     notssss['instruments'] = []
     threads = []
-    with open('not instruments.json', 'w') as nots:
-        nots.write(json.dumps(notinst))
-    with open('instrumentstwo.json', 'rb') as insts:
+    with open('instrumentsForexOne.json', 'rb') as insts:
         instrum = msgspec.json.decode(insts.read(), type=object)
         info = instrum['instruments']
         Starters.instrument_bank = info
@@ -145,3 +165,6 @@ for val in Starters.instrument_bank:
     with open('avoidinst.json', 'r') as trades:
         if val in json.loads(trades.read())['instruments']:
             Starters.instrument_list.append(val)"""
+    
+#/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+# have been included with this distribution. */

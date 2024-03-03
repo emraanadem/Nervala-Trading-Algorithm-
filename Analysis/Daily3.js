@@ -10,10 +10,7 @@ const tr = require('technicalindicators').ATR;
 const { createModel } = require('polynomial-regression');
 const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
-const createClient = require('@supabase/supabase-js').createClient;
-
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://nvlbmpghemfunkpnhwee.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52bGJtcGdoZW1mdW5rcG5od2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDgxMTg3ODcsImV4cCI6MjAyMzY5NDc4N30.woZOGh5WaEcUtEyvsXaNP3Kg6BsNP8UOWhmv5RG4iMY')
+var json = require('json');
 
 
 class Daily_Nexus{
@@ -340,7 +337,6 @@ class Daily_Nexus{
         Daily_Functions.rejecinit()
         Daily_Functions.HistoryAssigner()
         Daily_Functions.ValueAssigner()
-        console.log(dataset)
         Daily_Functions.stoploss()
         Daily_Functions.getPrice()
         Daily_Functions.supreslevs()
@@ -509,14 +505,8 @@ class Daily_Functions{
         }
 /** load price from json file */
     static ValueAssigner(){
-        let instrument = Daily_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Daily_Functions.price = dataspecific['Price']
-        }catch (error) {}
-        }
+        Daily_Functions.price = liveprice
+    }
     
 /** second consolidation method, meant to strengthen consolidation identification */
     static consolidationtwo(){
@@ -1279,13 +1269,7 @@ class Weekly_Functions{
         }
 
     static ValueAssigner(){
-        let instrument = Daily_Functions.instrument_name()
-        let raw = fs.readFileSync('LivePrice.json')
-        try{
-            let data = JSON.parse(raw)
-            let dataspecific = data[instrument]
-            Weekly_Functions.price = dataspecific['Price']
-        }catch (error) {}
+        Daily_Functions.price = liveprice
         }
     
     /* make  function */
@@ -1753,37 +1737,21 @@ class Fifteen_Min_Functions{
     
 }
 
-function controlbox(){
-    let g = 0
-    while(g == 0){
-        Daily_Nexus.controlMain()
-    }
-    
+var dataset = {}
+var liveprice = 0
+
+function testdaily(data){
+    dataset = data
+    Daily_Nexus.controlMain()
+
 }
 
-async function test(){
-    const fs = require('fs');
-    let rawtwo = fs.readFileSync('instrument.json')
-    let instrum = JSON.parse(rawtwo)
-    let instrument = instrum['instrument']
-    let raw = fs.readFileSync('IDS.json')
-    let ids = JSON.parse(raw)
-    const axios = require('axios');
-    axios.get('http://localhost:8000/' + instrument)
-    .then(res => {
-        console.log('Status Code:', res.status);
+module.exports = { testdaily: function(data, price){
+    liveprice = price
+    dataset = data
+    Daily_Nexus.controlMain()
 
-        const data = res.data;
-        dataset = data
-        Daily_Nexus.controlMain()
-
-    })
-    .catch(err => {
-        console.log('Error: ', err.message);
-    });
-}
-
-test()
+} }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */
@@ -1798,5 +1766,5 @@ depending on the type of trade, so that it doesn't result in trades that exit su
                             
 /* Bro this app is gonna take off I promise. Get that grind on bro you got this. */ 
 
-/* © 2022 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
+/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
  have been included with this distribution. */
