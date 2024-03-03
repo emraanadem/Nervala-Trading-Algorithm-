@@ -15,6 +15,8 @@ class Starters:
     current_val = ''
     current_dir = os.getcwd()
     accinfo = []
+    proxyinfo = []
+    instrumentproxy = []
     paths = []
     importantinfo = []
     impinfo = []
@@ -24,21 +26,39 @@ class Starters:
         import pathlib
         path = str(pathlib.Path(__file__).parent.resolve())
         acclist = []
-        with open(path + '/accounts2.txt', 'r') as infor:
+        with open(path + '/accounts.txt', 'r') as infor:
             datas = list(csv.reader(infor, delimiter = ' '))
             rowid = 0
             for row in datas:
                 Starters.accinfo.append([str(row[0]), str(row[1]), rowid])
                 rowid+=1 
+        with open(path + '/proxies.txt', 'r') as infor:
+            datas = list(csv.reader(infor, delimiter = ' '))
+            rowid = 0
+            for row in datas:
+                Starters.proxyinfo.append([row[0].split(":")[0],row[0].split(":")[1].replace("//",""), row[0].split(":")[2], rowid])
+                rowid+=1 
+        with open('instrumentsAll.json', 'rb') as insts:
+            instrum = msgspec.json.decode(insts.read(), type=object)
+            info = instrum['instruments']
+        for item in range(0, len(info)):
+            Starters.instrumentproxy.append([info[item], Starters.proxyinfo[item][0], Starters.proxyinfo[item][1], Starters.proxyinfo[item][2], Starters.proxyinfo[item][3]])
         redo = True
         Starters.current_val = val
         pathtwo = str(pathlib.Path(__file__).parent.resolve()) + "/" + val + "_Analysis"
+        proxyitems = []
+        for item in Starters.instrumentproxy:
+            if val == item[0]:
+                proxyitems = item
+                break
         #path = str(pathlib.Path(__file__).parent.resolve()) + "/" + val
         if os.path.isdir(pathtwo):
             dict = {}
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
                 json.dump(dict, inst)
+            with open(pathtwo + '/proxyinfo.json', 'w') as inst:
+                json.dump(proxyitems, inst)
             for valss in Starters.accinfo:
                 for vals in Starters.impinfo:
                     if valss[2] == vals[1]:
@@ -64,6 +84,8 @@ class Starters:
             dict['instrument'] = val
             with open(pathtwo + '/instrument.json', 'w') as inst:
                 json.dump(dict, inst)
+            with open(pathtwo + '/proxyinfo.json', 'w') as inst:
+                json.dump(proxyitems, inst)
             for valss in Starters.accinfo:
                 for vals in Starters.impinfo:
                     if valss[2] == vals[1]:
@@ -78,7 +100,7 @@ class Starters:
 
     def starting(path, current_val):
         try:
-            path = str(current_val) + "_Analysis"
+            path = str(current_val)+"_Analysis"
             with open(path + '/pythoner' + current_val + ".py", "w+") as file:
                 file.write('\nimport sparkerAuto as starttt' + "\nstarttt.Automatically.automatic()")
             file.close()
@@ -144,5 +166,6 @@ for val in Starters.instrument_bank:
         if val in json.loads(trades.read())['instruments']:
             Starters.instrument_list.append(val)"""
     
+Starters.begin("XAU_USD")
 #/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */

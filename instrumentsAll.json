@@ -1,0 +1,11 @@
+{"instruments": ["USD_NOK", "USD_CZK", "USD_DKK", "USD_HKD", "USD_SAR", "EUR_HUF", "USD_CNH", "ZAR_JPY", 
+"SGD_JPY", "EUR_PLN", "GBP_HKD", "AUD_SGD", "EUR_SGD", "GBP_SGD", "GBP_ZAR", "ETH_USD",
+"LTC_USD", "BCH_USD", "MBTC_USD", "GBP_PLN", "XAU_EUR", "XAG_CHF", "XAG_GBP", "NZD_CHF","BTC_USD", "XAU_USD", 
+"EUR_USD", "NAS100_USD", "GBP_JPY", "US30_USD", "GBP_USD", "SPX500_USD", "USD_JPY", "AUD_USD", 
+"USD_CAD", "EUR_JPY", "NZD_USD", "XAG_USD", "GBP_AUD", "USD_CHF", "EUR_GBP", "CAD_JPY", "EUR_CAD", "NZD_JPY", 
+"EUR_NZD", "AUD_CHF","GBP_CHF","CHF_JPY", "GBP_NZD", "BCO_USD",
+"MSFT", "AAPL", "NVDA", "AMZN", "GOOGL", "META", "BRK.B", "LLY", "TSM", "AVGO", 
+"TSLA", "V", "NVO", "JPM", "WMT", "UNH", "MA", "XOM", "ASML", "JNJ", "HD", "PG", "COST", "AMD", 
+"MRK", "ABBV", "ORCL", "CRM", "CVX", "BAC", "NFLX", "ADBE", "KO", "ACN", "PEP", "FMX", "SAP", "TMO",
+ "LIN", "MCD", "NVS", "ABT", "DIS", "SHEL", "AZN", "WFC", "CSCO", "TMUS", "BABA", "INTC", "QCOM", 
+ "GE", "VZ", "UBER", "CAT", "NKE", "LOW", "MS", "ABNB", "BLK", "T", "IBM"]}
