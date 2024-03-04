@@ -21,7 +21,11 @@ let proxyinfo = JSON.parse(rawthree)
 let proxyval =   {
       protocol: String(proxyinfo[1]),
       host: String(proxyinfo[2]),
-      port: parseInt(proxyinfo[3])
+      port: parseInt(proxyinfo[3]),
+      auth: {
+        username:"PDEBM",
+        password:"34N4VP6V"
+      }
 }
 
 const instance = axios.create({

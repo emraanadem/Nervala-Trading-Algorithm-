@@ -1,7 +1,8 @@
-const fs = require('fs')
-const axios = require('axios')
+// Making a request using axios: https://github.com/axios/axios#example
+const axios = require('axios');
 const http = require('node:http')
 const https = require('node:https')
+const fs = require('fs')
 let raw = fs.readFileSync('accinfo.json')
 let accinfo = JSON.parse(raw)
 let rawtwo = fs.readFileSync('instrument.json')
@@ -13,32 +14,17 @@ var testonehour = require('./OneHour3.js')
 var testtwohour = require('./TwoHour3.js')
 var testfourhour = require('./FourHour3.js')
 var testweekly = require('./Weekly3.js')
-
 let accountID = String(accinfo[0])
 let token = String(accinfo[1])
-let rawthree = fs.readFileSync('proxyinfo.json')
-let proxyinfo = JSON.parse(rawthree)
-let proxyval =   {
-      protocol: String(proxyinfo[1]),
-      host: String(proxyinfo[2]),
-      port: parseInt(proxyinfo[3])
-}
 
-async function test(){
-const instance = axios.create({
-  baseURL: "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?",
-  headers: {
-    Authorization: "Bearer " + token
-  }, proxy: proxyval})
+const url =  'https://proxy.scrapeops.io/v1/?api_key=f0bdfa08-797b-45ae-bc06-da63d2e8b732&url=https://api-fxpractice.oanda.com/v3/accounts/101-001-28245478-001/instruments/GBP_HKD/candles?/count=1000&granularity=H2'
 
-  let url = "count=1000&granularity=M5"
-  const options = {
-    headers: {
-      Authorization: "Bearer " + token
-    },
-    maxRedirects: 100
-  };
-  const res = await instance.get(url, options);
-
-}
-test()
+axios.get(url, { headers: { Authorization: "Bearer " + token } })
+  .then(function (response) {
+    // print out the page response
+    console.log(response);
+  })
+  .catch(function (error) {
+    // handle error
+    console.log(error);
+  });
