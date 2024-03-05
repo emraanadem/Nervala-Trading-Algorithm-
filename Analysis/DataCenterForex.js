@@ -1,7 +1,5 @@
 const fs = require('fs')
-const axios = require('axios')
-const http = require('node:http')
-const https = require('node:https')
+const { ProxyAgent } = require('undici') // native fetch uses undici as underlying HTTP handler, need the agent from it
 let raw = fs.readFileSync('accinfo.json')
 let accinfo = JSON.parse(raw)
 let rawtwo = fs.readFileSync('instrument.json')
@@ -18,56 +16,61 @@ let accountID = String(accinfo[0])
 let token = String(accinfo[1])
 let rawthree = fs.readFileSync('proxyinfo.json')
 let proxyinfo = JSON.parse(rawthree)
-let proxyval =   {
-      protocol: String(proxyinfo[1]),
-      host: String(proxyinfo[2]),
-      port: parseInt(proxyinfo[3]),
-      auth: {
-        username:"PDEBM",
-        password:"34N4VP6V"
-      }
+
+
+
+
+// Set up common connection parameters; once you hit a rate limit and want to rotate proxies or if you want
+// to randomize, you need to construct proxyAgent again with the new proxy details
+const baseURL = `https://api-fxpractice.oanda.com/v3/accounts/${accountID}/instruments/${instrument}/candles?`
+const proxyAgent = new ProxyAgent({
+  uri: `http://${proxyinfo[2]}:${proxyinfo[3]}`,
+  token: `Basic ${Buffer.from('PDEBM:34N4VP6V').toString('base64')}`
+});
+const options = {
+  headers: {
+    'Authorization': `Bearer ${token}`
+  },
+  dispatcher: proxyAgent
+};
+
+// Printing IP from API to confirm proxy is in use, gotta use .then syntax outside async method since
+// you're not using ES (which you should but you're gonna have to refactor)
+fetch("https://api.ipify.org", options)
+  .then(response => response.text())
+  .then(text => console.log(`IP in use: ${text}`));
+
+
+
+values = {}
+let price = 0
+
+function Assigner(){
+  values = {}
+  let timeperiods = ["Five_Min", "Fifteen_Min", "Thirty_Min", "One_Hour", "Two_Hour", "Four_Hour", "Daily", "Weekly", "Five_Min Extend", "Fifteen_Min Extend", "Thirty_Min Extend", "One_Hour Extend", "Two_Hour Extend", "Four_Hour Extend", "Daily Extend", "Weekly Extend"]
+  for(let item = 0; item < timeperiods.length; item++){
+  values[timeperiods[item]] = {}
+  values[timeperiods[item]]['o'] = []
+  values[timeperiods[item]]['h'] = []
+  values[timeperiods[item]]['l'] = []
+  values[timeperiods[item]]['c'] = []
+
+  }
 }
 
-const instance = axios.create({
-  baseURL: "https://"+"api-fxpractice.oanda.com"+"/v3/accounts/"+accountID+"/instruments/"+instrument+"/candles?",
-  headers: {
-    Authorization: "Bearer " + token
-  }, proxy: proxyval})
+async function Five_Min(instrument){
+  let params = "count=1000&granularity=M5"
 
+  const response = await fetch(baseURL + params, options); // fetch is a native global, no module needed
+  const data = await response.json(); // Parsing the response stream is async, this returns a Promise
 
-
-
-  values = {}
-  let price = 0
-
-  function Assigner(){
-    values = {}
-    let timeperiods = ["Five_Min", "Fifteen_Min", "Thirty_Min", "One_Hour", "Two_Hour", "Four_Hour", "Daily", "Weekly", "Five_Min Extend", "Fifteen_Min Extend", "Thirty_Min Extend", "One_Hour Extend", "Two_Hour Extend", "Four_Hour Extend", "Daily Extend", "Weekly Extend"]
-    for(let item = 0; item < timeperiods.length; item++){
-    values[timeperiods[item]] = {}
-    values[timeperiods[item]]['o'] = []
-    values[timeperiods[item]]['h'] = []
-    values[timeperiods[item]]['l'] = []
-    values[timeperiods[item]]['c'] = []
-
-    }
+  for (let item = 0; item < data.candles.length; item++){
+    values["Five_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
   }
-  async function Five_Min(instrument){
-      let accountID = String(accinfo[0])
-      let token = String(accinfo[1])
-      let url = "count=1000&granularity=M5"
-      const options = {
-        headers: {
-          Authorization: "Bearer " + token
-        }
-      };
-      const res = await instance.get(url, options);
-      const data = await res.data;
-          for(let item = 0; item < data.candles.length; item++){
-            values["Five_Min"]['c'].push(parseFloat(data.candles[item].mid['c']))
-          }
-          
-        }
+
+  console.log(values["Five_Min"]['c']); // Print what we got to confirm
+}
+
   async function Fifteen_Min(instrument){
     let accountID = String(accinfo[0])
     let token = String(accinfo[1])
@@ -1166,7 +1169,10 @@ async function Assign(){
   testthirtymin.testthirtymin(values, price)
   testweekly.testweekly(values, price)
 }
-Assign()
+
+// Just running the first method in this dev branch as proof-of-concept
+Assigner()
+Five_Min(instrument)
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 have been included with this distribution. */
