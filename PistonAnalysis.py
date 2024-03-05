@@ -1,5 +1,4 @@
 import os
-import msgspec
 import subprocess
 import threading
 import json
@@ -32,18 +31,20 @@ class Starters:
             for row in datas:
                 Starters.accinfo.append([str(row[0]), str(row[1]), rowid])
                 rowid+=1 
-        with open(path + '/proxylist2.txt', 'r') as infor:
-            datas = list(csv.reader(infor, delimiter = ' '))
+        with open(path + '/proxylist2.json', 'r') as infor:
+            datas = json.load(infor)
             rowid = 0
             for row in datas:
-                Starters.proxyinfo.append([row[0].replace(",", "").replace("[", "").replace("'", ""), row[1].replace(",", "").replace("'", ""), int(row[2].replace(",","")), rowid])
+                Starters.proxyinfo.append([row[0], row[1], row[2], rowid])
                 rowid+=1 
-        with open('instrumentsAll.json', 'rb') as insts:
-            instrum = msgspec.json.decode(insts.read(), type=object)
+        with open('instrumentsAll.json', 'r') as insts:
+            instrum = json.load(insts)
             info = instrum['instruments']
         for item in range(0, len(info)):
-            Starters.instrumentproxy.append([info[item], Starters.proxyinfo[item][0], Starters.proxyinfo[item][1], Starters.proxyinfo[item][2], Starters.proxyinfo[item][3]])
-        redo = True
+            if item < len(Starters.proxyinfo):
+                Starters.instrumentproxy.append([info[item], Starters.proxyinfo[item][0], Starters.proxyinfo[item][1], Starters.proxyinfo[item][2], Starters.proxyinfo[item][3]])
+            else:
+                Starters.instrumentproxy.append([info[item], Starters.proxyinfo[item-13][0], Starters.proxyinfo[item-13][1], Starters.proxyinfo[item-13][2], Starters.proxyinfo[item-13][3]])
         Starters.current_val = val
         pathtwo = str(pathlib.Path(__file__).parent.resolve()) + "/" + val + "_Analysis"
         proxyitems = []
@@ -126,8 +127,8 @@ def borjan():
     notssss = {}
     notssss['instruments'] = []
     threads = []
-    with open('instrumentsForexOne.json', 'rb') as insts:
-        instrum = msgspec.json.decode(insts.read(), type=object)
+    with open('instrumentsForexOne.json', 'r') as insts:
+        instrum = json.load(insts)
         info = instrum['instruments']
         Starters.instrument_bank = info
         rowid = 0
@@ -166,5 +167,6 @@ for val in Starters.instrument_bank:
         if val in json.loads(trades.read())['instruments']:
             Starters.instrument_list.append(val)"""
     
+Starters.begin("XAU_USD")
 #/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 # have been included with this distribution. */
