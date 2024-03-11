@@ -51,7 +51,7 @@ function Assigner(){
   }
 }
 
-async function Five_Min(instrument){
+async function Five_Min(){
   let params = "count=1000&granularity=M5"
 
   const response = await fetch(baseURL + params, options); // fetch is a native global, no module needed
@@ -62,9 +62,8 @@ async function Five_Min(instrument){
   }// Print what we got to confirm
 }
 
-  async function Fifteen_Min(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Fifteen_Min(){
+  
     let params = "count=1000&granularity=M15"
     
     const res = await fetch(baseURL + params, options);
@@ -74,9 +73,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Thirty_Min(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Thirty_Min(){
+  
     let params = "count=1000&granularity=M30"
     
     const res = await fetch(baseURL + params, options);
@@ -86,9 +84,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function One_Hour(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function One_Hour(){
+  
     let params = "count=1000&granularity=H1"
     
     const res = await fetch(baseURL + params, options);
@@ -98,9 +95,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Two_Hour(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Two_Hour(){
+  
     let params = "count=1000&granularity=H2"
     
     const res = await fetch(baseURL + params, options);
@@ -110,9 +106,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Four_Hour(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Four_Hour(){
+  
     let params = "count=1000&granularity=H4"
     
     const res = await fetch(baseURL + params, options);
@@ -122,9 +117,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Daily(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Daily(){
+  
     let params = "count=1000&granularity=D"
     
     const res = await fetch(baseURL + params, options);
@@ -134,9 +128,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Weekly(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Weekly(){
+  
     let params = "count=1000&granularity=W"
     
     const res = await fetch(baseURL + params, options);
@@ -146,9 +139,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Five_Min_Extend(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Five_Min_Extend(){
+  
     let params = "count=2500&granularity=M5"
     
     const res = await fetch(baseURL + params, options);
@@ -158,9 +150,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Fifteen_Min_Extend(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Fifteen_Min_Extend(){
+  
     let params = "count=2500&granularity=M15"
     
     const res = await fetch(baseURL + params, options);
@@ -170,9 +161,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Thirty_Min_Extend(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Thirty_Min_Extend(){
+  
     let params = "count=2500&granularity=M30"
     
     const res = await fetch(baseURL + params, options);
@@ -182,9 +172,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function One_Hour_Extend(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function One_Hour_Extend(){
+  
     let params = "count=2500&granularity=H1"
     
     const res = await fetch(baseURL + params, options);
@@ -194,9 +183,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Two_Hour_Extend(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Two_Hour_Extend(){
+  
     let params = "count=2500&granularity=H2"
     
     const res = await fetch(baseURL + params, options);
@@ -206,9 +194,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Four_Hour_Extend(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Four_Hour_Extend(){
+  
     let params = "count=2500&granularity=H4"
     
     const res = await fetch(baseURL + params, options);
@@ -218,9 +205,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Daily_Extend(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Daily_Extend(){
+  
     let params = "count=2500&granularity=D"
     
     const res = await fetch(baseURL + params, options);
@@ -230,9 +216,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Weekly_Extend(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Weekly_Extend(){
+  
     let params = "count=2500&granularity=W"
     
     const res = await fetch(baseURL + params, options);
@@ -242,9 +227,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Five_Min_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Five_Min_High(){
+  
     let params = "count=1000&granularity=M5"
     
     const res = await fetch(baseURL + params, options);
@@ -254,9 +238,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Fifteen_Min_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Fifteen_Min_High(){
+  
     let params = "count=1000&granularity=M15"
     
     const res = await fetch(baseURL + params, options);
@@ -266,9 +249,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Thirty_Min_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Thirty_Min_High(){
+  
     let params = "count=1000&granularity=M30"
     
     const res = await fetch(baseURL + params, options);
@@ -278,9 +260,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function One_Hour_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function One_Hour_High(){
+  
     let params = "count=1000&granularity=H1"
     
     const res = await fetch(baseURL + params, options);
@@ -290,9 +271,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Two_Hour_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Two_Hour_High(){
+  
     let params = "count=1000&granularity=H2"
     
     const res = await fetch(baseURL + params, options);
@@ -302,9 +282,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Four_Hour_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Four_Hour_High(){
+  
     let params = "count=1000&granularity=H4"
     
     const res = await fetch(baseURL + params, options);
@@ -314,9 +293,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Daily_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Daily_High(){
+  
     let params = "count=1000&granularity=D"
     
     const res = await fetch(baseURL + params, options);
@@ -326,9 +304,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Weekly_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Weekly_High(){
+  
     let params = "count=1000&granularity=W"
     
     const res = await fetch(baseURL + params, options);
@@ -338,9 +315,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Five_Min_Extend_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Five_Min_Extend_High(){
+  
     let params = "count=2500&granularity=M5"
     
     const res = await fetch(baseURL + params, options);
@@ -350,9 +326,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Fifteen_Min_Extend_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Fifteen_Min_Extend_High(){
+  
     let params = "count=2500&granularity=M15"
     
     const res = await fetch(baseURL + params, options);
@@ -362,9 +337,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Thirty_Min_Extend_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Thirty_Min_Extend_High(){
+  
     let params = "count=2500&granularity=M30"
     
     const res = await fetch(baseURL + params, options);
@@ -374,9 +348,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function One_Hour_Extend_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function One_Hour_Extend_High(){
+  
     let params = "count=2500&granularity=H1"
     
     const res = await fetch(baseURL + params, options);
@@ -386,9 +359,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Two_Hour_Extend_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Two_Hour_Extend_High(){
+  
     let params = "count=2500&granularity=H2"
     
     const res = await fetch(baseURL + params, options);
@@ -398,9 +370,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Four_Hour_Extend_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Four_Hour_Extend_High(){
+  
     let params = "count=2500&granularity=H4"
     
     const res = await fetch(baseURL + params, options);
@@ -410,9 +381,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Daily_Extend_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Daily_Extend_High(){
+  
     let params = "count=2500&granularity=D"
     
     const res = await fetch(baseURL + params, options);
@@ -422,9 +392,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Weekly_Extend_High(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Weekly_Extend_High(){
+  
     let params = "count=2500&granularity=W"
     
     const res = await fetch(baseURL + params, options);
@@ -434,9 +403,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Five_Min_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Five_Min_Open(){
+  
     let params = "count=1000&granularity=M5"
     
     const res = await fetch(baseURL + params, options);
@@ -446,9 +414,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Fifteen_Min_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Fifteen_Min_Open(){
+  
     let params = "count=1000&granularity=M15"
     
     const res = await fetch(baseURL + params, options);
@@ -458,9 +425,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Thirty_Min_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Thirty_Min_Open(){
+  
     let params = "count=1000&granularity=M30"
     
     const res = await fetch(baseURL + params, options);
@@ -470,9 +436,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function One_Hour_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function One_Hour_Open(){
+  
     let params = "count=1000&granularity=H1"
     
     const res = await fetch(baseURL + params, options);
@@ -482,9 +447,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Two_Hour_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Two_Hour_Open(){
+  
     let params = "count=1000&granularity=H2"
     
     const res = await fetch(baseURL + params, options);
@@ -494,9 +458,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Four_Hour_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Four_Hour_Open(){
+  
     let params = "count=1000&granularity=H4"
     
     const res = await fetch(baseURL + params, options);
@@ -506,9 +469,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Daily_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Daily_Open(){
+  
     let params = "count=1000&granularity=D"
     
     const res = await fetch(baseURL + params, options);
@@ -518,9 +480,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Weekly_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Weekly_Open(){
+  
     let params = "count=1000&granularity=W"
     
     const res = await fetch(baseURL + params, options);
@@ -530,9 +491,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Five_Min_Extend_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Five_Min_Extend_Open(){
+  
     let params = "count=2500&granularity=M5"
     
     const res = await fetch(baseURL + params, options);
@@ -542,9 +502,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Fifteen_Min_Extend_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Fifteen_Min_Extend_Open(){
+  
     let params = "count=2500&granularity=M15"
     
     const res = await fetch(baseURL + params, options);
@@ -554,9 +513,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Thirty_Min_Extend_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Thirty_Min_Extend_Open(){
+  
     let params = "count=2500&granularity=M30"
     
     const res = await fetch(baseURL + params, options);
@@ -566,9 +524,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function One_Hour_Extend_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function One_Hour_Extend_Open(){
+  
     let params = "count=2500&granularity=H1"
     
     const res = await fetch(baseURL + params, options);
@@ -578,9 +535,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Two_Hour_Extend_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Two_Hour_Extend_Open(){
+  
     let params = "count=2500&granularity=H2"
     
     const res = await fetch(baseURL + params, options);
@@ -590,9 +546,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Four_Hour_Extend_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Four_Hour_Extend_Open(){
+  
     let params = "count=2500&granularity=H4"
     
     const res = await fetch(baseURL + params, options);
@@ -602,9 +557,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Daily_Extend_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Daily_Extend_Open(){
+  
     let params = "count=2500&granularity=D"
     
     const res = await fetch(baseURL + params, options);
@@ -614,9 +568,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Weekly_Extend_Open(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Weekly_Extend_Open(){
+  
     let params = "count=2500&granularity=W"
     
     const res = await fetch(baseURL + params, options);
@@ -626,9 +579,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Five_Min_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Five_Min_Low(){
+  
     let params = "count=1000&granularity=M5"
     
     const res = await fetch(baseURL + params, options);
@@ -638,9 +590,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Fifteen_Min_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Fifteen_Min_Low(){
+  
     let params = "count=1000&granularity=M15"
     
     const res = await fetch(baseURL + params, options);
@@ -650,9 +601,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Thirty_Min_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Thirty_Min_Low(){
+  
     let params = "count=1000&granularity=M30"
     
     const res = await fetch(baseURL + params, options);
@@ -662,9 +612,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function One_Hour_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function One_Hour_Low(){
+  
     let params = "count=1000&granularity=H1"
     
     const res = await fetch(baseURL + params, options);
@@ -674,9 +623,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Two_Hour_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Two_Hour_Low(){
+  
     let params = "count=1000&granularity=H2"
     
     const res = await fetch(baseURL + params, options);
@@ -686,9 +634,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Four_Hour_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Four_Hour_Low(){
+  
     let params = "count=1000&granularity=H4"
     
     const res = await fetch(baseURL + params, options);
@@ -698,9 +645,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Daily_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Daily_Low(){
+  
     let params = "count=1000&granularity=D"
     
     const res = await fetch(baseURL + params, options);
@@ -710,9 +656,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Weekly_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Weekly_Low(){
+  
     let params = "count=1000&granularity=W"
     
     const res = await fetch(baseURL + params, options);
@@ -722,9 +667,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Five_Min_Extend_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Five_Min_Extend_Low(){
+  
     let params = "count=2500&granularity=M5"
     
     const res = await fetch(baseURL + params, options);
@@ -734,9 +678,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Fifteen_Min_Extend_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Fifteen_Min_Extend_Low(){
+  
     let params = "count=2500&granularity=M15"
     
     const res = await fetch(baseURL + params, options);
@@ -746,9 +689,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Thirty_Min_Extend_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Thirty_Min_Extend_Low(){
+  
     let params = "count=2500&granularity=M30"
     
     const res = await fetch(baseURL + params, options);
@@ -758,9 +700,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function One_Hour_Extend_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function One_Hour_Extend_Low(){
+  
     let params = "count=2500&granularity=H1"
     
     const res = await fetch(baseURL + params, options);
@@ -770,9 +711,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Two_Hour_Extend_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Two_Hour_Extend_Low(){
+  
     let params = "count=2500&granularity=H2"
     
     const res = await fetch(baseURL + params, options);
@@ -782,9 +722,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Four_Hour_Extend_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Four_Hour_Extend_Low(){
+  
     let params = "count=2500&granularity=H4"
     
     const res = await fetch(baseURL + params, options);
@@ -794,9 +733,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Daily_Extend_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Daily_Extend_Low(){
+  
     let params = "count=2500&granularity=D"
     
     const res = await fetch(baseURL + params, options);
@@ -806,9 +744,8 @@ async function Five_Min(instrument){
         }
         
       }
-  async function Weekly_Extend_Low(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Weekly_Extend_Low(){
+  
     let params = "count=2500&granularity=W"
     
     const res = await fetch(baseURL + params, options);
@@ -818,9 +755,8 @@ async function Five_Min(instrument){
         }
       }
 
-  async function Price(instrument){
-    let accountID = String(accinfo[0])
-    let token = String(accinfo[1])
+  async function Price(){
+  
     let params = "count=1&granularity=M1"
     
     const res = await fetch(baseURL + params, options);
@@ -834,71 +770,71 @@ async function Assign(){
   let g = 0
   while(g == 0){
     Assigner()
-    Five_Min(instrument)
-    Fifteen_Min(instrument)
-    Thirty_Min(instrument)
-    One_Hour(instrument)
-    Two_Hour(instrument)
-    Four_Hour(instrument)
-    Daily(instrument)
-    Weekly(instrument)
-    Five_Min_Extend(instrument)
-    Fifteen_Min_Extend(instrument)
-    Thirty_Min_Extend(instrument)
-    One_Hour_Extend(instrument)
-    Two_Hour_Extend(instrument)
-    Four_Hour_Extend(instrument)
-    Daily_Extend(instrument)
-    Weekly_Extend(instrument)
-    Five_Min_Low(instrument)
-    Fifteen_Min_Low(instrument)
-    Thirty_Min_Low(instrument)
-    One_Hour_Low(instrument)
-    Two_Hour_Low(instrument)
-    Four_Hour_Low(instrument)
-    Daily_Low(instrument)
-    Weekly_Low(instrument)
-    Five_Min_Extend_Low(instrument)
-    Fifteen_Min_Extend_Low(instrument)
-    Thirty_Min_Extend_Low(instrument)
-    One_Hour_Extend_Low(instrument)
-    Two_Hour_Extend_Low(instrument)
-    Four_Hour_Extend_Low(instrument)
-    Daily_Extend_Low(instrument)
-    Weekly_Extend_Low(instrument)
-    Five_Min_High(instrument)
-    Fifteen_Min_High(instrument)
-    Thirty_Min_High(instrument)
-    One_Hour_High(instrument)
-    Two_Hour_High(instrument)
-    Four_Hour_High(instrument)
-    Daily_High(instrument)
-    Weekly_High(instrument)
-    Five_Min_Extend_High(instrument)
-    Fifteen_Min_Extend_High(instrument)
-    Thirty_Min_Extend_High(instrument)
-    One_Hour_Extend_High(instrument)
-    Two_Hour_Extend_High(instrument)
-    Four_Hour_Extend_High(instrument)
-    Daily_Extend_High(instrument)
-    Weekly_Extend_High(instrument)
-    Five_Min_Open(instrument)
-    Fifteen_Min_Open(instrument)
-    Thirty_Min_Open(instrument)
-    One_Hour_Open(instrument)
-    Two_Hour_Open(instrument)
-    Four_Hour_Open(instrument)
-    Daily_Open(instrument)
-    Weekly_Open(instrument)
-    await Five_Min_Extend_Open(instrument)
-    await Fifteen_Min_Extend_Open(instrument)
-    await Thirty_Min_Extend_Open(instrument)
-    await One_Hour_Extend_Open(instrument)
-    await Two_Hour_Extend_Open(instrument)
-    await Four_Hour_Extend_Open(instrument)
-    await Daily_Extend_Open(instrument)
-    await Weekly_Extend_Open(instrument)
-    await Price(instrument)
+    Five_Min()
+    Fifteen_Min()
+    Thirty_Min()
+    One_Hour()
+    Two_Hour()
+    Four_Hour()
+    Daily()
+    Weekly()
+    Five_Min_Extend()
+    Fifteen_Min_Extend()
+    Thirty_Min_Extend()
+    One_Hour_Extend()
+    Two_Hour_Extend()
+    Four_Hour_Extend()
+    Daily_Extend()
+    Weekly_Extend()
+    Five_Min_Low()
+    Fifteen_Min_Low()
+    Thirty_Min_Low()
+    One_Hour_Low()
+    Two_Hour_Low()
+    Four_Hour_Low()
+    Daily_Low()
+    Weekly_Low()
+    Five_Min_Extend_Low()
+    Fifteen_Min_Extend_Low()
+    Thirty_Min_Extend_Low()
+    One_Hour_Extend_Low()
+    Two_Hour_Extend_Low()
+    Four_Hour_Extend_Low()
+    Daily_Extend_Low()
+    Weekly_Extend_Low()
+    Five_Min_High()
+    Fifteen_Min_High()
+    Thirty_Min_High()
+    One_Hour_High()
+    Two_Hour_High()
+    Four_Hour_High()
+    Daily_High()
+    Weekly_High()
+    Five_Min_Extend_High()
+    Fifteen_Min_Extend_High()
+    Thirty_Min_Extend_High()
+    One_Hour_Extend_High()
+    Two_Hour_Extend_High()
+    Four_Hour_Extend_High()
+    Daily_Extend_High()
+    Weekly_Extend_High()
+    Five_Min_Open()
+    Fifteen_Min_Open()
+    Thirty_Min_Open()
+    One_Hour_Open()
+    Two_Hour_Open()
+    Four_Hour_Open()
+    Daily_Open()
+    Weekly_Open()
+    Five_Min_Extend_Open()
+    Fifteen_Min_Extend_Open()
+    Thirty_Min_Extend_Open()
+    One_Hour_Extend_Open()
+    await Two_Hour_Extend_Open()
+    await Four_Hour_Extend_Open()
+    await Daily_Extend_Open()
+    await Weekly_Extend_Open()
+    await Price()
     testdaily.testdaily(values, price)
     testfifteen.testfifteenmin(values, price)
     testfourhour.testfourhour(values, price)
