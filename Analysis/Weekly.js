@@ -12,6 +12,8 @@ const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
 
 
+var instrum = ""
+
 class Weekly_Nexus{
 
     pos = false
@@ -471,11 +473,8 @@ class Weekly_Functions{
 
 /** load instrument name from json file */
     static instrument_name(){
-        let raw = fs.readFileSync('instrument.json')
-        let instrument = JSON.parse(raw)
-        let dataspecific = instrument['instrument']
-        Weekly_Nexus.pair = dataspecific
-        return dataspecific
+        Weekly_Nexus.pair = instrum
+        return instrum
     }
 /** load historical prices from json file */
     static HistoryAssigner(){
@@ -1565,7 +1564,8 @@ class Thirty_Min_Functions{
 var dataset = {}
 var liveprice = 0
 
-module.exports = { testweekly: function(data, price){
+module.exports = { testweekly: function(data, price, instrument){
+    instrum = instrument
     liveprice = price
     dataset = data
     Weekly_Nexus.controlMain()

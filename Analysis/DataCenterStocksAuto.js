@@ -1,17 +1,13 @@
 const fs = require('fs')
 const axios = require('axios')
 const yfin = require("yahoo-finance2").default;
-let raw = fs.readFileSync('accinfo.json')
-let accinfo = JSON.parse(raw)
-let rawtwo = fs.readFileSync('instrument.json')
-let instrument = JSON.parse(rawtwo)['instrument']
-var testdaily = require('./Daily3.js')
-var testfifteen = require('./FifteenMin3.js')
-var testthirtymin = require('./ThirtyMin3.js')
-var testonehour = require('./OneHour3.js')
-var testtwohour = require('./TwoHour3.js')
-var testfourhour = require('./FourHour3.js')
-var testweekly = require('./Weekly3.js')
+var testdaily = require('./Daily.js')
+var testfifteen = require('./FifteenMin.js')
+var testthirtymin = require('./ThirtyMin.js')
+var testonehour = require('./OneHour.js')
+var testtwohour = require('./TwoHour.js')
+var testfourhour = require('./FourHour.js')
+var testweekly = require('./Weekly.js')
 var moment = require('moment');
 let yourDate = new Date()
 let today = yourDate.toISOString().split('T')[0]
@@ -23,16 +19,9 @@ let refdaytwohour = moment().subtract(124.5, 'days').format().split('T')[0];
 let refdayfourhour = moment().subtract(248, 'days').format().split('T')[0];
 let refdaydaily = moment().subtract(1062.5, 'days').format().split('T')[0];
 let refdayweekly = moment().subtract(5115, 'days').format().split('T')[0];
-let rawthree = fs.readFileSync('proxyinfo.json')
-let proxyinfo = JSON.parse(rawthree)
-let proxyval =   {
-      protocol: proxyinfo[1],
-      host: proxyinfo[2],
-      port: parseInt(proxyinfo[3])
-}
-const instance = axios.create({
-  baseURL: "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/", proxy: proxyval
-  })
+var instrument = ""
+var instance = axios.create({
+  baseURL: "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/"})
 
 
 
@@ -190,7 +179,7 @@ function Assigner(){
 }
 }
 
-async function Five_Min(instrument){
+async function Five_Min(){
   let aggs = []
   let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -213,7 +202,7 @@ async function Five_Min(instrument){
   Variables.lenfive = Variables.five.length
   }
 
-async function Fifteen_Min(instrument){
+async function Fifteen_Min(){
   let aggs = []
   let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -236,7 +225,7 @@ async function Fifteen_Min(instrument){
   Variables.lenfifteen = Variables.fifteen.length
 }
 
-async function Thirty_Min(instrument){
+async function Thirty_Min(){
   let aggs = []
   let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -259,7 +248,7 @@ async function Thirty_Min(instrument){
   Variables.lenthirty = Variables.thirty.length
 }
 
-async function One_Hour(instrument){
+async function One_Hour(){
   let aggs = []
   let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -283,7 +272,7 @@ async function One_Hour(instrument){
             }
 
 
-async function Two_Hour(instrument){
+async function Two_Hour(){
   let aggs = []
   let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -306,7 +295,7 @@ async function Two_Hour(instrument){
   Variables.lentwohour = Variables.twohour.length
 }
 
-async function Four_Hour(instrument){
+async function Four_Hour(){
   let aggs = []
   let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -329,7 +318,7 @@ async function Four_Hour(instrument){
   Variables.lenfourhour = Variables.fourhour.length
 }
 
-async function Daily(instrument){
+async function Daily(){
   let aggs = []
   let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -352,7 +341,7 @@ async function Daily(instrument){
   Variables.lendaily = Variables.daily.length
 }
 
-async function Weekly(instrument){
+async function Weekly(){
   let aggs = []
   let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -374,7 +363,7 @@ async function Weekly(instrument){
   Variables.weekly = values["Weekly"]['c']
   Variables.lenweekly = Variables.weekly.length
 }
-async function Five_Min_Extend(instrument){
+async function Five_Min_Extend(){
   let aggs = []
   let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -397,7 +386,7 @@ async function Five_Min_Extend(instrument){
   Variables.lenextendfive = Variables.extendfive.length
     }
 
-async function Fifteen_Min_Extend(instrument){
+async function Fifteen_Min_Extend(){
   let aggs = []
   let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -420,7 +409,7 @@ async function Fifteen_Min_Extend(instrument){
   Variables.lenextendfifteen = Variables.extendfifteen.length
 }
 
-async function Thirty_Min_Extend(instrument){
+async function Thirty_Min_Extend(){
   let aggs = []
   let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -443,7 +432,7 @@ async function Thirty_Min_Extend(instrument){
   Variables.lenextendthirty = Variables.extendthirty.length
 }
 
-async function One_Hour_Extend(instrument){
+async function One_Hour_Extend(){
   let aggs = []
   let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -466,7 +455,7 @@ async function One_Hour_Extend(instrument){
   Variables.lenextendhour = Variables.extendhour.length
 }
 
-async function Two_Hour_Extend(instrument){
+async function Two_Hour_Extend(){
   let aggs = []
   let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -489,7 +478,7 @@ async function Two_Hour_Extend(instrument){
   Variables.lenextendtwohour = Variables.extendtwohour.length
 }
 
-async function Four_Hour_Extend(instrument){
+async function Four_Hour_Extend(){
   let aggs = []
   let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -512,7 +501,7 @@ async function Four_Hour_Extend(instrument){
   Variables.lenextendfourhour = Variables.extendfourhour.length
 }
 
-async function Daily_Extend(instrument){
+async function Daily_Extend(){
   let aggs = []
   let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -535,7 +524,7 @@ async function Daily_Extend(instrument){
   Variables.lenextenddaily = Variables.extenddaily.length
   }
 
-async function Weekly_Extend(instrument){
+async function Weekly_Extend(){
   let aggs = []
   let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
   var res = await instance.get(url);
@@ -557,7 +546,7 @@ async function Weekly_Extend(instrument){
   Variables.extendweekly = values["Weekly Extend"]['c']
   Variables.lenextendweekly = Variables.extendweekly.length
   }
-async function Five_Min_Low(instrument){
+async function Five_Min_Low(){
     let aggs = []
     let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -580,7 +569,7 @@ async function Five_Min_Low(instrument){
     Variables.lenfivelow = Variables.fivelow.length
     }
   
-async function Fifteen_Min_Low(instrument){
+async function Fifteen_Min_Low(){
     let aggs = []
     let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -603,7 +592,7 @@ async function Fifteen_Min_Low(instrument){
     Variables.lenfifteenlow = Variables.fifteenlow.length
   }
   
-async function Thirty_Min_Low(instrument){
+async function Thirty_Min_Low(){
     let aggs = []
     let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -626,7 +615,7 @@ async function Thirty_Min_Low(instrument){
     Variables.lenthirtylow = Variables.thirtylow.length
   }
   
-async function One_Hour_Low(instrument){
+async function One_Hour_Low(){
     let aggs = []
     let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -649,7 +638,7 @@ async function One_Hour_Low(instrument){
     Variables.lenhourlow = Variables.hourlow.length
     }
   
-async function Two_Hour_Low(instrument){
+async function Two_Hour_Low(){
     let aggs = []
     let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -672,7 +661,7 @@ async function Two_Hour_Low(instrument){
     Variables.lentwohourlow = Variables.twohourlow.length
   }
   
-async function Four_Hour_Low(instrument){
+async function Four_Hour_Low(){
     let aggs = []
     let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -695,7 +684,7 @@ async function Four_Hour_Low(instrument){
     Variables.lenfourhourlow = Variables.fourhourlow.length
   }
   
-async function Daily_Low(instrument){
+async function Daily_Low(){
     let aggs = []
     let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -718,7 +707,7 @@ async function Daily_Low(instrument){
     Variables.lendailylow = Variables.dailylow.length
   }
   
-async function Weekly_Low(instrument){
+async function Weekly_Low(){
     let aggs = []
     let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -740,7 +729,7 @@ async function Weekly_Low(instrument){
     Variables.weeklylow = values["Weekly"]['l']
     Variables.lenweeklylow = Variables.weeklylow.length
   }
-async function Five_Min_Extend_Low(instrument){
+async function Five_Min_Extend_Low(){
     let aggs = []
     let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -763,7 +752,7 @@ async function Five_Min_Extend_Low(instrument){
     Variables.lenextendfivelow = Variables.extendfivelow.length
       }
   
-async function Fifteen_Min_Extend_Low(instrument){
+async function Fifteen_Min_Extend_Low(){
     let aggs = []
     let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -786,7 +775,7 @@ async function Fifteen_Min_Extend_Low(instrument){
     Variables.lenextendfifteenlow = Variables.extendfifteenlow.length
   }
   
-async function Thirty_Min_Extend_Low(instrument){
+async function Thirty_Min_Extend_Low(){
     let aggs = []
     let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -809,7 +798,7 @@ async function Thirty_Min_Extend_Low(instrument){
     Variables.lenextendthirtylow = Variables.extendthirtylow.length
   }
   
-async function One_Hour_Extend_Low(instrument){
+async function One_Hour_Extend_Low(){
     let aggs = []
     let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -832,7 +821,7 @@ async function One_Hour_Extend_Low(instrument){
     Variables.lenextendhourlow = Variables.extendhourlow.length
   }
   
-async function Two_Hour_Extend_Low(instrument){
+async function Two_Hour_Extend_Low(){
     let aggs = []
     let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -855,7 +844,7 @@ async function Two_Hour_Extend_Low(instrument){
     Variables.lenextendtwohourlow = Variables.extendtwohourlow.length
   }
   
-async function Four_Hour_Extend_Low(instrument){
+async function Four_Hour_Extend_Low(){
     let aggs = []
     let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -878,7 +867,7 @@ async function Four_Hour_Extend_Low(instrument){
     Variables.lenextendfourhourlow = Variables.extendfourhourlow.length
   }
   
-async function Daily_Extend_Low(instrument){
+async function Daily_Extend_Low(){
     let aggs = []
     let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -901,7 +890,7 @@ async function Daily_Extend_Low(instrument){
     Variables.lenextenddailylow = Variables.extenddailylow.length
     }
   
-async function Weekly_Extend_Low(instrument){
+async function Weekly_Extend_Low(){
     let aggs = []
     let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
     var res = await instance.get(url);
@@ -924,7 +913,7 @@ async function Weekly_Extend_Low(instrument){
     Variables.lenextendweeklylow = Variables.extendweeklylow.length
     }
 
-    async function Five_Min_High(instrument){
+    async function Five_Min_High(){
       let aggs = []
       let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -947,7 +936,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenfivehigh = Variables.fivehigh.length
       }
     
-  async function Fifteen_Min_High(instrument){
+  async function Fifteen_Min_High(){
       let aggs = []
       let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -970,7 +959,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenfifteenhigh = Variables.fifteenhigh.length
     }
     
-  async function Thirty_Min_High(instrument){
+  async function Thirty_Min_High(){
       let aggs = []
       let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -993,7 +982,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenthirtyhigh = Variables.thirtyhigh.length
     }
     
-  async function One_Hour_High(instrument){
+  async function One_Hour_High(){
       let aggs = []
       let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1016,7 +1005,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenhourhigh = Variables.hourhigh.length
       }
     
-  async function Two_Hour_High(instrument){
+  async function Two_Hour_High(){
       let aggs = []
       let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1039,7 +1028,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lentwohourhigh = Variables.twohourhigh.length
     }
     
-  async function Four_Hour_High(instrument){
+  async function Four_Hour_High(){
       let aggs = []
       let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1062,7 +1051,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenfourhourhigh = Variables.fourhourhigh.length
     }
     
-  async function Daily_High(instrument){
+  async function Daily_High(){
       let aggs = []
       let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1085,7 +1074,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lendailyhigh = Variables.dailyhigh.length
     }
     
-  async function Weekly_High(instrument){
+  async function Weekly_High(){
       let aggs = []
       let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1107,7 +1096,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.weeklyhigh = values["Weekly"]['h']
       Variables.lenweeklyhigh = Variables.weeklyhigh.length
     }
-  async function Five_Min_Extend_High(instrument){
+  async function Five_Min_Extend_High(){
       let aggs = []
       let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1130,7 +1119,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenextendfivehigh = Variables.extendfivehigh.length
         }
     
-  async function Fifteen_Min_Extend_High(instrument){
+  async function Fifteen_Min_Extend_High(){
       let aggs = []
       let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1153,7 +1142,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenextendfifteenhigh = Variables.extendfifteenhigh.length
     }
     
-  async function Thirty_Min_Extend_High(instrument){
+  async function Thirty_Min_Extend_High(){
       let aggs = []
       let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1176,7 +1165,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenextendthirtyhigh = Variables.extendthirtyhigh.length
     }
     
-  async function One_Hour_Extend_High(instrument){
+  async function One_Hour_Extend_High(){
       let aggs = []
       let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1199,7 +1188,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenextendhourhigh = Variables.extendhourhigh.length
     }
     
-  async function Two_Hour_Extend_High(instrument){
+  async function Two_Hour_Extend_High(){
       let aggs = []
       let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1222,7 +1211,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenextendtwohourhigh = Variables.extendtwohourhigh.length
     }
     
-  async function Four_Hour_Extend_High(instrument){
+  async function Four_Hour_Extend_High(){
       let aggs = []
       let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1245,7 +1234,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenextendfourhourhigh = Variables.extendfourhourhigh.length
     }
     
-  async function Daily_Extend_High(instrument){
+  async function Daily_Extend_High(){
       let aggs = []
       let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1268,7 +1257,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.lenextenddailyhigh = Variables.extenddailyhigh.length
       }
     
-    async function Weekly_Extend_High(instrument){
+    async function Weekly_Extend_High(){
       let aggs = []
       let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
       var res = await instance.get(url);
@@ -1290,7 +1279,7 @@ async function Weekly_Extend_Low(instrument){
       Variables.extendweeklyhigh = values["Weekly Extend"]['h']
       Variables.lenextendweeklyhigh = Variables.extendweeklyhigh.length
       }
-    async function Five_Min_Open(instrument){
+    async function Five_Min_Open(){
         let aggs = []
         let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1313,7 +1302,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenfiveopen = Variables.fiveopen.length
         }
       
-    async function Fifteen_Min_Open(instrument){
+    async function Fifteen_Min_Open(){
         let aggs = []
         let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1336,7 +1325,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenfifteenopen = Variables.fifteenopen.length
       }
       
-    async function Thirty_Min_Open(instrument){
+    async function Thirty_Min_Open(){
         let aggs = []
         let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1359,7 +1348,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenthirtyopen = Variables.thirtyopen.length
       }
       
-    async function One_Hour_Open(instrument){
+    async function One_Hour_Open(){
         let aggs = []
         let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1382,7 +1371,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenhouropen = Variables.houropen.length
         }
       
-    async function Two_Hour_Open(instrument){
+    async function Two_Hour_Open(){
         let aggs = []
         let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1405,7 +1394,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lentwohouropen = Variables.twohouropen.length
       }
       
-    async function Four_Hour_Open(instrument){
+    async function Four_Hour_Open(){
         let aggs = []
         let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1428,7 +1417,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenfourhouropen = Variables.fourhouropen.length
       }
       
-    async function Daily_Open(instrument){
+    async function Daily_Open(){
         let aggs = []
         let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1451,7 +1440,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lendailyopen = Variables.dailyopen.length
       }
       
-    async function Weekly_Open(instrument){
+    async function Weekly_Open(){
         let aggs = []
         let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1473,7 +1462,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.weeklyopen = values["Weekly"]['o']
         Variables.lenweeklyopen = Variables.weeklyopen.length
       }
-    async function Five_Min_Extend_Open(instrument){
+    async function Five_Min_Extend_Open(){
         let aggs = []
         let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1496,7 +1485,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenextendfiveopen = Variables.extendfiveopen.length
           }
       
-    async function Fifteen_Min_Extend_Open(instrument){
+    async function Fifteen_Min_Extend_Open(){
         let aggs = []
         let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1519,7 +1508,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenextendfifteenopen = Variables.extendfifteenopen.length
       }
       
-    async function Thirty_Min_Extend_Open(instrument){
+    async function Thirty_Min_Extend_Open(){
         let aggs = []
         let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1542,7 +1531,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenextendthirtyopen = Variables.extendthirtyopen.length
       }
       
-    async function One_Hour_Extend_Open(instrument){
+    async function One_Hour_Extend_Open(){
         let aggs = []
         let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1565,7 +1554,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenextendhouropen = Variables.extendhouropen.length
       }
       
-    async function Two_Hour_Extend_Open(instrument){
+    async function Two_Hour_Extend_Open(){
         let aggs = []
         let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1588,7 +1577,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenextendtwohouropen = Variables.extendtwohouropen.length
       }
       
-    async function Four_Hour_Extend_Open(instrument){
+    async function Four_Hour_Extend_Open(){
         let aggs = []
         let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1611,7 +1600,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenextendfourhouropen = Variables.extendfourhouropen.length
       }
       
-    async function Daily_Extend_Open(instrument){
+    async function Daily_Extend_Open(){
         let aggs = []
         let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1634,7 +1623,7 @@ async function Weekly_Extend_Low(instrument){
         Variables.lenextenddailyopen = Variables.extenddailyopen.length
         }
       
-    async function Weekly_Extend_Open(instrument){
+    async function Weekly_Extend_Open(){
         let aggs = []
         let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
         var res = await instance.get(url);
@@ -1656,8 +1645,8 @@ async function Weekly_Extend_Low(instrument){
         Variables.extendweeklyopen = values["Weekly Extend"]['o']
         Variables.lenextendweeklyopen = Variables.extendweeklyopen.length
         }
-    async function Price(instrument){
-      const pricelist = await yfin.quoteSummary(instrument)
+    async function Price(inst){
+      const pricelist = await yfin.quoteSummary(inst)
       const prices = pricelist.price.regularMarketPrice
       Variables.price = parseFloat(prices)
       }
@@ -1926,75 +1915,82 @@ function equalizer(){
 
 
 
-async function caller(){
+async function caller(instrum, proxy, accinfo){
+  instrument = instrum
+  proxyinfo = proxy
+  accountID = String(accinfo[0])
+  token = String(accinfo[1])
+  instance = axios.create({
+    baseURL: "https://api.polygon.io/v2/aggs/ticker/"+instrum+"/range/", proxy: proxyval
+    })
   let g = 0
   while(g == 0){
     Assigner()
-    Price(instrument)
-    Five_Min(instrument)
-    Fifteen_Min(instrument)
-    Thirty_Min(instrument)
-    One_Hour(instrument)
-    Two_Hour(instrument)
-    Four_Hour(instrument)
-    Daily(instrument)
-    Weekly(instrument)
-    Five_Min_Extend(instrument)
-    Fifteen_Min_Extend(instrument)
-    Thirty_Min_Extend(instrument)
-    One_Hour_Extend(instrument)
-    Two_Hour_Extend(instrument)
-    Four_Hour_Extend(instrument)
-    Daily_Extend(instrument)
-    Weekly_Extend(instrument)
-    Five_Min_Low(instrument)
-    Fifteen_Min_Low(instrument)
-    Thirty_Min_Low(instrument)
-    One_Hour_Low(instrument)
-    Two_Hour_Low(instrument)
-    Four_Hour_Low(instrument)
-    Daily_Low(instrument)
-    Weekly_Low(instrument)
-    Five_Min_Extend_Low(instrument)
-    Fifteen_Min_Extend_Low(instrument)
-    Thirty_Min_Extend_Low(instrument)
-    One_Hour_Extend_Low(instrument)
-    Two_Hour_Extend_Low(instrument)
-    Four_Hour_Extend_Low(instrument)
-    Daily_Extend_Low(instrument)
-    Weekly_Extend_Low(instrument)
-    Five_Min_High(instrument)
-    Fifteen_Min_High(instrument)
-    Thirty_Min_High(instrument)
-    One_Hour_High(instrument)
-    Two_Hour_High(instrument)
-    Four_Hour_High(instrument)
-    Daily_High(instrument)
-    Weekly_High(instrument)
-    Five_Min_Extend_High(instrument)
-    Fifteen_Min_Extend_High(instrument)
-    Thirty_Min_Extend_High(instrument)
-    One_Hour_Extend_High(instrument)
-    Two_Hour_Extend_High(instrument)
-    Four_Hour_Extend_High(instrument)
-    Daily_Extend_High(instrument)
-    Weekly_Extend_High(instrument)
-    Five_Min_Open(instrument)
-    Fifteen_Min_Open(instrument)
-    Thirty_Min_Open(instrument)
-    One_Hour_Open(instrument)
-    Two_Hour_Open(instrument)
-    Four_Hour_Open(instrument)
-    Daily_Open(instrument)
-    Weekly_Open(instrument)
-    Five_Min_Extend_Open(instrument)
-    Fifteen_Min_Extend_Open(instrument)
-    Thirty_Min_Extend_Open(instrument)
-    One_Hour_Extend_Open(instrument)
-    Two_Hour_Extend_Open(instrument)
-    await Four_Hour_Extend_Open(instrument)
-    await Daily_Extend_Open(instrument)
-    await Weekly_Extend_Open(instrument)
+    Price(instrum)
+    Five_Min()
+    Fifteen_Min()
+    Thirty_Min()
+    One_Hour()
+    Two_Hour()
+    Four_Hour()
+    Daily()
+    Weekly()
+    Five_Min_Extend()
+    Fifteen_Min_Extend()
+    Thirty_Min_Extend()
+    One_Hour_Extend()
+    Two_Hour_Extend()
+    Four_Hour_Extend()
+    Daily_Extend()
+    Weekly_Extend()
+    Five_Min_Low()
+    Fifteen_Min_Low()
+    Thirty_Min_Low()
+    One_Hour_Low()
+    Two_Hour_Low()
+    Four_Hour_Low()
+    Daily_Low()
+    Weekly_Low()
+    Five_Min_Extend_Low()
+    Fifteen_Min_Extend_Low()
+    Thirty_Min_Extend_Low()
+    One_Hour_Extend_Low()
+    Two_Hour_Extend_Low()
+    Four_Hour_Extend_Low()
+    Daily_Extend_Low()
+    Weekly_Extend_Low()
+    Five_Min_High()
+    Fifteen_Min_High()
+    Thirty_Min_High()
+    One_Hour_High()
+    Two_Hour_High()
+    Four_Hour_High()
+    Daily_High()
+    Weekly_High()
+    Five_Min_Extend_High()
+    Fifteen_Min_Extend_High()
+    Thirty_Min_Extend_High()
+    One_Hour_Extend_High()
+    Two_Hour_Extend_High()
+    Four_Hour_Extend_High()
+    Daily_Extend_High()
+    Weekly_Extend_High()
+    Five_Min_Open()
+    Fifteen_Min_Open()
+    Thirty_Min_Open()
+    One_Hour_Open()
+    Two_Hour_Open()
+    Four_Hour_Open()
+    Daily_Open()
+    Weekly_Open()
+    Five_Min_Extend_Open()
+    Fifteen_Min_Extend_Open()
+    Thirty_Min_Extend_Open()
+    One_Hour_Extend_Open()
+    Two_Hour_Extend_Open()
+    await Four_Hour_Extend_Open()
+    await Daily_Extend_Open()
+    await Weekly_Extend_Open()
     equalizer()
     testdaily.testdaily(values, Variables.price)
     testfifteen.testfifteenmin(values, Variables.price)
@@ -2006,7 +2002,8 @@ async function caller(){
   
   }
 }
-caller()
 
+
+module.exports = { assigning: function(instrum, proxy, accinfo){caller(instrum, proxy, accinfo)} }
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
  have been included with this distribution. */

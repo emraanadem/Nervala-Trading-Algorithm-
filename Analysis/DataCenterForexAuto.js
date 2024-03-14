@@ -1,28 +1,23 @@
 const fs = require('fs')
 const { ProxyAgent } = require('undici') // native fetch uses undici as underlying HTTP handler, need the agent from it
-let raw = fs.readFileSync('accinfo.json')
-let accinfo = JSON.parse(raw)
-let rawtwo = fs.readFileSync('instrument.json')
-let instrument = JSON.parse(rawtwo)['instrument']
-var testdaily = require('./Daily3.js')
-var testfifteen = require('./FifteenMin3.js')
-var testthirtymin = require('./ThirtyMin3.js')
-var testonehour = require('./OneHour3.js')
-var testtwohour = require('./TwoHour3.js')
-var testfourhour = require('./FourHour3.js')
-var testweekly = require('./Weekly3.js')
-
-let accountID = String(accinfo[0])
-let token = String(accinfo[1])
-let rawthree = fs.readFileSync('proxyinfo.json')
-let proxyinfo = JSON.parse(rawthree)
+var testdaily = require('./Daily.js')
+var testfifteen = require('./FifteenMin.js')
+var testthirtymin = require('./ThirtyMin.js')
+var testonehour = require('./OneHour.js')
+var testtwohour = require('./TwoHour.js')
+var testfourhour = require('./FourHour.js')
+var testweekly = require('./Weekly.js')
+let instrument = ""
+let accountID = ""
+let token = ""
+let proxyinfo = []
 
 
 
 
 // Set up common connection parameters; once you hit a rate limit and want to rotate proxies or if you want
 // to randomize, you need to construct proxyAgent again with the new proxy details
-const baseURL = `https://api-fxpractice.oanda.com/v3/accounts/${accountID}/instruments/${instrument}/candles?`
+var baseURL = `https://api-fxpractice.oanda.com/v3/accounts/${accountID}/instruments/${instrument}/candles?`
 const proxyAgent = new ProxyAgent({
   uri: `http://${proxyinfo[2]}:${proxyinfo[3]}`
 });
@@ -765,9 +760,13 @@ async function Five_Min(){
     )
         }
 
-
-async function Assign(){
+async function Assign(instrum, proxy, accinfo){
   let g = 0
+  instrument = instrum
+  proxyinfo = proxy
+  accountID = String(accinfo[0])
+  token = String(accinfo[1])
+  baseURL = `https://api-fxpractice.oanda.com/v3/accounts/${accountID}/instruments/${instrument}/candles?`
   while(g == 0){
     Assigner()
     Five_Min()
@@ -786,22 +785,6 @@ async function Assign(){
     Four_Hour_Extend()
     Daily_Extend()
     Weekly_Extend()
-    Five_Min_Low()
-    Fifteen_Min_Low()
-    Thirty_Min_Low()
-    One_Hour_Low()
-    Two_Hour_Low()
-    Four_Hour_Low()
-    Daily_Low()
-    Weekly_Low()
-    Five_Min_Extend_Low()
-    Fifteen_Min_Extend_Low()
-    Thirty_Min_Extend_Low()
-    One_Hour_Extend_Low()
-    Two_Hour_Extend_Low()
-    Four_Hour_Extend_Low()
-    Daily_Extend_Low()
-    Weekly_Extend_Low()
     Five_Min_High()
     Fifteen_Min_High()
     Thirty_Min_High()
@@ -830,22 +813,37 @@ async function Assign(){
     Fifteen_Min_Extend_Open()
     Thirty_Min_Extend_Open()
     One_Hour_Extend_Open()
-    await Two_Hour_Extend_Open()
-    await Four_Hour_Extend_Open()
-    await Daily_Extend_Open()
-    await Weekly_Extend_Open()
+    Two_Hour_Extend_Open()
+    Four_Hour_Extend_Open()
+    Daily_Extend_Open()
+    Weekly_Extend_Open()
+    Five_Min_Low()
+    Fifteen_Min_Low()
+    Thirty_Min_Low()
+    One_Hour_Low()
+    Two_Hour_Low()
+    Four_Hour_Low()
+    Daily_Low()
+    Weekly_Low()
+    Five_Min_Extend_Low()
+    Fifteen_Min_Extend_Low()
+    Thirty_Min_Extend_Low()
+    One_Hour_Extend_Low()
+    await Two_Hour_Extend_Low()
+    await Four_Hour_Extend_Low()
+    await Daily_Extend_Low()
+    await Weekly_Extend_Low()
     await Price()
-    testdaily.testdaily(values, price)
-    testfifteen.testfifteenmin(values, price)
-    testfourhour.testfourhour(values, price)
-    testtwohour.testtwohour(values, price)
-    testonehour.testonehour(values, price)
-    testthirtymin.testthirtymin(values, price)
-    testweekly.testweekly(values, price)
-  
-  }
+    testdaily.testdaily(values, price, instrument)
+    testfifteen.testfifteenmin(values, price, instrument)
+    testfourhour.testfourhour(values, price, instrument)
+    testtwohour.testtwohour(values, price, instrument)
+    testonehour.testonehour(values, price, instrument)
+    testthirtymin.testthirtymin(values, price, instrument)
+    testweekly.testweekly(values, price, instrument)}
 }
-Assign()
+
+module.exports = { assigning: function(instrum, proxy, accinfo){Assign(instrum, proxy, accinfo)} }
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
- have been included with this distribution. */
+have been included with this distribution. */

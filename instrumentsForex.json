@@ -12,8 +12,4 @@
 "XAU_CHF", "XAG_AUD", "XAU_CAD", "XAG_GBP", "XAU_NZD", "XAG_CAD", "XAG_CHF", "XAG_SGD", "XAG_JPY", 
 "XAG_NZD", "XAU_HKD", "XAG_HKD", "CH20_CHF", "CHINAH_HKD", "ESPIX_EUR", "TRY_JPY", "UK10YB_GBP",
 "SGD_CHF", "SGD_HKD", "DE10YB_EUR", "HKD_JPY", "CAD_HKD", "CAD_SGD", "CHF_ZAR", "CHF_HKD", "IN50_USD", 
-"NZD_HKD","MSFT", "AAPL", "NVDA", "AMZN", "GOOGL", "META", "BRK.B", "LLY", "TSM", "AVGO", 
-"TSLA", "V", "NVO", "JPM", "WMT", "UNH", "MA", "XOM", "ASML", "JNJ", "HD", "PG", "COST", "AMD", 
-"MRK", "ABBV", "ORCL", "CRM", "CVX", "BAC", "NFLX", "ADBE", "KO", "ACN", "PEP", "FMX", "SAP", "TMO",
- "LIN", "MCD", "NVS", "ABT", "DIS", "SHEL", "AZN", "WFC", "CSCO", "TMUS", "BABA", "INTC", "QCOM", 
- "GE", "VZ", "UBER", "CAT", "NKE", "LOW", "MS", "ABNB", "BLK", "T", "IBM"]}
+"NZD_HKD"]}

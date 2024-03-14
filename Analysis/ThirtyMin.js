@@ -11,6 +11,8 @@ const { createModel } = require('polynomial-regression');
 const nerdamer = require("nerdamer/all.min");
 const roots = require('kld-polynomial');
 
+var instrum = ""
+
 
 class Thirty_Min_Nexus{
 
@@ -498,11 +500,8 @@ class Thirty_Min_Functions{
 
 /** load instrument name from json file */
     static instrument_name(){
-        let raw = fs.readFileSync('instrument.json')
-        let instrument = JSON.parse(raw)
-        let dataspecific = instrument['instrument']
-        Thirty_Min_Nexus.pair = dataspecific   
-        return dataspecific
+        Thirty_Min_Nexus.pair = instrum 
+        return instrum
     }
 /** load historical prices from json file */
     static HistoryAssigner(){
@@ -1280,11 +1279,8 @@ class Four_Hour_Functions{
 
 /** load instrument name from json file */
     static instrument_name(){
-        let raw = fs.readFileSync('instrument.json')
-        let instrument = JSON.parse(raw)
-        let dataspecific = instrument['instrument']
-        Thirty_Min_Nexus.pair = dataspecific   
-        return dataspecific
+        Thirty_Min_Nexus.pair = instrum  
+        return instrum
     }
 /** load historical prices from json file */
    static HistoryAssigner(){
@@ -2267,7 +2263,8 @@ class Five_Min_Functions{
 var dataset = {}
 var liveprice = 0
 
-module.exports = { testthirtymin: function(data, price){
+module.exports = { testthirtymin: function(data, price, instrument){
+    instrum = instrument
     liveprice = price
     dataset = data
     Thirty_Min_Nexus.controlMain()

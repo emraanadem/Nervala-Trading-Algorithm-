@@ -1,28 +1,24 @@
 const fs = require('fs')
 const { ProxyAgent } = require('undici') // native fetch uses undici as underlying HTTP handler, need the agent from it
-let raw = fs.readFileSync('accinfo.json')
-let accinfo = JSON.parse(raw)
-let rawtwo = fs.readFileSync('instrument.json')
-let instrument = JSON.parse(rawtwo)['instrument']
-var testdaily = require('./Daily3.js')
-var testfifteen = require('./FifteenMin3.js')
-var testthirtymin = require('./ThirtyMin3.js')
-var testonehour = require('./OneHour3.js')
-var testtwohour = require('./TwoHour3.js')
-var testfourhour = require('./FourHour3.js')
-var testweekly = require('./Weekly3.js')
 
-let accountID = String(accinfo[0])
-let token = String(accinfo[1])
-let rawthree = fs.readFileSync('proxyinfo.json')
-let proxyinfo = JSON.parse(rawthree)
+var testdaily = require('./Daily.js')
+var testfifteen = require('./FifteenMin.js')
+var testthirtymin = require('./ThirtyMin.js')
+var testonehour = require('./OneHour.js')
+var testtwohour = require('./TwoHour.js')
+var testfourhour = require('./FourHour.js')
+var testweekly = require('./Weekly.js')
+let instrument = ""
+let accountID = ""
+let proxyinfo = ["test", "http", "192.168.1.1", 38, ]
+let token = ""
 
 
 
 
 // Set up common connection parameters; once you hit a rate limit and want to rotate proxies or if you want
 // to randomize, you need to construct proxyAgent again with the new proxy details
-const baseURL = `https://api-fxpractice.oanda.com/v3/accounts/${accountID}/instruments/${instrument}/candles?`
+var baseURL = `https://api-fxpractice.oanda.com/v3/accounts/${accountID}/instruments/${instrument}/candles?`
 const proxyAgent = new ProxyAgent({
   uri: `http://${proxyinfo[2]}:${proxyinfo[3]}`
 });
@@ -765,7 +761,12 @@ async function Five_Min(){
     )
         }
 
-async function Assign(){
+async function Assign(instrum, proxy, accinfo){
+  instrument = instrum
+  proxyinfo = proxy
+  accountID = String(accinfo[0])
+  token = String(accinfo[1])
+  baseURL = `https://api-fxpractice.oanda.com/v3/accounts/${accountID}/instruments/${instrument}/candles?`
   Assigner()
   Five_Min()
   Fifteen_Min()
@@ -834,17 +835,21 @@ async function Assign(){
   await Price()
   console.log(values)
   console.log(price)
-  testdaily.testdaily(values, price)
-  testfifteen.testfifteenmin(values, price)
-  testfourhour.testfourhour(values, price)
-  testtwohour.testtwohour(values, price)
-  testonehour.testonehour(values, price)
-  testthirtymin.testthirtymin(values, price)
-  testweekly.testweekly(values, price)
+  testdaily.testdaily(values, price, instrument)
+  testfifteen.testfifteenmin(values, price, instrument)
+  testfourhour.testfourhour(values, price, instrument)
+  testtwohour.testtwohour(values, price, instrument)
+  testonehour.testonehour(values, price, instrument)
+  testthirtymin.testthirtymin(values, price, instrument)
+  testweekly.testweekly(values, price, instrument)
 }
 
-// Just running the first method in this dev branch as proof-of-concept
-Assign()
+
+
+
+
+
+module.exports = { assigning: function(instrum, proxy, accinfo){Assign(instrum, proxy, accinfo)} }
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 have been included with this distribution. */
