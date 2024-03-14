@@ -20,8 +20,8 @@ let refdayfourhour = moment().subtract(248, 'days').format().split('T')[0];
 let refdaydaily = moment().subtract(1062.5, 'days').format().split('T')[0];
 let refdayweekly = moment().subtract(5115, 'days').format().split('T')[0];
 var instrument = ""
-var instance = axios.create({
-  baseURL: "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/"})
+
+var baseURL = "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/"
 
 
 
@@ -182,8 +182,8 @@ function Assigner(){
 async function Five_Min(){
   let aggs = []
   let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Five_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
@@ -191,8 +191,8 @@ async function Five_Min(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Five_Min"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -205,8 +205,8 @@ async function Five_Min(){
 async function Fifteen_Min(){
   let aggs = []
   let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Fifteen_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
@@ -214,8 +214,8 @@ async function Fifteen_Min(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Fifteen_Min"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -228,8 +228,8 @@ async function Fifteen_Min(){
 async function Thirty_Min(){
   let aggs = []
   let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Thirty_Min"]['c'].push(parseFloat(data['results'][item]['c']))
       }
@@ -237,8 +237,8 @@ async function Thirty_Min(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Thirty_Min"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -251,8 +251,8 @@ async function Thirty_Min(){
 async function One_Hour(){
   let aggs = []
   let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["One_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -260,8 +260,8 @@ async function One_Hour(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["One_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -275,8 +275,8 @@ async function One_Hour(){
 async function Two_Hour(){
   let aggs = []
   let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["Two_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -284,8 +284,8 @@ async function Two_Hour(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["Two_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -298,8 +298,8 @@ async function Two_Hour(){
 async function Four_Hour(){
   let aggs = []
   let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["Four_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -307,8 +307,8 @@ async function Four_Hour(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["Four_Hour"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -321,8 +321,8 @@ async function Four_Hour(){
 async function Daily(){
   let aggs = []
   let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["Daily"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -330,8 +330,8 @@ async function Daily(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["Daily"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -344,8 +344,8 @@ async function Daily(){
 async function Weekly(){
   let aggs = []
   let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["Weekly"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -353,8 +353,8 @@ async function Weekly(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["Weekly"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -366,8 +366,8 @@ async function Weekly(){
 async function Five_Min_Extend(){
   let aggs = []
   let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Five_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
@@ -375,8 +375,8 @@ async function Five_Min_Extend(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Five_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -389,8 +389,8 @@ async function Five_Min_Extend(){
 async function Fifteen_Min_Extend(){
   let aggs = []
   let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Fifteen_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
@@ -398,8 +398,8 @@ async function Fifteen_Min_Extend(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Fifteen_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -412,8 +412,8 @@ async function Fifteen_Min_Extend(){
 async function Thirty_Min_Extend(){
   let aggs = []
   let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Thirty_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
@@ -421,8 +421,8 @@ async function Thirty_Min_Extend(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Thirty_Min Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -435,8 +435,8 @@ async function Thirty_Min_Extend(){
 async function One_Hour_Extend(){
   let aggs = []
   let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["One_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
       }
@@ -444,8 +444,8 @@ async function One_Hour_Extend(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["One_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -458,8 +458,8 @@ async function One_Hour_Extend(){
 async function Two_Hour_Extend(){
   let aggs = []
   let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["Two_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -467,8 +467,8 @@ async function Two_Hour_Extend(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["Two_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -481,8 +481,8 @@ async function Two_Hour_Extend(){
 async function Four_Hour_Extend(){
   let aggs = []
   let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["Four_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -490,8 +490,8 @@ async function Four_Hour_Extend(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["Four_Hour Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -504,8 +504,8 @@ async function Four_Hour_Extend(){
 async function Daily_Extend(){
   let aggs = []
   let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["Daily Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -513,8 +513,8 @@ async function Daily_Extend(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["Daily Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -527,8 +527,8 @@ async function Daily_Extend(){
 async function Weekly_Extend(){
   let aggs = []
   let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-  var res = await instance.get(url);
-  var data = await res.data;
+  var res = await fetch(baseURL+url);
+  var data = await res.json();
     for(let item = 0; item < data['results'].length; item++){
       values["Weekly Extend"]['c'].push(parseFloat(data['results'][item]['c']))
     }
@@ -536,8 +536,8 @@ async function Weekly_Extend(){
       if('next_url' in data){
         let id = data['next_url'].split('/')[10]
         url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
         if ('results' in data){
             for(let item = 0; item < data['results'].length; item++){
                 values["Weekly Extend"]['c'].push(parseFloat(data['results'][item]['c']))
@@ -549,8 +549,8 @@ async function Weekly_Extend(){
 async function Five_Min_Low(){
     let aggs = []
     let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Five_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
@@ -558,8 +558,8 @@ async function Five_Min_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Five_Min"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -572,8 +572,8 @@ async function Five_Min_Low(){
 async function Fifteen_Min_Low(){
     let aggs = []
     let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Fifteen_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
@@ -581,8 +581,8 @@ async function Fifteen_Min_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Fifteen_Min"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -595,8 +595,8 @@ async function Fifteen_Min_Low(){
 async function Thirty_Min_Low(){
     let aggs = []
     let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Thirty_Min"]['l'].push(parseFloat(data['results'][item]['l']))
         }
@@ -604,8 +604,8 @@ async function Thirty_Min_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Thirty_Min"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -618,8 +618,8 @@ async function Thirty_Min_Low(){
 async function One_Hour_Low(){
     let aggs = []
     let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["One_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
         }
@@ -627,8 +627,8 @@ async function One_Hour_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["One_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -641,8 +641,8 @@ async function One_Hour_Low(){
 async function Two_Hour_Low(){
     let aggs = []
     let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Two_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
       }
@@ -650,8 +650,8 @@ async function Two_Hour_Low(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Two_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -664,8 +664,8 @@ async function Two_Hour_Low(){
 async function Four_Hour_Low(){
     let aggs = []
     let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Four_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
       }
@@ -673,8 +673,8 @@ async function Four_Hour_Low(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Four_Hour"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -687,8 +687,8 @@ async function Four_Hour_Low(){
 async function Daily_Low(){
     let aggs = []
     let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Daily"]['l'].push(parseFloat(data['results'][item]['l']))
       }
@@ -696,8 +696,8 @@ async function Daily_Low(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Daily"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -710,8 +710,8 @@ async function Daily_Low(){
 async function Weekly_Low(){
     let aggs = []
     let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Weekly"]['l'].push(parseFloat(data['results'][item]['l']))
       }
@@ -719,8 +719,8 @@ async function Weekly_Low(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Weekly"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -732,8 +732,8 @@ async function Weekly_Low(){
 async function Five_Min_Extend_Low(){
     let aggs = []
     let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Five_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
@@ -741,8 +741,8 @@ async function Five_Min_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Five_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -755,8 +755,8 @@ async function Five_Min_Extend_Low(){
 async function Fifteen_Min_Extend_Low(){
     let aggs = []
     let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Fifteen_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
@@ -764,8 +764,8 @@ async function Fifteen_Min_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Fifteen_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -778,8 +778,8 @@ async function Fifteen_Min_Extend_Low(){
 async function Thirty_Min_Extend_Low(){
     let aggs = []
     let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Thirty_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
@@ -787,8 +787,8 @@ async function Thirty_Min_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Thirty_Min Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -801,8 +801,8 @@ async function Thirty_Min_Extend_Low(){
 async function One_Hour_Extend_Low(){
     let aggs = []
     let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["One_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
         }
@@ -810,8 +810,8 @@ async function One_Hour_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["One_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -824,8 +824,8 @@ async function One_Hour_Extend_Low(){
 async function Two_Hour_Extend_Low(){
     let aggs = []
     let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Two_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
@@ -833,8 +833,8 @@ async function Two_Hour_Extend_Low(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Two_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -847,8 +847,8 @@ async function Two_Hour_Extend_Low(){
 async function Four_Hour_Extend_Low(){
     let aggs = []
     let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Four_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
@@ -856,8 +856,8 @@ async function Four_Hour_Extend_Low(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Four_Hour Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -870,8 +870,8 @@ async function Four_Hour_Extend_Low(){
 async function Daily_Extend_Low(){
     let aggs = []
     let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Daily Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
@@ -879,8 +879,8 @@ async function Daily_Extend_Low(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Daily Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -893,8 +893,8 @@ async function Daily_Extend_Low(){
 async function Weekly_Extend_Low(){
     let aggs = []
     let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-    var res = await instance.get(url);
-    var data = await res.data;
+    var res = await fetch(baseURL+url);
+    var data = await res.json();
       for(let item = 0; item < data['results'].length; item++){
         values["Weekly Extend"]['l'].push(parseFloat(data['results'][item]['l']))
       }
@@ -902,8 +902,8 @@ async function Weekly_Extend_Low(){
         if('next_url' in data){
           let id = data['next_url'].split('/')[10]
           url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-          var res = await instance.get(url);
-          var data = await res.data;
+          var res = await fetch(baseURL+url);
+          var data = await res.json();
           if ('results' in data){
               for(let item = 0; item < data['results'].length; item++){
                   values["Weekly Extend"]['l'].push(parseFloat(data['results'][item]['l']))
@@ -916,8 +916,8 @@ async function Weekly_Extend_Low(){
     async function Five_Min_High(){
       let aggs = []
       let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Five_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
@@ -925,8 +925,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Five_Min"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -939,8 +939,8 @@ async function Weekly_Extend_Low(){
   async function Fifteen_Min_High(){
       let aggs = []
       let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Fifteen_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
@@ -948,8 +948,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Fifteen_Min"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -962,8 +962,8 @@ async function Weekly_Extend_Low(){
   async function Thirty_Min_High(){
       let aggs = []
       let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Thirty_Min"]['h'].push(parseFloat(data['results'][item]['h']))
           }
@@ -971,8 +971,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Thirty_Min"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -985,8 +985,8 @@ async function Weekly_Extend_Low(){
   async function One_Hour_High(){
       let aggs = []
       let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["One_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
           }
@@ -994,8 +994,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["One_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1008,8 +1008,8 @@ async function Weekly_Extend_Low(){
   async function Two_Hour_High(){
       let aggs = []
       let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Two_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
         }
@@ -1017,8 +1017,8 @@ async function Weekly_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Two_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1031,8 +1031,8 @@ async function Weekly_Extend_Low(){
   async function Four_Hour_High(){
       let aggs = []
       let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Four_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
         }
@@ -1040,8 +1040,8 @@ async function Weekly_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Four_Hour"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1054,8 +1054,8 @@ async function Weekly_Extend_Low(){
   async function Daily_High(){
       let aggs = []
       let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Daily"]['h'].push(parseFloat(data['results'][item]['h']))
         }
@@ -1063,8 +1063,8 @@ async function Weekly_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Daily"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1077,8 +1077,8 @@ async function Weekly_Extend_Low(){
   async function Weekly_High(){
       let aggs = []
       let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Weekly"]['h'].push(parseFloat(data['results'][item]['h']))
         }
@@ -1086,8 +1086,8 @@ async function Weekly_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Weekly"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1099,8 +1099,8 @@ async function Weekly_Extend_Low(){
   async function Five_Min_Extend_High(){
       let aggs = []
       let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Five_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
@@ -1108,8 +1108,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Five_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1122,8 +1122,8 @@ async function Weekly_Extend_Low(){
   async function Fifteen_Min_Extend_High(){
       let aggs = []
       let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Fifteen_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
@@ -1131,8 +1131,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Fifteen_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1145,8 +1145,8 @@ async function Weekly_Extend_Low(){
   async function Thirty_Min_Extend_High(){
       let aggs = []
       let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Thirty_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
@@ -1154,8 +1154,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Thirty_Min Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1168,8 +1168,8 @@ async function Weekly_Extend_Low(){
   async function One_Hour_Extend_High(){
       let aggs = []
       let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["One_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
           }
@@ -1177,8 +1177,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["One_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1191,8 +1191,8 @@ async function Weekly_Extend_Low(){
   async function Two_Hour_Extend_High(){
       let aggs = []
       let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Two_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
@@ -1200,8 +1200,8 @@ async function Weekly_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Two_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1214,8 +1214,8 @@ async function Weekly_Extend_Low(){
   async function Four_Hour_Extend_High(){
       let aggs = []
       let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Four_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
@@ -1223,8 +1223,8 @@ async function Weekly_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Four_Hour Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1237,8 +1237,8 @@ async function Weekly_Extend_Low(){
   async function Daily_Extend_High(){
       let aggs = []
       let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Daily Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
@@ -1246,8 +1246,8 @@ async function Weekly_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Daily Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1260,8 +1260,8 @@ async function Weekly_Extend_Low(){
     async function Weekly_Extend_High(){
       let aggs = []
       let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-      var res = await instance.get(url);
-      var data = await res.data;
+      var res = await fetch(baseURL+url);
+      var data = await res.json();
         for(let item = 0; item < data['results'].length; item++){
           values["Weekly Extend"]['h'].push(parseFloat(data['results'][item]['h']))
         }
@@ -1269,8 +1269,8 @@ async function Weekly_Extend_Low(){
           if('next_url' in data){
             let id = data['next_url'].split('/')[10]
             url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-            var res = await instance.get(url);
-            var data = await res.data;
+            var res = await fetch(baseURL+url);
+            var data = await res.json();
             if ('results' in data){
                 for(let item = 0; item < data['results'].length; item++){
                     values["Weekly Extend"]['h'].push(parseFloat(data['results'][item]['h']))
@@ -1282,8 +1282,8 @@ async function Weekly_Extend_Low(){
     async function Five_Min_Open(){
         let aggs = []
         let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
             for(let item = 0; item < data['results'].length; item++){
               values["Five_Min"]['o'].push(parseFloat(data['results'][item]['o']))
             }
@@ -1291,8 +1291,8 @@ async function Weekly_Extend_Low(){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url);
-                var data = await res.data;
+                var res = await fetch(baseURL+url);
+                var data = await res.json();
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
                         values["Five_Min"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1305,8 +1305,8 @@ async function Weekly_Extend_Low(){
     async function Fifteen_Min_Open(){
         let aggs = []
         let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
             for(let item = 0; item < data['results'].length; item++){
               values["Fifteen_Min"]['o'].push(parseFloat(data['results'][item]['o']))
             }
@@ -1314,8 +1314,8 @@ async function Weekly_Extend_Low(){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url);
-                var data = await res.data;
+                var res = await fetch(baseURL+url);
+                var data = await res.json();
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
                         values["Fifteen_Min"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1328,8 +1328,8 @@ async function Weekly_Extend_Low(){
     async function Thirty_Min_Open(){
         let aggs = []
         let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
             for(let item = 0; item < data['results'].length; item++){
               values["Thirty_Min"]['o'].push(parseFloat(data['results'][item]['o']))
             }
@@ -1337,8 +1337,8 @@ async function Weekly_Extend_Low(){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url);
-                var data = await res.data;
+                var res = await fetch(baseURL+url);
+                var data = await res.json();
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
                         values["Thirty_Min"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1351,8 +1351,8 @@ async function Weekly_Extend_Low(){
     async function One_Hour_Open(){
         let aggs = []
         let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
             for(let item = 0; item < data['results'].length; item++){
               values["One_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
             }
@@ -1360,8 +1360,8 @@ async function Weekly_Extend_Low(){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url);
-                var data = await res.data;
+                var res = await fetch(baseURL+url);
+                var data = await res.json();
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
                         values["One_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1374,8 +1374,8 @@ async function Weekly_Extend_Low(){
     async function Two_Hour_Open(){
         let aggs = []
         let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Two_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
           }
@@ -1383,8 +1383,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Two_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1397,8 +1397,8 @@ async function Weekly_Extend_Low(){
     async function Four_Hour_Open(){
         let aggs = []
         let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Four_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
           }
@@ -1406,8 +1406,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Four_Hour"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1420,8 +1420,8 @@ async function Weekly_Extend_Low(){
     async function Daily_Open(){
         let aggs = []
         let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Daily"]['o'].push(parseFloat(data['results'][item]['o']))
           }
@@ -1429,8 +1429,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Daily"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1443,8 +1443,8 @@ async function Weekly_Extend_Low(){
     async function Weekly_Open(){
         let aggs = []
         let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Weekly"]['o'].push(parseFloat(data['results'][item]['o']))
           }
@@ -1452,8 +1452,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Weekly"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1465,8 +1465,8 @@ async function Weekly_Extend_Low(){
     async function Five_Min_Extend_Open(){
         let aggs = []
         let url = "5/minute/"+String(refdayfive)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
             for(let item = 0; item < data['results'].length; item++){
               values["Five_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
             }
@@ -1474,8 +1474,8 @@ async function Weekly_Extend_Low(){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "5/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url);
-                var data = await res.data;
+                var res = await fetch(baseURL+url);
+                var data = await res.json();
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
                         values["Five_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1488,8 +1488,8 @@ async function Weekly_Extend_Low(){
     async function Fifteen_Min_Extend_Open(){
         let aggs = []
         let url = "15/minute/"+String(refdayfifteen)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
             for(let item = 0; item < data['results'].length; item++){
               values["Fifteen_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
             }
@@ -1497,8 +1497,8 @@ async function Weekly_Extend_Low(){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "15/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url);
-                var data = await res.data;
+                var res = await fetch(baseURL+url);
+                var data = await res.json();
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
                         values["Fifteen_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1511,8 +1511,8 @@ async function Weekly_Extend_Low(){
     async function Thirty_Min_Extend_Open(){
         let aggs = []
         let url = "30/minute/"+String(refdaythirty)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
             for(let item = 0; item < data['results'].length; item++){
               values["Thirty_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
             }
@@ -1520,8 +1520,8 @@ async function Weekly_Extend_Low(){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "30/minute/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url);
-                var data = await res.data;
+                var res = await fetch(baseURL+url);
+                var data = await res.json();
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
                         values["Thirty_Min Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1534,8 +1534,8 @@ async function Weekly_Extend_Low(){
     async function One_Hour_Extend_Open(){
         let aggs = []
         let url = "1/hour/"+String(refdayhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
             for(let item = 0; item < data['results'].length; item++){
               values["One_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
             }
@@ -1543,8 +1543,8 @@ async function Weekly_Extend_Low(){
               if('next_url' in data){
                 let id = data['next_url'].split('/')[10]
                 url = "1/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-                var res = await instance.get(url);
-                var data = await res.data;
+                var res = await fetch(baseURL+url);
+                var data = await res.json();
                 if ('results' in data){
                     for(let item = 0; item < data['results'].length; item++){
                         values["One_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1557,8 +1557,8 @@ async function Weekly_Extend_Low(){
     async function Two_Hour_Extend_Open(){
         let aggs = []
         let url = "2/hour/"+String(refdaytwohour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Two_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
           }
@@ -1566,8 +1566,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "2/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Two_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1580,8 +1580,8 @@ async function Weekly_Extend_Low(){
     async function Four_Hour_Extend_Open(){
         let aggs = []
         let url = "4/hour/"+String(refdayfourhour)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Four_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
           }
@@ -1589,8 +1589,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "4/hour/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Four_Hour Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1603,8 +1603,8 @@ async function Weekly_Extend_Low(){
     async function Daily_Extend_Open(){
         let aggs = []
         let url = "1/day/"+String(refdaydaily)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Daily Extend"]['o'].push(parseFloat(data['results'][item]['o']))
           }
@@ -1612,8 +1612,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/day/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Daily Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1626,8 +1626,8 @@ async function Weekly_Extend_Low(){
     async function Weekly_Extend_Open(){
         let aggs = []
         let url = "1/week/"+String(refdayweekly)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-        var res = await instance.get(url);
-        var data = await res.data;
+        var res = await fetch(baseURL+url);
+        var data = await res.json();
           for(let item = 0; item < data['results'].length; item++){
             values["Weekly Extend"]['o'].push(parseFloat(data['results'][item]['o']))
           }
@@ -1635,8 +1635,8 @@ async function Weekly_Extend_Low(){
             if('next_url' in data){
               let id = data['next_url'].split('/')[10]
               url = "1/week/"+String(id)+"/"+String(today)+"?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG"
-              var res = await instance.get(url);
-              var data = await res.data;
+              var res = await fetch(baseURL+url);
+              var data = await res.json();
               if ('results' in data){
                   for(let item = 0; item < data['results'].length; item++){
                       values["Weekly Extend"]['o'].push(parseFloat(data['results'][item]['o']))
@@ -1921,8 +1921,7 @@ async function caller(instrum, proxy, accinfo){
   proxyinfo = proxy
   accountID = String(accinfo[0])
   token = String(accinfo[1])
-  instance = axios.create({
-    baseURL: "https://api.polygon.io/v2/aggs/ticker/"+instrum+"/range/"})
+  baseURL =  "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/"
   Assigner()
   Price(instrum)
   Five_Min()
