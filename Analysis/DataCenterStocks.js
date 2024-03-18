@@ -1,13 +1,13 @@
-const fs = require('fs')
-const axios = require('axios')
-const yfin = require("yahoo-finance2").default;
-var testdaily = require('./Daily.js')
-var testfifteen = require('./FifteenMin.js')
-var testthirtymin = require('./ThirtyMin.js')
-var testonehour = require('./OneHour.js')
-var testtwohour = require('./TwoHour.js')
-var testfourhour = require('./FourHour.js')
-var testweekly = require('./Weekly.js')
+import yfin from 'yahoo-finance2';
+
+import { testdaily } from './Daily'
+import { testfifteen } from './FifteenMin'
+import { testthirtymin } from './ThirtyMin'
+import { testonehour } from './OneHour'
+import { testtwohour } from './TwoHour'
+import { testfourhour } from './FourHour'
+import { testweekly } from './Weekly'
+
 var moment = require('moment');
 let yourDate = new Date()
 let today = yourDate.toISOString().split('T')[0]
@@ -1652,7 +1652,6 @@ async function Weekly_Extend_Low(){
       }
 
 
-
 function equalizer(){
   let listoflens = []
   listoflens.push(Variables.lenfivehigh)
@@ -1916,92 +1915,97 @@ function equalizer(){
 
 
 
-async function caller(instrum, proxy, accinfo){
+export async function assign(instrum, proxy, accinfo, loop = false)
+{
+  if (process.argv.slice(2).find("loop"))
+  {
+    loop = true;
+  }
+
   instrument = instrum
   proxyinfo = proxy
   accountID = String(accinfo[0])
   token = String(accinfo[1])
   baseURL =  "https://api.polygon.io/v2/aggs/ticker/"+instrument+"/range/"
-  Assigner()
-  Price(instrum)
-  Five_Min()
-  Fifteen_Min()
-  Thirty_Min()
-  One_Hour()
-  Two_Hour()
-  Four_Hour()
-  Daily()
-  Weekly()
-  Five_Min_Extend()
-  Fifteen_Min_Extend()
-  Thirty_Min_Extend()
-  One_Hour_Extend()
-  Two_Hour_Extend()
-  Four_Hour_Extend()
-  Daily_Extend()
-  Weekly_Extend()
-  Five_Min_Low()
-  Fifteen_Min_Low()
-  Thirty_Min_Low()
-  One_Hour_Low()
-  Two_Hour_Low()
-  Four_Hour_Low()
-  Daily_Low()
-  Weekly_Low()
-  Five_Min_Extend_Low()
-  Fifteen_Min_Extend_Low()
-  Thirty_Min_Extend_Low()
-  One_Hour_Extend_Low()
-  Two_Hour_Extend_Low()
-  Four_Hour_Extend_Low()
-  Daily_Extend_Low()
-  Weekly_Extend_Low()
-  Five_Min_High()
-  Fifteen_Min_High()
-  Thirty_Min_High()
-  One_Hour_High()
-  Two_Hour_High()
-  Four_Hour_High()
-  Daily_High()
-  Weekly_High()
-  Five_Min_Extend_High()
-  Fifteen_Min_Extend_High()
-  Thirty_Min_Extend_High()
-  One_Hour_Extend_High()
-  Two_Hour_Extend_High()
-  Four_Hour_Extend_High()
-  Daily_Extend_High()
-  Weekly_Extend_High()
-  Five_Min_Open()
-  Fifteen_Min_Open()
-  Thirty_Min_Open()
-  One_Hour_Open()
-  Two_Hour_Open()
-  Four_Hour_Open()
-  Daily_Open()
-  Weekly_Open()
-  Five_Min_Extend_Open()
-  Fifteen_Min_Extend_Open()
-  Thirty_Min_Extend_Open()
-  One_Hour_Extend_Open()
-  Two_Hour_Extend_Open()
-  await Four_Hour_Extend_Open()
-  await Daily_Extend_Open()
-  await Weekly_Extend_Open()
-  equalizer()
-  console.log(values)
-  console.log(Variables.price)
-  testdaily.testdaily(values, Variables.price, inst)
-  testfifteen.testfifteenmin(values, Variables.price, inst)
-  testfourhour.testfourhour(values, Variables.price, inst)
-  testtwohour.testtwohour(values, Variables.price, inst)
-  testonehour.testonehour(values, Variables.price, inst)
-  testthirtymin.testthirtymin(values, Variables.price, inst)
-  testweekly.testweekly(values, Variables.price, inst)
 
+  while (loop)
+  {
+    Assigner()
+    Price(instrum)
+    Five_Min()
+    Fifteen_Min()
+    Thirty_Min()
+    One_Hour()
+    Two_Hour()
+    Four_Hour()
+    Daily()
+    Weekly()
+    Five_Min_Extend()
+    Fifteen_Min_Extend()
+    Thirty_Min_Extend()
+    One_Hour_Extend()
+    Two_Hour_Extend()
+    Four_Hour_Extend()
+    Daily_Extend()
+    Weekly_Extend()
+    Five_Min_Low()
+    Fifteen_Min_Low()
+    Thirty_Min_Low()
+    One_Hour_Low()
+    Two_Hour_Low()
+    Four_Hour_Low()
+    Daily_Low()
+    Weekly_Low()
+    Five_Min_Extend_Low()
+    Fifteen_Min_Extend_Low()
+    Thirty_Min_Extend_Low()
+    One_Hour_Extend_Low()
+    Two_Hour_Extend_Low()
+    Four_Hour_Extend_Low()
+    Daily_Extend_Low()
+    Weekly_Extend_Low()
+    Five_Min_High()
+    Fifteen_Min_High()
+    Thirty_Min_High()
+    One_Hour_High()
+    Two_Hour_High()
+    Four_Hour_High()
+    Daily_High()
+    Weekly_High()
+    Five_Min_Extend_High()
+    Fifteen_Min_Extend_High()
+    Thirty_Min_Extend_High()
+    One_Hour_Extend_High()
+    Two_Hour_Extend_High()
+    Four_Hour_Extend_High()
+    Daily_Extend_High()
+    Weekly_Extend_High()
+    Five_Min_Open()
+    Fifteen_Min_Open()
+    Thirty_Min_Open()
+    One_Hour_Open()
+    Two_Hour_Open()
+    Four_Hour_Open()
+    Daily_Open()
+    Weekly_Open()
+    Five_Min_Extend_Open()
+    Fifteen_Min_Extend_Open()
+    Thirty_Min_Extend_Open()
+    One_Hour_Extend_Open()
+    Two_Hour_Extend_Open()
+    await Four_Hour_Extend_Open()
+    await Daily_Extend_Open()
+    await Weekly_Extend_Open()
+    equalizer()
+    testdaily.testdaily(values, Variables.price, inst)
+    testfifteen.testfifteenmin(values, Variables.price, inst)
+    testfourhour.testfourhour(values, Variables.price, inst)
+    testtwohour.testtwohour(values, Variables.price, inst)
+    testonehour.testonehour(values, Variables.price, inst)
+    testthirtymin.testthirtymin(values, Variables.price, inst)
+    testweekly.testweekly(values, Variables.price, inst)
+  }
 }
-
-module.exports = { assigning: function(instrum, proxy, accinfo){caller(instrum, proxy, accinfo)} }
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
  have been included with this distribution. */
