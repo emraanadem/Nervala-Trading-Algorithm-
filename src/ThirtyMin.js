@@ -1,26 +1,20 @@
 import * as fs from 'fs'
-const regression = require('ml-regression-simple-linear')
-const emas = require('technicalindicators').EMA
-const rsis = require('technicalindicators').RSI
-const macds = require('technicalindicators').MACD
-const rocs = require('technicalindicators').ROC
-const bolls = require('technicalindicators').BollingerBands
-const smas = require('technicalindicators').SMA
-const tr = require('technicalindicators').ATR
-const { createModel } = require('polynomial-regression')
-const nerdamer = require('nerdamer/all.min')
-const roots = require('kld-polynomial')
+import * as regression from 'ml-regression-simple-linear'
+import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as bolls, SMA as smas, ATR as tr } from 'technicalindicators'
+import { createModel } from 'polynomial-regression'
+import * as nerdamer from 'nerdamer/all.min.js'
+import * as roots from 'kld-polynomial'
 
 let instrum = ''
 
-class Fifteen_Min_Nexus {
+class Thirty_Min_Nexus {
   pos = false
   buy_pos = false
   sell_pos = false
-  wins = 0
   pot_buy = false
-  pot_sell = false
   biggersupres = []
+  pot_sell = false
+  wins = 0
   losses = 0
   trades = 0
   support = 0
@@ -31,14 +25,13 @@ class Fifteen_Min_Nexus {
   tp = 0
   tstop = false
   tstoplossinits = false
+  tptwo = 0
   tstoploss = 0
   sldiff = 0
-  tptwo = 0
   tstoplossvoid = false
   pips = 0
   piplog = [0]
   finlevs = []
-  biggersupres = []
   pchan = false
   pzone = false
   bigsupport = 0
@@ -47,137 +40,137 @@ class Fifteen_Min_Nexus {
 
   /** announce price zones and price channels */
   static announcer () {
-    if (Fifteen_Min_Nexus.pzone == false && Fifteen_Min_Functions.priceZones() == true) {
-      Fifteen_Min_Nexus.pzone = true
+    if (Thirty_Min_Nexus.pzone == false && Thirty_Min_Functions.priceZones() == true) {
+      Thirty_Min_Nexus.pzone = true
       console.log('Price Zone Identified')
-    } if (Fifteen_Min_Nexus.pzone == true && Fifteen_Min_Functions.priceZones() == false) {
-      Fifteen_Min_Nexus.pzone = false
-    } if (Fifteen_Min_Nexus.pchan == false && Fifteen_Min_Functions.priceChannels() == true) {
-      Fifteen_Min_Nexus.pchan = true
+    } if (Thirty_Min_Nexus.pzone == true && Thirty_Min_Functions.priceZones() == false) {
+      Thirty_Min_Nexus.pzone = false
+    } if (Thirty_Min_Nexus.pchan == false && Thirty_Min_Functions.priceChannels() == true) {
+      Thirty_Min_Nexus.pchan = true
       console.log('Price Channel Identified')
-    } if (Fifteen_Min_Nexus.pchan == true && Fifteen_Min_Functions.priceChannels() == false) {
-      Fifteen_Min_Nexus.pchan = false
+    } if (Thirty_Min_Nexus.pchan == true && Thirty_Min_Functions.priceChannels() == false) {
+      Thirty_Min_Nexus.pchan = false
     }
   }
 
   /** stop loss for buys */
   static stopLossBuy () {
-    if (Fifteen_Min_Functions.price <= Fifteen_Min_Nexus.sl) {
-      Fifteen_Min_Nexus.closePosSL()
+    if (Thirty_Min_Functions.price <= Thirty_Min_Nexus.sl) {
+      Thirty_Min_Nexus.closePosSL()
     }
   }
 
   /** stop loss for selling */
   static stopLossSell () {
-    if (Fifteen_Min_Functions.price >= Fifteen_Min_Nexus.sl) {
-      Fifteen_Min_Nexus.closePosSL()
+    if (Thirty_Min_Functions.price >= Thirty_Min_Nexus.sl) {
+      Thirty_Min_Nexus.closePosSL()
     }
   }
 
   /** initiates the piplog for pipcounting */
   static piploginit () {
-    Fifteen_Min_Nexus.piplog = [0, 0, 0]
+    Thirty_Min_Nexus.piplog = [0, 0, 0]
   }
 
   /** pip logging method */
   static piplogger () {
-    const piplogging = Fifteen_Min_Nexus.piplog
-    if (Fifteen_Min_Nexus.buy_pos) {
-      piplogging.push(Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price))
-      Fifteen_Min_Nexus.bigpipprice = Math.max(...piplogging)
-      Fifteen_Min_Nexus.piplog = piplogging
+    const piplogging = Thirty_Min_Nexus.piplog
+    if (Thirty_Min_Nexus.buy_pos) {
+      piplogging.push(Thirty_Min_Functions.pipCountBuy(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price))
+      Thirty_Min_Nexus.bigpipprice = Math.max(...piplogging)
+      Thirty_Min_Nexus.piplog = piplogging
     }
-    if (Fifteen_Min_Nexus.sell_pos) {
-      piplogging.push(Fifteen_Min_Functions.pipCountSell(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price))
-      Fifteen_Min_Nexus.bigpipprice = Math.max(...piplogging)
-      Fifteen_Min_Nexus.piplog = piplogging
+    if (Thirty_Min_Nexus.sell_pos) {
+      piplogging.push(Thirty_Min_Functions.pipCountSell(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price))
+      Thirty_Min_Nexus.bigpipprice = Math.max(...piplogging)
+      Thirty_Min_Nexus.piplog = piplogging
     }
   }
 
   /** take profit for buying */
   static takeProfitBuy () {
-    if (Fifteen_Min_Functions.price >= Fifteen_Min_Nexus.tp) {
-      if (Fifteen_Min_Functions.volatility() > 0.618) {
-        if ((Fifteen_Min_Functions.price - Fifteen_Min_Nexus.tp) > (Fifteen_Min_Nexus.tp - Fifteen_Min_Nexus.tstoploss)) {
-          if (Fifteen_Min_Nexus.tp < Fifteen_Min_Nexus.tptwo) {
-            Fifteen_Min_Nexus.piploginit()
-            Fifteen_Min_Nexus.posprice = Fifteen_Min_Nexus.tp
-            Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.tptwo
-            Fifteen_Min_Functions.tpvariation()
-            console.log('pair: ' + Fifteen_Min_Nexus.pair)
+    if (Thirty_Min_Functions.price >= Thirty_Min_Nexus.tp) {
+      if (Thirty_Min_Functions.volatility() > 0.618) {
+        if ((Thirty_Min_Functions.price - Thirty_Min_Nexus.tp) > (Thirty_Min_Nexus.tp - Thirty_Min_Nexus.tstoploss)) {
+          if (Thirty_Min_Nexus.tp < Thirty_Min_Nexus.tptwo) {
+            Thirty_Min_Nexus.piploginit()
+            Thirty_Min_Nexus.posprice = Thirty_Min_Nexus.tp
+            Thirty_Min_Nexus.tp = Thirty_Min_Nexus.tptwo
+            Thirty_Min_Functions.tpvariation()
+            console.log('pair: ' + Thirty_Min_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
-            console.log('New Target Take Profit: ' + String(Fifteen_Min_Nexus.tp))
-            console.log('New Take Profit 2: ' + String(Fifteen_Min_Nexus.tptwo))
+            console.log('New Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
+            console.log('New Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
           }
         }
       } else {
-        Fifteen_Min_Nexus.closePosTP()
+        Thirty_Min_Nexus.closePosTP()
       }
-    } else if (Fifteen_Min_Functions.price <= Fifteen_Min_Nexus.tstoploss) {
-      Fifteen_Min_Nexus.closePosTP()
-    } else if (Fifteen_Min_Functions.price == Fifteen_Min_Nexus.tptwo) {
-      Fifteen_Min_Nexus.closePosTP()
+    } else if (Thirty_Min_Functions.price <= Thirty_Min_Nexus.tstoploss) {
+      Thirty_Min_Nexus.closePosTP()
+    } else if (Thirty_Min_Functions.price == Thirty_Min_Nexus.tptwo) {
+      Thirty_Min_Nexus.closePosTP()
     }
   }
 
   /** take profit for selling */
   static takeProfitSell () {
-    if (Fifteen_Min_Functions.price <= Fifteen_Min_Nexus.tp) {
-      if (Fifteen_Min_Functions.volatility() > 0.618) {
-        if ((Fifteen_Min_Nexus.tp - Fifteen_Min_Functions.price) > (Fifteen_Min_Nexus.tstoploss - Fifteen_Min_Nexus.tp)) {
-          if (Fifteen_Min_Nexus.tp < Fifteen_Min_Nexus.tptwo) {
-            Fifteen_Min_Nexus.piploginit()
-            Fifteen_Min_Nexus.posprice = Fifteen_Min_Nexus.tp
-            Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.tptwo
-            Fifteen_Min_Functions.tpvariation()
-            console.log('pair: ' + Fifteen_Min_Nexus.pair)
+    if (Thirty_Min_Functions.price <= Thirty_Min_Nexus.tp) {
+      if (Thirty_Min_Functions.volatility() > 0.618) {
+        if ((Thirty_Min_Nexus.tp - Thirty_Min_Functions.price) > (Thirty_Min_Nexus.tstoploss - Thirty_Min_Nexus.tp)) {
+          if (Thirty_Min_Nexus.tp < Thirty_Min_Nexus.tptwo) {
+            Thirty_Min_Nexus.piploginit()
+            Thirty_Min_Nexus.posprice = Thirty_Min_Nexus.tp
+            Thirty_Min_Nexus.tp = Thirty_Min_Nexus.tptwo
+            Thirty_Min_Functions.tpvariation()
+            console.log('pair: ' + Thirty_Min_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
-            console.log('New Target Take Profit: ' + String(Fifteen_Min_Nexus.tp))
-            console.log('New Take Profit 2: ' + String(Fifteen_Min_Nexus.tptwo))
+            console.log('New Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
+            console.log('New Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
           }
         }
       } else {
-        Fifteen_Min_Nexus.closePosTP()
+        Thirty_Min_Nexus.closePosTP()
       }
-    } else if (Fifteen_Min_Functions.price >= Fifteen_Min_Nexus.tstoploss) {
-      Fifteen_Min_Nexus.closePosTP()
-    } else if (Fifteen_Min_Functions.price == Fifteen_Min_Nexus.tptwo) {
-      Fifteen_Min_Nexus.closePosTP()
+    } else if (Thirty_Min_Functions.price >= Thirty_Min_Nexus.tstoploss) {
+      Thirty_Min_Nexus.closePosTP()
+    } else if (Thirty_Min_Functions.price == Thirty_Min_Nexus.tptwo) {
+      Thirty_Min_Nexus.closePosTP()
     }
   }
 
   /** stop loss defining method */
   static stoplossdef () {
-    const stoploss = Fifteen_Min_Functions.stoploss()
-    if (Fifteen_Min_Nexus.buy_pos) {
-      Fifteen_Min_Nexus.sl = Fifteen_Min_Functions.price - stoploss
+    const stoploss = Thirty_Min_Functions.stoploss()
+    if (Thirty_Min_Nexus.buy_pos) {
+      Thirty_Min_Nexus.sl = Thirty_Min_Functions.price - stoploss
     }
-    if (Fifteen_Min_Nexus.sell_pos) {
-      Fifteen_Min_Nexus.sl = Fifteen_Min_Functions.price + stoploss
+    if (Thirty_Min_Nexus.sell_pos) {
+      Thirty_Min_Nexus.sl = Thirty_Min_Functions.price + stoploss
     }
   }
 
   /** define volatility for the system, tells me whether or not to alter trailing stop loss */
   static volatilitydef () {
-    if (Fifteen_Min_Functions.volatility() > 0.618 && Fifteen_Min_Nexus.tstoplossinits && !Fifteen_Min_Nexus.tstoplossvoid) {
-      Fifteen_Min_Nexus.tstoplossdefvol()
+    if (Thirty_Min_Functions.volatility() > 0.618 && Thirty_Min_Nexus.tstoplossinits && !Thirty_Min_Nexus.tstoplossvoid) {
+      Thirty_Min_Nexus.tstoplossdefvol()
     }
   }
 
   /** initiate trailing stop loss */
   static tstoplossinit () {
-    const stoploss = Fifteen_Min_Nexus.sldiff
-    if (!Fifteen_Min_Nexus.tstop && !Fifteen_Min_Nexus.tstoplossinits && !Fifteen_Min_Nexus.tstoplossvoid) {
-      if (Fifteen_Min_Nexus.buy_pos) {
-        if (Fifteen_Min_Functions.price > Fifteen_Min_Nexus.posprice + 0.3 * stoploss) {
-          Fifteen_Min_Nexus.tstoplossinits = true
-          Fifteen_Min_Nexus.tstoplossdef()
+    const stoploss = Thirty_Min_Nexus.sldiff
+    if (!Thirty_Min_Nexus.tstop && !Thirty_Min_Nexus.tstoplossinits && !Thirty_Min_Nexus.tstoplossvoid) {
+      if (Thirty_Min_Nexus.buy_pos) {
+        if (Thirty_Min_Functions.price > Thirty_Min_Nexus.posprice + 0.3 * stoploss) {
+          Thirty_Min_Nexus.tstoplossinits = true
+          Thirty_Min_Nexus.tstoplossdef()
         }
       }
-      if (Fifteen_Min_Nexus.sell_pos) {
-        if (Fifteen_Min_Functions.price < Fifteen_Min_Nexus.posprice - 0.3 * stoploss) {
-          Fifteen_Min_Nexus.tstoplossinits = true
-          Fifteen_Min_Nexus.tstoplossdef()
+      if (Thirty_Min_Nexus.sell_pos) {
+        if (Thirty_Min_Functions.price < Thirty_Min_Nexus.posprice - 0.3 * stoploss) {
+          Thirty_Min_Nexus.tstoplossinits = true
+          Thirty_Min_Nexus.tstoplossdef()
         }
       }
     }
@@ -187,58 +180,58 @@ class Fifteen_Min_Nexus {
      * sort of "bubble" when trading so that you don't get stopped out of trades really early
      */
   static tstoplossdefvol () {
-    Fifteen_Min_Nexus.sldiff = Fifteen_Min_Functions.stoploss()
-    const stoploss = Fifteen_Min_Nexus.sldiff
-    if (Fifteen_Min_Nexus.buy_pos) {
-      if (Fifteen_Min_Functions.price > Fifteen_Min_Nexus.posprice + 0.3 * stoploss) {
-        Fifteen_Min_Nexus.tstop = true
-        Fifteen_Min_Nexus.tstoploss = Fifteen_Min_Nexus.posprice + (((Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Nexus.posprice)) * (Fifteen_Min_Functions.trailingsl())))
+    Thirty_Min_Nexus.sldiff = Thirty_Min_Functions.stoploss()
+    const stoploss = Thirty_Min_Nexus.sldiff
+    if (Thirty_Min_Nexus.buy_pos) {
+      if (Thirty_Min_Functions.price > Thirty_Min_Nexus.posprice + 0.3 * stoploss) {
+        Thirty_Min_Nexus.tstop = true
+        Thirty_Min_Nexus.tstoploss = Thirty_Min_Nexus.posprice + (((Math.abs(Thirty_Min_Functions.price - Thirty_Min_Nexus.posprice)) * (Thirty_Min_Functions.trailingsl())))
       }
     }
-    if (Fifteen_Min_Nexus.sell_pos) {
-      if (Fifteen_Min_Functions.price < Fifteen_Min_Nexus.posprice - 0.3 * stoploss) {
-        Fifteen_Min_Nexus.tstop = true
-        Fifteen_Min_Nexus.tstoploss = Fifteen_Min_Nexus.posprice - (((Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Nexus.posprice)) * (Fifteen_Min_Functions.trailingsl())))
+    if (Thirty_Min_Nexus.sell_pos) {
+      if (Thirty_Min_Functions.price < Thirty_Min_Nexus.posprice - 0.3 * stoploss) {
+        Thirty_Min_Nexus.tstop = true
+        Thirty_Min_Nexus.tstoploss = Thirty_Min_Nexus.posprice - (((Math.abs(Thirty_Min_Functions.price - Thirty_Min_Nexus.posprice)) * (Thirty_Min_Functions.trailingsl())))
       }
     }
   }
 
   /** sort of checks and balances method, where the trailing stop loss is checked for and adjusted, and therefore reset depending on the price and volatility */
   static tstoplosscheck () {
-    const tstoploss = Fifteen_Min_Nexus.sldiff
-    if (Fifteen_Min_Nexus.buy_pos) {
-      if (Fifteen_Min_Functions.price < Fifteen_Min_Nexus.posprice + 0.3 * tstoploss) {
-        Fifteen_Min_Nexus.tstoplossvoid = true
+    const tstoploss = Thirty_Min_Nexus.sldiff
+    if (Thirty_Min_Nexus.buy_pos) {
+      if (Thirty_Min_Functions.price < Thirty_Min_Nexus.posprice + 0.3 * tstoploss) {
+        Thirty_Min_Nexus.tstoplossvoid = true
       } else {
-        Fifteen_Min_Nexus.tstoplossvoid = false
-        Fifteen_Min_Nexus.volatilitydef()
-        Fifteen_Min_Nexus.tstoplossinit()
+        Thirty_Min_Nexus.tstoplossvoid = false
+        Thirty_Min_Nexus.volatilitydef()
+        Thirty_Min_Nexus.tstoplossinit()
       }
     }
-    if (Fifteen_Min_Nexus.sell_pos) {
-      if (Fifteen_Min_Functions.price > Fifteen_Min_Nexus.posprice - 0.3 * tstoploss) {
-        Fifteen_Min_Nexus.tstoplossvoid = true
+    if (Thirty_Min_Nexus.sell_pos) {
+      if (Thirty_Min_Functions.price > Thirty_Min_Nexus.posprice - 0.3 * tstoploss) {
+        Thirty_Min_Nexus.tstoplossvoid = true
       } else {
-        Fifteen_Min_Nexus.tstoplossvoid = false
-        Fifteen_Min_Nexus.volatilitydef()
-        Fifteen_Min_Nexus.tstoplossinit()
+        Thirty_Min_Nexus.tstoplossvoid = false
+        Thirty_Min_Nexus.volatilitydef()
+        Thirty_Min_Nexus.tstoplossinit()
       }
     }
   }
 
   /** method that, if the price movement is not too volatile, will reset trailing stop loss based on given parameters */
   static tstoplosscont () {
-    if (Fifteen_Min_Functions.volatility() < 0.618 && Fifteen_Min_Nexus.tstoplossinits && !Fifteen_Min_Nexus.tstoplossvoid) {
-      Fifteen_Min_Nexus.sldiff = Fifteen_Min_Functions.stoploss()
-      const stoploss = Fifteen_Min_Nexus.sldiff
-      if (Fifteen_Min_Nexus.buy_pos) {
-        if (Fifteen_Min_Functions.price > Fifteen_Min_Nexus.posprice + 0.3 * stoploss) {
-          Fifteen_Min_Nexus.tstoploss = Fifteen_Min_Nexus.posprice + Fifteen_Min_Functions.pipreverse(Fifteen_Min_Nexus.posprice, 0.618 * Fifteen_Min_Nexus.bigpipprice)
+    if (Thirty_Min_Functions.volatility() < 0.618 && Thirty_Min_Nexus.tstoplossinits && !Thirty_Min_Nexus.tstoplossvoid) {
+      Thirty_Min_Nexus.sldiff = Thirty_Min_Functions.stoploss()
+      const stoploss = Thirty_Min_Nexus.sldiff
+      if (Thirty_Min_Nexus.buy_pos) {
+        if (Thirty_Min_Functions.price > Thirty_Min_Nexus.posprice + 0.3 * stoploss) {
+          Thirty_Min_Nexus.tstoploss = Thirty_Min_Nexus.posprice + Thirty_Min_Functions.pipreverse(Thirty_Min_Nexus.posprice, 0.618 * Thirty_Min_Nexus.bigpipprice)
         }
       }
-      if (Fifteen_Min_Nexus.sell_pos) {
-        if (Fifteen_Min_Functions.price < Fifteen_Min_Nexus.posprice - 0.3 * stoploss) {
-          Fifteen_Min_Nexus.tstoploss = Fifteen_Min_Nexus.posprice - Fifteen_Min_Functions.pipreverse(Fifteen_Min_Nexus.posprice, 0.618 * Fifteen_Min_Nexus.bigpipprice)
+      if (Thirty_Min_Nexus.sell_pos) {
+        if (Thirty_Min_Functions.price < Thirty_Min_Nexus.posprice - 0.3 * stoploss) {
+          Thirty_Min_Nexus.tstoploss = Thirty_Min_Nexus.posprice - Thirty_Min_Functions.pipreverse(Thirty_Min_Nexus.posprice, 0.618 * Thirty_Min_Nexus.bigpipprice)
         }
       }
     }
@@ -246,18 +239,18 @@ class Fifteen_Min_Nexus {
 
   /** method that defines trailing stop loss for the system to begin with trailing stop loss */
   static tstoplossdef () {
-    Fifteen_Min_Nexus.sldiff = Fifteen_Min_Functions.stoploss()
-    const stoploss = Fifteen_Min_Nexus.sldiff
-    if (Fifteen_Min_Nexus.buy_pos) {
-      if (Fifteen_Min_Functions.price > Fifteen_Min_Nexus.posprice + 0.3 * stoploss) {
-        Fifteen_Min_Nexus.tstop = true
-        Fifteen_Min_Nexus.tstoploss = Fifteen_Min_Nexus.posprice + Fifteen_Min_Functions.pipreverse(Fifteen_Min_Nexus.posprice, 0.618 * Fifteen_Min_Nexus.bigpipprice)
+    Thirty_Min_Nexus.sldiff = Thirty_Min_Functions.stoploss()
+    const stoploss = Thirty_Min_Nexus.sldiff
+    if (Thirty_Min_Nexus.buy_pos) {
+      if (Thirty_Min_Functions.price > Thirty_Min_Nexus.posprice + 0.3 * stoploss) {
+        Thirty_Min_Nexus.tstop = true
+        Thirty_Min_Nexus.tstoploss = Thirty_Min_Nexus.posprice + Thirty_Min_Functions.pipreverse(Thirty_Min_Nexus.posprice, 0.618 * Thirty_Min_Nexus.bigpipprice)
       }
     }
-    if (Fifteen_Min_Nexus.sell_pos) {
-      if (Fifteen_Min_Functions.price < Fifteen_Min_Nexus.posprice - 0.3 * stoploss) {
-        Fifteen_Min_Nexus.tstop = true
-        Fifteen_Min_Nexus.tstoploss = Fifteen_Min_Nexus.posprice - Fifteen_Min_Functions.pipreverse(Fifteen_Min_Nexus.posprice, 0.618 * Fifteen_Min_Nexus.bigpipprice)
+    if (Thirty_Min_Nexus.sell_pos) {
+      if (Thirty_Min_Functions.price < Thirty_Min_Nexus.posprice - 0.3 * stoploss) {
+        Thirty_Min_Nexus.tstop = true
+        Thirty_Min_Nexus.tstoploss = Thirty_Min_Nexus.posprice - Thirty_Min_Functions.pipreverse(Thirty_Min_Nexus.posprice, 0.618 * Thirty_Min_Nexus.bigpipprice)
       }
     }
   }
@@ -266,98 +259,97 @@ class Fifteen_Min_Nexus {
 
   /** initiates a buy signal */
   static buy () {
-    Fifteen_Min_Functions.supreslevs()
-    Fifteen_Min_Functions.getPrice()
-    Fifteen_Min_Functions.stoploss()
-    Fifteen_Min_Functions.tpvariation()
-    if (!Fifteen_Min_Functions.rejectionzoning()) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(Fifteen_Min_Functions.price, Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price))) > 0.025) {
-        console.log(Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price))
-        Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.resistance
-        Fifteen_Min_Nexus.pos = true
-        Fifteen_Min_Nexus.buy_pos = true
-        Fifteen_Min_Nexus.posprice = Fifteen_Min_Functions.price
-        Fifteen_Min_Functions.stoploss()
-        Fifteen_Min_Functions.tpvariation()
-        console.log('pair: ' + Fifteen_Min_Nexus.pair)
-        console.log('Open Buy Order on Fifteen Min')
-        console.log('Entry Price: ' + String(Fifteen_Min_Nexus.posprice))
-        console.log('Stop Loss: ' + String(Fifteen_Min_Nexus.sl))
-        console.log('Target Take Profit: ' + String(Fifteen_Min_Nexus.tp))
-        console.log('Take Profit 2: ' + String(Fifteen_Min_Nexus.tptwo))
+    Thirty_Min_Functions.supreslevs()
+    Thirty_Min_Functions.getPrice()
+    Thirty_Min_Functions.stoploss()
+    Thirty_Min_Functions.tpvariation()
+    if (!Thirty_Min_Functions.rejectionzoning()) {
+      if (Math.abs(Thirty_Min_Functions.valdiff(Thirty_Min_Functions.price, Thirty_Min_Functions.closest(Thirty_Min_Functions.price))) > 0.025) {
+        Thirty_Min_Nexus.tp = Thirty_Min_Nexus.resistance
+        Thirty_Min_Nexus.pos = true
+        Thirty_Min_Nexus.buy_pos = true
+        Thirty_Min_Nexus.posprice = Thirty_Min_Functions.price
+        Thirty_Min_Functions.stoploss()
+        Thirty_Min_Functions.tpvariation()
+        console.log('pair: ' + Thirty_Min_Nexus.pair)
+        console.log('Open Buy Order on Thirty Min')
+        console.log('Entry Price: ' + String(Thirty_Min_Nexus.posprice))
+        console.log('Stop Loss: ' + String(Thirty_Min_Nexus.sl))
+        console.log('Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
+        console.log('Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
         fs.writeFileSync('trade.json', JSON.stringify('true'))
       }
     }
   }
 
   /* static buy(){
-        Fifteen_Min_Functions.supreslevs()
-        Fifteen_Min_Functions.getPrice()
-        Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.resistance
-        Fifteen_Min_Nexus.pos = true
-        Fifteen_Min_Nexus.buy_pos = true
-        Fifteen_Min_Nexus.posprice = Fifteen_Min_Functions.price
-                Fifteen_Min_Functions.stoploss()
-                Fifteen_Min_Functions.tpvariation()
+        Thirty_Min_Functions.supreslevs()
+        Thirty_Min_Functions.getPrice()
+        Thirty_Min_Nexus.tp = Thirty_Min_Nexus.resistance
+        Thirty_Min_Nexus.pos = true
+        Thirty_Min_Nexus.buy_pos = true
+        Thirty_Min_Nexus.posprice = Thirty_Min_Functions.price
+                Thirty_Min_Functions.stoploss()
+                Thirty_Min_Functions.tpvariation()
         console.log("Open Buy Order")
-        console.log(Fifteen_Min_Nexus.sl + " : Stop Loss")
-        console.log(Fifteen_Min_Nexus.tp + " : Target Take Profit")
+        console.log(Thirty_Min_Nexus.sl + " : Stop Loss")
+        console.log(Thirty_Min_Nexus.tp + " : Target Take Profit")
         } */
 
   /** initiates a sell order */
   static sell () {
-    Fifteen_Min_Functions.supreslevs()
-    Fifteen_Min_Functions.getPrice()
-    Fifteen_Min_Functions.stoploss()
-    Fifteen_Min_Functions.tpvariation()
-    if (!Fifteen_Min_Functions.rejectionzoning()) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(Fifteen_Min_Functions.price, Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price))) > 0.025) {
-        console.log(Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price))
-        Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.support
-        Fifteen_Min_Nexus.pos = true
-        Fifteen_Min_Nexus.sell_pos = true
-        Fifteen_Min_Nexus.posprice = Fifteen_Min_Functions.price
-        Fifteen_Min_Functions.stoploss()
-        Fifteen_Min_Functions.tpvariation()
-        console.log('pair: ' + Fifteen_Min_Nexus.pair)
-        console.log('Open Sell Order on Fifteen Min')
-        console.log('Entry Price: ' + String(Fifteen_Min_Nexus.posprice))
-        console.log('Stop Loss: ' + String(Fifteen_Min_Nexus.sl))
-        console.log('Target Take Profit: ' + String(Fifteen_Min_Nexus.tp))
-        console.log('Take Profit 2: ' + String(Fifteen_Min_Nexus.tptwo))
+    Thirty_Min_Functions.supreslevs()
+    Thirty_Min_Functions.getPrice()
+    Thirty_Min_Functions.stoploss()
+    Thirty_Min_Functions.tpvariation()
+    if (!Thirty_Min_Functions.rejectionzoning()) {
+      if (Math.abs(Thirty_Min_Functions.valdiff(Thirty_Min_Functions.price, Thirty_Min_Functions.closest(Thirty_Min_Functions.price))) > 0.025) {
+        Thirty_Min_Nexus.tp = Thirty_Min_Nexus.support
+        Thirty_Min_Nexus.pos = true
+        Thirty_Min_Nexus.sell_pos = true
+        Thirty_Min_Nexus.posprice = Thirty_Min_Functions.price
+        Thirty_Min_Functions.stoploss()
+        Thirty_Min_Functions.tpvariation()
+        console.log('pair: ' + Thirty_Min_Nexus.pair)
+        console.log('Open Sell Order on Thirty Min')
+        console.log('Entry Price: ' + String(Thirty_Min_Nexus.posprice))
+        console.log('Stop Loss: ' + String(Thirty_Min_Nexus.sl))
+        console.log('Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
+        console.log('Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
         fs.writeFileSync('trade.json', JSON.stringify('true'))
       }
     }
   }
 
   /* static sell(){
-        Fifteen_Min_Functions.supreslevs()
-        Fifteen_Min_Functions.getPrice()
-        Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.support
-        Fifteen_Min_Nexus.pos = true
-        Fifteen_Min_Nexus.sell_pos = true
-        Fifteen_Min_Nexus.posprice = Fifteen_Min_Functions.price
-                Fifteen_Min_Functions.stoploss()
-                Fifteen_Min_Functions.tpvariation()
+        Thirty_Min_Functions.supreslevs()
+        Thirty_Min_Functions.getPrice()
+        Thirty_Min_Nexus.tp = Thirty_Min_Nexus.support
+        Thirty_Min_Nexus.pos = true
+        Thirty_Min_Nexus.sell_pos = true
+        Thirty_Min_Nexus.posprice = Thirty_Min_Functions.price
+                Thirty_Min_Functions.stoploss()
+                Thirty_Min_Functions.tpvariation()
         console.log("Open Sell Order")
-        console.log(Fifteen_Min_Nexus.sl + " : Stop Loss")
-        console.log(Fifteen_Min_Nexus.tp + " : Target Take Profit")
+        console.log(Thirty_Min_Nexus.sl + " : Stop Loss")
+        console.log(Thirty_Min_Nexus.tp + " : Target Take Profit")
         } */
 
   /** checks for price movement in lower periods to get better idea of the trend */
   static controlSmallerPeriod () {
     try {
       /* Confirm Trend w/ indicators and price movement */
+      Fifteen_Min_Functions.HistoryAssigner()
       Five_Min_Functions.HistoryAssigner()
       Four_Hour_Functions.HistoryAssigner()
-      Fifteen_Min_Functions.stoploss()
-      Fifteen_Min_Functions.tpvariation()
+      Thirty_Min_Functions.stoploss()
+      Thirty_Min_Functions.tpvariation()
       let buy = false
       let sell = false
       if (!Four_Hour_Functions.rejectionzoning() &&
             !Five_Min_Functions.consolidationtwo()) {
-        if (Four_Hour_Functions.trend() && Five_Min_Functions.ema()) {
-          if (Five_Min_Functions.trend() && Five_Min_Functions.macd() && Five_Min_Functions.obv()) {
+        if (Four_Hour_Functions.trend() && Fifteen_Min_Functions.ema()) {
+          if (Fifteen_Min_Functions.trend() && Fifteen_Min_Functions.macd() && Fifteen_Min_Functions.obv()) {
             if (Five_Min_Functions.ema()) {
               if (Five_Min_Functions.rsi() && Five_Min_Functions.obv()) {
                 buy = true
@@ -365,8 +357,8 @@ class Fifteen_Min_Nexus {
             }
           }
         }
-        if (!Four_Hour_Functions.trend() && !Five_Min_Functions.ema()) {
-          if (!Five_Min_Functions.trend() && !Five_Min_Functions.macd() && !Five_Min_Functions.obv()) {
+        if (!Four_Hour_Functions.trend() && !Fifteen_Min_Functions.ema()) {
+          if (!Fifteen_Min_Functions.trend() && !Fifteen_Min_Functions.macd() && !Fifteen_Min_Functions.obv()) {
             if (!Five_Min_Functions.ema()) {
               if (!Five_Min_Functions.rsi() && !Five_Min_Functions.obv()) {
                 sell = true
@@ -391,74 +383,73 @@ class Fifteen_Min_Nexus {
       One_Hour_Functions.HistoryAssigner()
       Four_Hour_Functions.priceZones()
       One_Hour_Functions.priceZones()
-      let h = new Array()
-      let i = new Array()
-      h = Four_Hour_Functions.finlevs
-      i = One_Hour_Functions.finlevs
-      const totallevs = h.push(i)
-      Fifteen_Min_Nexus.biggersupres = totallevs
-      Fifteen_Min_Nexus.finlevs.concat(totallevs)
     } catch (error) {
       console.log(error)
     }
+    let h = new Array()
+    h = Four_Hour_Functions.finlevs
+    const i = One_Hour_Functions.finlevs
+    const totallevs = h.push(i)
+    Thirty_Min_Nexus.biggersupres = totallevs
+    Thirty_Min_Nexus.finlevs.concat(totallevs)
   }
 
   /** main control method, takes control of the entire program and serves as the brain */
   static controlMain () {
     try {
+      Thirty_Min_Functions.rejecinit()
       Four_Hour_Functions.rejecinit()
-      Fifteen_Min_Functions.rejecinit()
-      Fifteen_Min_Functions.HistoryAssigner()
-      Fifteen_Min_Functions.ValueAssigner()
-      Fifteen_Min_Functions.stoploss()
-      Fifteen_Min_Functions.getPrice()
-      Fifteen_Min_Functions.supreslevs()
-      Fifteen_Min_Nexus.controlBiggerPeriod()
-      if (!Fifteen_Min_Functions.consolidationtwo() && !Fifteen_Min_Functions.consolidation() && !Fifteen_Min_Functions.overall() &&
-            !Fifteen_Min_Functions.keylev()) {
-        if (Fifteen_Min_Functions.ema()) {
-          if (Fifteen_Min_Nexus.controlSmallerPeriod()[0] == true) {
-            if (Fifteen_Min_Functions.trend() && Fifteen_Min_Functions.rsi() &&
-                            Fifteen_Min_Functions.macd() && Fifteen_Min_Functions.roc() && Fifteen_Min_Functions.obv()) {
-              if (!Fifteen_Min_Nexus.pos) {
-                if (!Fifteen_Min_Nexus.buy_pos) { Fifteen_Min_Nexus.pot_buy = true }
-                Fifteen_Min_Functions.stoploss()
-                Fifteen_Min_Nexus.piploginit()
-                Fifteen_Min_Nexus.buy()
+      Thirty_Min_Functions.HistoryAssigner()
+      Thirty_Min_Functions.ValueAssigner()
+      Thirty_Min_Functions.stoploss()
+      Thirty_Min_Functions.getPrice()
+      Thirty_Min_Functions.supreslevs()
+      Thirty_Min_Nexus.controlBiggerPeriod()
+      if (!Thirty_Min_Functions.consolidationtwo() && Thirty_Min_Functions.overall() && !Thirty_Min_Functions.consolidation() &&
+            !Thirty_Min_Functions.keylev()) {
+        if (Thirty_Min_Functions.ema()) {
+          if (Thirty_Min_Nexus.controlSmallerPeriod()[0] == true) {
+            if (Thirty_Min_Functions.trend() && Thirty_Min_Functions.rsi() &&
+                            Thirty_Min_Functions.macd() && Thirty_Min_Functions.roc() && Thirty_Min_Functions.obv()) {
+              if (!Thirty_Min_Nexus.pos) {
+                if (!Thirty_Min_Nexus.buy_pos) { Thirty_Min_Nexus.pot_buy = true }
+                Thirty_Min_Functions.stoploss()
+                Thirty_Min_Nexus.piploginit()
+                Thirty_Min_Nexus.buy()
               }
             }
           }
         }
-        if (!Fifteen_Min_Functions.ema()) {
-          if (Fifteen_Min_Nexus.controlSmallerPeriod()[1] == true) {
-            if (!Fifteen_Min_Functions.trend() && !Fifteen_Min_Functions.rsi() &&
-                            !Fifteen_Min_Functions.macd() && !Fifteen_Min_Functions.roc() && !Fifteen_Min_Functions.obv()) {
-              if (!Fifteen_Min_Nexus.pos) {
-                if (!Fifteen_Min_Nexus.sell_pos) { Fifteen_Min_Nexus.pot_sell = true }
-                Fifteen_Min_Functions.stoploss()
-                Fifteen_Min_Nexus.piploginit()
-                Fifteen_Min_Nexus.sell()
+        if (!Thirty_Min_Functions.ema()) {
+          if (Thirty_Min_Nexus.controlSmallerPeriod()[1] == true) {
+            if (!Thirty_Min_Functions.trend() && !Thirty_Min_Functions.rsi() &&
+                            !Thirty_Min_Functions.macd() && !Thirty_Min_Functions.roc() && !Thirty_Min_Functions.obv()) {
+              if (!Thirty_Min_Nexus.pos) {
+                if (!Thirty_Min_Nexus.sell_pos) { Thirty_Min_Nexus.pot_sell = true }
+                Thirty_Min_Functions.stoploss()
+                Thirty_Min_Nexus.piploginit()
+                Thirty_Min_Nexus.sell()
               }
             }
           }
         }
       }
-      if (Fifteen_Min_Nexus.pos && Fifteen_Min_Nexus.buy_pos) {
-        Fifteen_Min_Nexus.piplogger()
-        Fifteen_Min_Nexus.stopLossBuy()
-        Fifteen_Min_Nexus.tstoplosscheck()
-        Fifteen_Min_Nexus.tstoplosscont()
-        Fifteen_Min_Nexus.takeProfitBuy()
+      if (Thirty_Min_Nexus.pos && Thirty_Min_Nexus.buy_pos) {
+        Thirty_Min_Nexus.piplogger()
+        Thirty_Min_Nexus.stopLossBuy()
+        Thirty_Min_Nexus.tstoplosscheck()
+        Thirty_Min_Nexus.tstoplosscont()
+        Thirty_Min_Nexus.takeProfitBuy()
       }
-      if (Fifteen_Min_Nexus.pos && Fifteen_Min_Nexus.sell_pos) {
-        Fifteen_Min_Nexus.piplogger()
-        Fifteen_Min_Nexus.stopLossSell()
-        Fifteen_Min_Nexus.tstoplosscheck()
-        Fifteen_Min_Nexus.tstoplosscont()
-        Fifteen_Min_Nexus.takeProfitSell()
+      if (Thirty_Min_Nexus.pos && Thirty_Min_Nexus.sell_pos) {
+        Thirty_Min_Nexus.piplogger()
+        Thirty_Min_Nexus.stopLossSell()
+        Thirty_Min_Nexus.tstoplosscheck()
+        Thirty_Min_Nexus.tstoplosscont()
+        Thirty_Min_Nexus.takeProfitSell()
       }
+      Thirty_Min_Functions.rejecsave()
       Four_Hour_Functions.rejecsave()
-      Fifteen_Min_Functions.rejecsave()
     } catch (error) {
       console.log(error)
     }
@@ -467,109 +458,109 @@ class Fifteen_Min_Nexus {
 
   /** close position method for taking profit, and gives pip count and win/loss ratio */
   static closePosTP () {
-    if (Fifteen_Min_Nexus.pos) {
-      if (Fifteen_Min_Nexus.buy_pos) {
-        Fifteen_Min_Nexus.buy_pos = false
-        Fifteen_Min_Nexus.pos = false
-        Fifteen_Min_Nexus.tstop = false
-        Fifteen_Min_Nexus.tstoplossinits = false
-        Fifteen_Min_Nexus.tstoplossvoid = false
-        Fifteen_Min_Nexus.pchan = false
-        Fifteen_Min_Nexus.pot_buy = false
-        Fifteen_Min_Nexus.pzone = false
-        Fifteen_Min_Nexus.wins += 1
-        Fifteen_Min_Nexus.trades += 1
-        Fifteen_Min_Nexus.piplog = [0, 0, 0]
-        const pipchange = Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price)
-        Fifteen_Min_Nexus.pips += Math.abs(pipchange)
-        console.log('pair: ' + Fifteen_Min_Nexus.pair)
-        console.log('Take Profit Hit on Fifteen Min')
-        console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
-        console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
-        console.log('Pip Count: ' + Fifteen_Min_Nexus.pips)
+    if (Thirty_Min_Nexus.pos) {
+      if (Thirty_Min_Nexus.buy_pos) {
+        Thirty_Min_Nexus.buy_pos = false
+        Thirty_Min_Nexus.pos = false
+        Thirty_Min_Nexus.pot_buy = false
+        Thirty_Min_Nexus.tstop = false
+        Thirty_Min_Nexus.tstoplossinits = false
+        Thirty_Min_Nexus.tstoplossvoid = false
+        Thirty_Min_Nexus.pchan = false
+        Thirty_Min_Nexus.pzone = false
+        Thirty_Min_Nexus.wins += 1
+        Thirty_Min_Nexus.trades += 1
+        Thirty_Min_Nexus.piplog = [0, 0, 0]
+        const pipchange = Thirty_Min_Functions.pipCountBuy(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
+        Thirty_Min_Nexus.pips += Math.abs(pipchange)
+        console.log('pair: ' + Thirty_Min_Nexus.pair)
+        console.log('Take Profit Hit on Thirty Min')
+        console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
+        console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
+        console.log('Pip Count: ' + Thirty_Min_Nexus.pips)
       }
-      if (Fifteen_Min_Nexus.sell_pos) {
-        Fifteen_Min_Nexus.sell_pos = false
-        Fifteen_Min_Nexus.pos = false
-        Fifteen_Min_Nexus.tstop = false
-        Fifteen_Min_Nexus.pot_sell = false
-        Fifteen_Min_Nexus.tstoplossinits = false
-        Fifteen_Min_Nexus.tstoplossvoid = false
-        Fifteen_Min_Nexus.pchan = false
-        Fifteen_Min_Nexus.pzone = false
-        Fifteen_Min_Nexus.wins += 1
-        Fifteen_Min_Nexus.trades += 1
-        Fifteen_Min_Nexus.piplog = [0, 0, 0]
-        const pipchange = Fifteen_Min_Functions.pipCountSell(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price)
-        Fifteen_Min_Nexus.pips += Math.abs(pipchange)
-        console.log('pair: ' + Fifteen_Min_Nexus.pair)
-        console.log('Take Profit Hit on Fifteen Min')
-        console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
-        console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
-        console.log('Pip Count: ' + Fifteen_Min_Nexus.pips)
+      if (Thirty_Min_Nexus.sell_pos) {
+        Thirty_Min_Nexus.sell_pos = false
+        Thirty_Min_Nexus.pos = false
+        Thirty_Min_Nexus.tstop = false
+        Thirty_Min_Nexus.pot_sell = false
+        Thirty_Min_Nexus.tstoplossinits = false
+        Thirty_Min_Nexus.tstoplossvoid = false
+        Thirty_Min_Nexus.pchan = false
+        Thirty_Min_Nexus.pzone = false
+        Thirty_Min_Nexus.wins += 1
+        Thirty_Min_Nexus.trades += 1
+        Thirty_Min_Nexus.piplog = [0, 0, 0]
+        const pipchange = Thirty_Min_Functions.pipCountSell(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
+        Thirty_Min_Nexus.pips += Math.abs(pipchange)
+        console.log('pair: ' + Thirty_Min_Nexus.pair)
+        console.log('Take Profit Hit on Thirty Min')
+        console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
+        console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
+        console.log('Pip Count: ' + Thirty_Min_Nexus.pips)
       }
     }
   }
 
   /** close position method for stopping out of losses, also gives pip count and win/loss ratio */
   static closePosSL () {
-    if (Fifteen_Min_Nexus.pos) {
-      if (Fifteen_Min_Nexus.sell_pos) {
-        Fifteen_Min_Nexus.sell_pos = false
-        Fifteen_Min_Nexus.pos = false
-        Fifteen_Min_Nexus.tstop = false
-        Fifteen_Min_Nexus.pot_sell = false
-        Fifteen_Min_Nexus.tstoplossinits = false
-        Fifteen_Min_Nexus.tstoplossvoid = false
-        Fifteen_Min_Nexus.pchan = false
-        Fifteen_Min_Nexus.pzone = false
-        Fifteen_Min_Nexus.losses += 1
-        Fifteen_Min_Nexus.trades += 1
-        Fifteen_Min_Nexus.piplog = [0, 0, 0]
-        const pipchange = Fifteen_Min_Functions.pipCountSell(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price)
-        Fifteen_Min_Nexus.pips -= Math.abs(pipchange)
-        console.log('pair: ' + Fifteen_Min_Nexus.pair)
-        console.log('Stop Loss Hit on Fifteen Min')
-        console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
-        console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
-        console.log('Pip Count' + Fifteen_Min_Nexus.pips)
+    if (Thirty_Min_Nexus.pos) {
+      if (Thirty_Min_Nexus.sell_pos) {
+        Thirty_Min_Nexus.sell_pos = false
+        Thirty_Min_Nexus.pos = false
+        Thirty_Min_Nexus.tstop = false
+        Thirty_Min_Nexus.pot_sell = false
+        Thirty_Min_Nexus.tstoplossinits = false
+        Thirty_Min_Nexus.tstoplossvoid = false
+        Thirty_Min_Nexus.pchan = false
+        Thirty_Min_Nexus.pzone = false
+        Thirty_Min_Nexus.losses += 1
+        Thirty_Min_Nexus.trades += 1
+        Thirty_Min_Nexus.piplog = [0, 0, 0]
+        const pipchange = Thirty_Min_Functions.pipCountSell(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
+        Thirty_Min_Nexus.pips -= Math.abs(pipchange)
+        console.log('pair: ' + Thirty_Min_Nexus.pair)
+        console.log('Stop Loss Hit on Thirty Min')
+        console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
+        console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
+        console.log('Pip Count' + Thirty_Min_Nexus.pips)
       }
-      if (Fifteen_Min_Nexus.buy_pos) {
-        Fifteen_Min_Nexus.buy_pos = false
-        Fifteen_Min_Nexus.pos = false
-        Fifteen_Min_Nexus.pot_buy = false
-        Fifteen_Min_Nexus.tstop = false
-        Fifteen_Min_Nexus.tstoplossinits = false
-        Fifteen_Min_Nexus.tstoplossvoid = false
-        Fifteen_Min_Nexus.pchan = false
-        Fifteen_Min_Nexus.pzone = false
-        Fifteen_Min_Nexus.losses += 1
-        Fifteen_Min_Nexus.trades += 1
-        Fifteen_Min_Nexus.piplog = [0, 0, 0]
-        const pipchange = Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price)
-        Fifteen_Min_Nexus.pips -= Math.abs(pipchange)
-        console.log('pair: ' + Fifteen_Min_Nexus.pair)
-        console.log('Stop Loss Hit on Fifteen Min')
-        console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
-        console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
-        console.log('Pip Count' + Fifteen_Min_Nexus.pips)
+      if (Thirty_Min_Nexus.buy_pos) {
+        Thirty_Min_Nexus.buy_pos = false
+        Thirty_Min_Nexus.pos = false
+        Thirty_Min_Nexus.tstop = false
+        Thirty_Min_Nexus.pot_buy = false
+        Thirty_Min_Nexus.tstoplossinits = false
+        Thirty_Min_Nexus.tstoplossvoid = false
+        Thirty_Min_Nexus.pchan = false
+        Thirty_Min_Nexus.pzone = false
+        Thirty_Min_Nexus.losses += 1
+        Thirty_Min_Nexus.trades += 1
+        Thirty_Min_Nexus.piplog = [0, 0, 0]
+        const pipchange = Thirty_Min_Functions.pipCountBuy(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
+        Thirty_Min_Nexus.pips -= Math.abs(pipchange)
+        console.log('pair: ' + Thirty_Min_Nexus.pair)
+        console.log('Stop Loss Hit on Thirty Min')
+        console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
+        console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
+        console.log('Pip Count' + Thirty_Min_Nexus.pips)
       }
     }
   }
 }
 
-class Fifteen_Min_Functions {
+class Thirty_Min_Functions {
   multiplier = 0
   priceHist = []
   extendHist = []
   rejectionzones = new Array()
   extendHigh = []
   extendLow = []
+  resistance = 0
+  support = 0
   timeperiods = {}
   vals = []
   price = 0
-  support = 0
-  resistance = 0
   maxes = []
   mins = []
   recentHisto = []
@@ -578,31 +569,31 @@ class Fifteen_Min_Functions {
 
   /** load instrument name from json file */
   static instrument_name () {
-    Fifteen_Min_Nexus.pair = instrum
+    Thirty_Min_Nexus.pair = instrum
     return instrum
   }
 
   /** load historical prices from json file */
   static HistoryAssigner () {
-    const instrument = Fifteen_Min_Functions.instrument_name()
-    Fifteen_Min_Functions.priceHist = dataset.Fifteen_Min.c
-    Fifteen_Min_Functions.highs = dataset.Fifteen_Min.h
-    Fifteen_Min_Functions.lows = dataset.Fifteen_Min.l
-    Fifteen_Min_Functions.extendHist = dataset['Fifteen_Min Extend'].c
-    Fifteen_Min_Functions.extendHigh = dataset['Fifteen_Min Extend'].h
-    Fifteen_Min_Functions.extendLow = dataset['Fifteen_Min Extend'].l
+    const instrument = Thirty_Min_Functions.instrument_name()
+    Thirty_Min_Functions.priceHist = dataset.Thirty_Min.c
+    Thirty_Min_Functions.highs = dataset.Thirty_Min.h
+    Thirty_Min_Functions.lows = dataset.Thirty_Min.l
+    Thirty_Min_Functions.extendHist = dataset['Thirty_Min Extend'].c
+    Thirty_Min_Functions.extendHigh = dataset['Thirty_Min Extend'].h
+    Thirty_Min_Functions.extendLow = dataset['Thirty_Min Extend'].l
   }
 
   /** load price from json file */
   static ValueAssigner () {
-    Fifteen_Min_Functions.price = liveprice
+    Thirty_Min_Functions.price = liveprice
   }
 
   /** second consolidation method, meant to strengthen consolidation identification */
   static consolidationtwo () {
-    const history = Fifteen_Min_Functions.priceHist
-    const highs = Fifteen_Min_Functions.highs
-    const lows = Fifteen_Min_Functions.lows
+    const history = Thirty_Min_Functions.priceHist
+    const highs = Thirty_Min_Functions.highs
+    const lows = Thirty_Min_Functions.lows
     const histmax = Math.max(...history)
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
@@ -637,23 +628,23 @@ class Fifteen_Min_Functions {
      * is about to hit TP2
      */
   static tpvariation () {
-    const tp = Fifteen_Min_Nexus.tp
-    const values = Fifteen_Min_Nexus.finlevs.concat(Fifteen_Min_Nexus.biggersupres)
+    const tp = Thirty_Min_Nexus.tp
+    const values = Thirty_Min_Nexus.finlevs.concat(Thirty_Min_Nexus.biggersupres)
     const valdiffgreater = []
     const valdiffless = []
     let closesttp = 0
     let filteredvaldiff = []
     let nexttp = 0
     let referenceval = 0
-    const num1 = Fifteen_Min_Nexus.price
-    const volval = Fifteen_Min_Functions.volatility()
-    if (Fifteen_Min_Nexus.buy_pos) {
+    const num1 = Thirty_Min_Nexus.price
+    const volval = Thirty_Min_Functions.volatility()
+    if (Thirty_Min_Nexus.buy_pos) {
       for (let item = 0; item < values.length; item++) {
         if (num1 < values[item]) {
           valdiffgreater.push(Math.abs(num1 - values[item]))
         }
       }
-      closesttp = Fifteen_Min_Nexus.tp
+      closesttp = Thirty_Min_Nexus.tp
       filteredvaldiff = [...new Set(valdiffgreater)]
       for (const valuers in filteredvaldiff) {
         referenceval = closesttp - num1
@@ -662,29 +653,29 @@ class Fifteen_Min_Functions {
         }
       }
       if (volval > 0.618) {
-        Fifteen_Min_Nexus.tp = Fifteen_Min_Functions.price + (Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Nexus.tp) * 1.382)
+        Thirty_Min_Nexus.tp = Thirty_Min_Functions.price + (Math.abs(Thirty_Min_Functions.price - Thirty_Min_Nexus.tp) * 1.382)
         if (Number.isFinite(Math.min(...filteredvaldiff)) && Math.min(...filteredvaldiff) < Infinity && Math.min(...filteredvaldiff) > 0 &&
-                    !(Math.min(...filteredvaldiff) == Fifteen_Min_Functions.price)) {
-          nexttp = Fifteen_Min_Functions.price + (Math.abs(Fifteen_Min_Functions.price - Math.min(...filteredvaldiff)) * 1.382)
+                    !(Math.min(...filteredvaldiff) == Thirty_Min_Functions.price)) {
+          nexttp = Thirty_Min_Functions.price + (Math.abs(Thirty_Min_Functions.price - Math.min(...filteredvaldiff)) * 1.382)
         } else {
-          nexttp = Fifteen_Min_Functions.price + ((Fifteen_Min_Nexus.tp - Fifteen_Min_Functions.price) * 1.618)
+          nexttp = Thirty_Min_Functions.price + ((Thirty_Min_Nexus.tp - Thirty_Min_Functions.price) * 1.618)
         }
       } else {
         if (Number.isFinite(Math.min(...filteredvaldiff)) && Math.min(...filteredvaldiff) < Infinity && Math.min(...filteredvaldiff) > 0 &&
-                    !(Math.min(...filteredvaldiff) == Fifteen_Min_Functions.price)) {
-          nexttp = Fifteen_Min_Functions.price + Math.min(...filteredvaldiff)
+                    !(Math.min(...filteredvaldiff) == Thirty_Min_Functions.price)) {
+          nexttp = Thirty_Min_Functions.price + Math.min(...filteredvaldiff)
         } else {
-          nexttp = Fifteen_Min_Functions.price + ((Fifteen_Min_Functions.tp - Fifteen_Min_Functions.price) * 1.382)
+          nexttp = Thirty_Min_Functions.price + ((Thirty_Min_Functions.tp - Thirty_Min_Functions.price) * 1.382)
         }
       }
     }
-    if (Fifteen_Min_Nexus.sell_pos) {
+    if (Thirty_Min_Nexus.sell_pos) {
       for (let item = 0; item < values.length; item++) {
         if (num1 > values[item]) {
           valdiffless.push(Math.abs(num1 - values[item]))
         }
       }
-      closesttp = Fifteen_Min_Nexus.tp
+      closesttp = Thirty_Min_Nexus.tp
       filteredvaldiff = [...new Set(valdiffless)]
       for (const valuers in filteredvaldiff) {
         referenceval = num1 - closesttp
@@ -693,30 +684,30 @@ class Fifteen_Min_Functions {
         }
       }
       if (volval > 0.618) {
-        Fifteen_Min_Nexus.tp = Fifteen_Min_Functions.price - (Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Nexus.tp) * 1.382)
+        Thirty_Min_Nexus.tp = Thirty_Min_Functions.price - (Math.abs(Thirty_Min_Functions.price - Thirty_Min_Nexus.tp) * 1.382)
         if (Number.isFinite(Math.min(...filteredvaldiff)) && Math.min(...filteredvaldiff) < Infinity && Math.min(...filteredvaldiff) > 0 &&
-                    !(Math.min(...filteredvaldiff) == Fifteen_Min_Functions.price)) {
-          nexttp = Fifteen_Min_Functions.price - (Math.abs(Fifteen_Min_Functions.price - Math.min(...filteredvaldiff)) * 1.382)
+                    !(Math.min(...filteredvaldiff) == Thirty_Min_Functions.price)) {
+          nexttp = Thirty_Min_Functions.price - (Math.abs(Thirty_Min_Functions.price - Math.min(...filteredvaldiff)) * 1.382)
         } else {
-          nexttp = Fifteen_Min_Functions.price - ((Fifteen_Min_Functions.price - Fifteen_Min_Nexus.tp) * 1.618)
+          nexttp = Thirty_Min_Functions.price - ((Thirty_Min_Functions.price - Thirty_Min_Nexus.tp) * 1.618)
         }
       } else {
         if (Number.isFinite(Math.min(...filteredvaldiff)) && Math.min(...filteredvaldiff) < Infinity && Math.min(...filteredvaldiff) > 0 &&
-                    !(Math.min(...filteredvaldiff) == Fifteen_Min_Functions.price)) {
-          nexttp = Fifteen_Min_Functions.price + Math.min(...filteredvaldiff)
+                    !(Math.min(...filteredvaldiff) == Thirty_Min_Functions.price)) {
+          nexttp = Thirty_Min_Functions.price + Math.min(...filteredvaldiff)
         } else {
-          nexttp = Fifteen_Min_Functions.price - ((Fifteen_Min_Functions.price - Fifteen_Min_Nexus.tp) * 1.382)
+          nexttp = Thirty_Min_Functions.price - ((Thirty_Min_Functions.price - Thirty_Min_Nexus.tp) * 1.382)
         }
       }
     }
-    Fifteen_Min_Nexus.tptwo = nexttp
+    Thirty_Min_Nexus.tptwo = nexttp
   }
 
   /** fibonacci levels to be added to the program...
      * update 6/5/22 @ 4:43 PM: Adding identification of retracement origin point
     */
   static fib () {
-    const recents = Fifteen_Min_Functions.recentHisto
+    const recents = Thirty_Min_Functions.recentHisto
     const dataset = []
     for (let x = 1; x < 51; x++) {
       dataset.push([x, recents[x - 1]])
@@ -729,7 +720,7 @@ class Fifteen_Min_Functions {
     const newequation = q.text()
     const root = roots.getRoots((newequation))
     const baseprice = 0
-    const currentprice = Fifteen_Min_Functions.price
+    const currentprice = Thirty_Min_Functions.price
     const diff = Math.abs(baseprice - currentprice)
     if (currentprice < baseprice) {
       const fib1 = diff * 0.236 + currentprice
@@ -751,38 +742,38 @@ class Fifteen_Min_Functions {
         then register fib levels from the price corresponding to that x value, depending on whether or not its a buy or sell */
   }
 
-  /** Rejection Zone Initiatior */
+  /** Rejection Zone Initiator */
   static rejecinit () {
-    const instrument = Fifteen_Min_Functions.instrument_name()
+    const instrument = Thirty_Min_Functions.instrument_name()
     if (!fs.existsSync('./Rejection_Archive/' + String(instrument) + '.json')) {
-      Fifteen_Min_Functions.timeperiods = {}
-      Fifteen_Min_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
-      Fifteen_Min_Functions.timeperiods.Thirty_Min = [0, 0, 0]
-      Fifteen_Min_Functions.timeperiods.One_Hour = [0, 0, 0]
-      Fifteen_Min_Functions.timeperiods.Two_Hour = [0, 0, 0]
-      Fifteen_Min_Functions.timeperiods.Four_Hour = [0, 0, 0]
-      Fifteen_Min_Functions.timeperiods.Daily = [0, 0, 0]
-      Fifteen_Min_Functions.timeperiods.Weekly = [0, 0, 0]
-      fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Fifteen_Min_Functions.timeperiods, null, 2))
+      Thirty_Min_Functions.timeperiods = {}
+      Thirty_Min_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
+      Thirty_Min_Functions.timeperiods.Thirty_Min = [0, 0, 0]
+      Thirty_Min_Functions.timeperiods.One_Hour = [0, 0, 0]
+      Thirty_Min_Functions.timeperiods.Two_Hour = [0, 0, 0]
+      Thirty_Min_Functions.timeperiods.Four_Hour = [0, 0, 0]
+      Thirty_Min_Functions.timeperiods.Daily = [0, 0, 0]
+      Thirty_Min_Functions.timeperiods.Weekly = [0, 0, 0]
+      fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Thirty_Min_Functions.timeperiods, null, 2))
     }
     const raw = fs.readFileSync('./Rejection_Archive/' + String(instrument) + '.json')
-    Fifteen_Min_Functions.timeperiods = JSON.parse(raw)
-    Fifteen_Min_Functions.rejectionzones = JSON.parse(raw).Fifteen_Min
+    Thirty_Min_Functions.timeperiods = JSON.parse(raw)
+    Thirty_Min_Functions.rejectionzones = JSON.parse(raw).Thirty_Min
   }
 
   /** Rejection Zone Saver */
   static rejecsave () {
-    const instrument = Fifteen_Min_Functions.instrument_name()
-    Fifteen_Min_Functions.rejectionzones = [...new Set(Fifteen_Min_Functions.rejectionzones)]
-    Fifteen_Min_Functions.timeperiods.Fifteen_Min = Fifteen_Min_Functions.rejectionzones
-    fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Fifteen_Min_Functions.timeperiods, null, 2))
+    const instrument = Thirty_Min_Functions.instrument_name()
+    Thirty_Min_Functions.rejectionzones = [...new Set(Thirty_Min_Functions.rejectionzones)]
+    Thirty_Min_Functions.timeperiods.Thirty_Min = Thirty_Min_Functions.rejectionzones
+    fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Thirty_Min_Functions.timeperiods, null, 2))
   }
 
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
   static overall () {
-    const extendedhistory = Fifteen_Min_Functions.extendHist
-    Fifteen_Min_Functions.rejectionzones = [0, 0, 0]
-    const price = Fifteen_Min_Functions.price
+    const extendedhistory = Thirty_Min_Functions.extendHist
+    Thirty_Min_Functions.rejectionzones = [0, 0, 0]
+    const price = Thirty_Min_Functions.price
     const max = Math.max(...extendedhistory)
     const min = Math.min(...extendedhistory)
     const buffer = (max - min) * 0.05
@@ -795,13 +786,13 @@ class Fifteen_Min_Functions {
         studylist.push([val, extendedhistory[val]])
       }
     }
-    const result = Fifteen_Min_Functions.analysis(studylist, extendedhistory, pricerange)
+    const result = Thirty_Min_Functions.analysis(studylist, extendedhistory, pricerange)
     return result
   }
 
   /** Do past Analysis to see if this is a good trade, based on static overall() method */
   static analysis (cases, extendedhistory, pricerange) {
-    const histnorm = Fifteen_Min_Functions.priceHist
+    const histnorm = Thirty_Min_Functions.priceHist
     const normdiff = (Math.max(...histnorm) - Math.min(...histnorm)) * 0.025
     const q = bolls.calculate({ period: 10, values: extendedhistory, stdDev: 1 })
     const h = new Array()
@@ -846,15 +837,15 @@ class Fifteen_Min_Functions {
         rejection++
         if (fractals.length < 1) {
           fractals.push(0)
-          Fifteen_Min_Functions.rejectionzones.push(fractals[0])
+          Thirty_Min_Functions.rejectionzones.push(fractals[0])
         } else {
           const frac = fractals[val]
-          Fifteen_Min_Functions.rejectionzones.push(extendedhistory[frac])
+          Thirty_Min_Functions.rejectionzones.push(extendedhistory[frac])
         }
       }
     }
-    if (Fifteen_Min_Functions.rejectionzones.length < 1) {
-      Fifteen_Min_Functions.rejectionzones.push(Fifteen_Min_Functions.price)
+    if (Thirty_Min_Functions.rejectionzones.length < 1) {
+      Thirty_Min_Functions.rejectionzones.push(Thirty_Min_Functions.price)
     }
     if (rejection > 2) {
       return false
@@ -865,25 +856,25 @@ class Fifteen_Min_Functions {
 
   /** Smart array that grows as program runs longer for each time period, shows rejection zones and if the program is near them, it'll not allow trading */
   static rejectionzoning () {
-    Fifteen_Min_Functions.overall()
-    const rejects = Fifteen_Min_Functions.rejectionzones
+    Thirty_Min_Functions.overall()
+    const rejects = Thirty_Min_Functions.rejectionzones
     const diffs = []
     for (const val in rejects) {
-      if (Fifteen_Min_Nexus.pot_buy) {
-        if (Fifteen_Min_Functions.price < val) {
-          diffs.push(val - Fifteen_Min_Functions.price)
+      if (Thirty_Min_Nexus.pot_buy) {
+        if (Thirty_Min_Functions.price < val) {
+          diffs.push(val - Thirty_Min_Functions.price)
         }
       }
-      if (Fifteen_Min_Nexus.pot_sell) {
-        if (Fifteen_Min_Functions.price > val) {
-          diffs.push(Fifteen_Min_Functions.price - val)
+      if (Thirty_Min_Nexus.pot_sell) {
+        if (Thirty_Min_Functions.price > val) {
+          diffs.push(Thirty_Min_Functions.price - val)
         }
       }
     }
 
-    if (Math.abs(Math.min(...diffs)) < Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Nexus.tp)) {
-      Fifteen_Min_Nexus.pot_buy = false
-      Fifteen_Min_Nexus.pot_sell = false
+    if (Math.abs(Math.min(...diffs)) < Math.abs(Thirty_Min_Functions.price - Thirty_Min_Nexus.tp)) {
+      Thirty_Min_Nexus.pot_buy = false
+      Thirty_Min_Nexus.pot_sell = false
       return true
     } else {
       return false
@@ -892,33 +883,33 @@ class Fifteen_Min_Functions {
 
   /** return price */
   static getPrice () {
-    return Fifteen_Min_Functions.price
+    return Thirty_Min_Functions.price
   }
 
   /** return historical price */
   static priceHistory () {
-    return Fifteen_Min_Functions.priceHist
+    return Thirty_Min_Functions.priceHist
   }
 
   /** find whether trend is going up or down */
   static trend () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
     if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
   }
 
   /** recent history, shortens history array into last 50 digits for different analyses */
   static recentHist () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const historytwo = []
     for (let x = 0; x < 50; x++) { historytwo.push(history.splice(-1, 1)[0]) }
-    Fifteen_Min_Functions.recentHisto = historytwo.reverse()
+    Thirty_Min_Functions.recentHisto = historytwo.reverse()
   }
 
   /** determination of stop loss size */
   static stoploss () {
-    const highs = Fifteen_Min_Functions.highs
-    const lows = Fifteen_Min_Functions.lows
+    const highs = Thirty_Min_Functions.highs
+    const lows = Thirty_Min_Functions.lows
     const diff = []
     let totaldiff = 0
     let finaldiff = 0
@@ -928,7 +919,7 @@ class Fifteen_Min_Functions {
     for (let variables = 0; variables < diff.length; variables++) {
       totaldiff += diff[variables]
     }
-    if (Fifteen_Min_Functions.volatility() > 0.618) {
+    if (Thirty_Min_Functions.volatility() > 0.618) {
       finaldiff = (totaldiff / 30) * 1.382
     } else {
       finaldiff = (totaldiff / 30)
@@ -937,43 +928,43 @@ class Fifteen_Min_Functions {
     let slfloor = 0
     let numbuy = 0
     let newsl = 0
-    if (Fifteen_Min_Nexus.pot_buy) {
-      const diffprice = Fifteen_Min_Functions.price - finaldiff
-      if (!Number.isFinite(Fifteen_Min_Functions.closesttwo(diffprice)[0])) {
-        slfloor = Fifteen_Min_Functions.price - (finaldiff * 3.618)
+    if (Thirty_Min_Nexus.pot_buy) {
+      const diffprice = Thirty_Min_Functions.price - finaldiff
+      if (!Number.isFinite(Thirty_Min_Functions.closesttwo(diffprice)[0])) {
+        slfloor = Thirty_Min_Functions.price - (finaldiff * 3.618)
         newsl = slfloor
       } else {
-        numbuy = Fifteen_Min_Functions.closesttwo(diffprice)[0]
-        if (!Number.isFinite(Fifteen_Min_Functions.closesttwo(numbuy)[0])) {
+        numbuy = Thirty_Min_Functions.closesttwo(diffprice)[0]
+        if (!Number.isFinite(Thirty_Min_Functions.closesttwo(numbuy)[0])) {
           newsl = diffprice - (0.786 * (diffprice - numbuy))
         } else {
-          slfloor = (Fifteen_Min_Functions.price - ((Fifteen_Min_Functions.price - Fifteen_Min_Functions.closesttwo(numbuy)[0]) * 1.618 * 0.786))
+          slfloor = (Thirty_Min_Functions.price - ((Thirty_Min_Functions.price - Thirty_Min_Functions.closesttwo(numbuy)[0]) * 1.618 * 0.786))
           newsl = slfloor
         }
       }
-      Fifteen_Min_Nexus.sl = newsl
-    } if (Fifteen_Min_Nexus.pot_sell) {
-      const diffprice = finaldiff + Fifteen_Min_Functions.price
-      if (!Number.isFinite(Fifteen_Min_Functions.closesttwo(diffprice)[1])) {
-        slceil = Fifteen_Min_Functions.price + (finaldiff * 3.618)
+      Thirty_Min_Nexus.sl = newsl
+    } if (Thirty_Min_Nexus.pot_sell) {
+      const diffprice = finaldiff + Thirty_Min_Functions.price
+      if (!Number.isFinite(Thirty_Min_Functions.closesttwo(diffprice)[1])) {
+        slceil = Thirty_Min_Functions.price + (finaldiff * 3.618)
         newsl = slceil
       } else {
-        numbuy = Fifteen_Min_Functions.closesttwo(diffprice)[1]
-        if (!Number.isFinite(Fifteen_Min_Functions.closesttwo(numbuy)[1])) {
+        numbuy = Thirty_Min_Functions.closesttwo(diffprice)[1]
+        if (!Number.isFinite(Thirty_Min_Functions.closesttwo(numbuy)[1])) {
           newsl = diffprice + (0.786 * (numbuy - diffprice))
         } else {
-          slceil = (Fifteen_Min_Functions.price + ((Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Functions.closesttwo(numbuy)[1])) * 1.618 * 0.786))
+          slceil = (Thirty_Min_Functions.price + ((Math.abs(Thirty_Min_Functions.price - Thirty_Min_Functions.closesttwo(numbuy)[1])) * 1.618 * 0.786))
           newsl = slceil
         }
       }
-      Fifteen_Min_Nexus.sl = newsl
+      Thirty_Min_Nexus.sl = newsl
     }
     return finaldiff
   }
 
   /** finds closest support and resistance level to whatever price u put in */
   static closesttwo (num1) {
-    const values = Fifteen_Min_Nexus.finlevs.concat(Fifteen_Min_Nexus.biggersupres)
+    const values = Thirty_Min_Nexus.finlevs.concat(Thirty_Min_Nexus.biggersupres)
     const valdiffgreater = []
     const valdiffless = []
     for (let item = 0; item < values.length; item++) {
@@ -984,20 +975,20 @@ class Fifteen_Min_Functions {
         valdiffless.push(Math.abs(num1 - values[item]))
       }
     }
-    const closestbelow = Fifteen_Min_Functions.price - Math.min(...valdiffless)
-    const closestabove = Fifteen_Min_Functions.price + Math.min(...valdiffgreater)
+    const closestbelow = Thirty_Min_Functions.price - Math.min(...valdiffless)
+    const closestabove = Thirty_Min_Functions.price + Math.min(...valdiffgreater)
     const closests = [closestbelow, closestabove]
     return closests
   }
 
   /** price zones, meant to determine whether a price zone has been found or not */
   static priceZones () {
-    Fifteen_Min_Functions.supreslevs()
-    if (Math.abs((Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Functions.price, Fifteen_Min_Nexus.resistance))
-    ) / (Math.abs(Fifteen_Min_Functions.pipCountBuy(Math.max(...Fifteen_Min_Functions.priceHist), Math.min(...Fifteen_Min_Functions.priceHist)))) < 0.1) {
+    Thirty_Min_Functions.supreslevs()
+    if (Math.abs((Thirty_Min_Functions.pipCountBuy(Thirty_Min_Functions.price, Thirty_Min_Nexus.resistance))
+    ) / (Math.abs(Thirty_Min_Functions.pipCountBuy(Math.max(...Thirty_Min_Functions.priceHist), Math.min(...Thirty_Min_Functions.priceHist)))) < 0.1) {
       return true
-    } else if (Math.abs((Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Functions.price, Fifteen_Min_Nexus.support))
-    ) / (Math.abs(Fifteen_Min_Functions.pipCountBuy(Math.max(...Fifteen_Min_Functions.priceHist), Math.min(...Fifteen_Min_Functions.priceHist)))) < 0.1) {
+    } else if (Math.abs((Thirty_Min_Functions.pipCountBuy(Thirty_Min_Functions.price, Thirty_Min_Nexus.support))
+    ) / (Math.abs(Thirty_Min_Functions.pipCountBuy(Math.max(...Thirty_Min_Functions.priceHist), Math.min(...Thirty_Min_Functions.priceHist)))) < 0.1) {
       return true
     } else {
       return false
@@ -1006,8 +997,8 @@ class Fifteen_Min_Functions {
 
   /** keylev, meant to determine the closest keylevel to the current price */
   static keylev () {
-    Fifteen_Min_Functions.getPrice()
-    if (Fifteen_Min_Functions.valdiff(Fifteen_Min_Functions.price, Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price)) < 0.1) {
+    Thirty_Min_Functions.getPrice()
+    if (Thirty_Min_Functions.valdiff(Thirty_Min_Functions.price, Thirty_Min_Functions.closest(Thirty_Min_Functions.price)) < 0.1) {
       return true
     } else {
       return false
@@ -1016,7 +1007,7 @@ class Fifteen_Min_Functions {
 
   /** volatility, meant to determine whether or not price movement is too volatile for current parameters */
   static volatility () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const r = rsis.calculate({ period: 14, values: history })
     const q = r[r.length - 1]
     let diff = 0
@@ -1028,12 +1019,12 @@ class Fifteen_Min_Functions {
 
   /** trailing stop loss factor, uses derived equation to create a sort of "bubble" around price movement to prevent trades being taken out early */
   static trailingsl () {
-    const factor = Fifteen_Min_Functions.volatility()
-    const history = Fifteen_Min_Functions.priceHist
+    const factor = Thirty_Min_Functions.volatility()
+    const history = Thirty_Min_Functions.priceHist
     const ceiling = Math.max(...history)
     const floor = Math.min(...history)
     const diffy = ceiling - floor
-    const posdiff = Math.abs(Fifteen_Min_Nexus.posprice - Fifteen_Min_Functions.price)
+    const posdiff = Math.abs(Thirty_Min_Nexus.posprice - Thirty_Min_Functions.price)
     const deci = posdiff / diffy
     const input = deci * 6.18
     const equation = (1 - factor) * (((input * input) + input) / ((input * input) + input + 1))
@@ -1042,7 +1033,7 @@ class Fifteen_Min_Functions {
 
   /**  used to determine price channels and send to announcer so that the announcer can announce whether a price channel has been found, similar to price zones */
   static priceChannels () {
-    const rvalues = Fifteen_Min_Functions.regression()
+    const rvalues = Thirty_Min_Functions.regression()
     if ((rvalues[0] * rvalues[0]) > 0.8 && (rvalues[1] * rvalues[1]) > 0.8) {
       return true
     } else {
@@ -1052,12 +1043,7 @@ class Fifteen_Min_Functions {
 
   /** used to determine consolidation via volatility, is added to consolidationtwo that was recently made now */
   static consolidation () {
-    Fifteen_Min_Functions.recentHist()
-    const max = Math.max(...Fifteen_Min_Functions.recentHisto)
-    const min = Math.min(...Fifteen_Min_Functions.recentHisto)
-    const totmax = Math.max(...Fifteen_Min_Functions.priceHist)
-    const totmin = Math.min(...Fifteen_Min_Functions.priceHist)
-    if (Fifteen_Min_Functions.volatility() > 0.618) {
+    if (Thirty_Min_Functions.volatility() > 0.618) {
       return false
     } else {
       return true
@@ -1066,8 +1052,8 @@ class Fifteen_Min_Functions {
 
   /** used to determine slope between two points */
   static slopes () {
-    Fifteen_Min_Functions.recentHist()
-    const recentHistory = Fifteen_Min_Functions.recentHisto
+    Thirty_Min_Functions.recentHist()
+    const recentHistory = Thirty_Min_Functions.recentHisto
     const slope = []
     for (let value = 0; value < recentHistory.length - 1; value++) {
       slope.push(recentHistory[value + 1] - recentHistory[value])
@@ -1079,9 +1065,9 @@ class Fifteen_Min_Functions {
   /* UPDATE: stricter values not working that well, but its identifying price channels so ... should I change? I don't know */
   /** used to determine relative maxes and mins for identification of price channels */
   static maxes_mins () {
-    Fifteen_Min_Functions.recentHist()
-    const recentHistory = Fifteen_Min_Functions.recentHisto
-    const slope = Fifteen_Min_Functions.slopes()
+    Thirty_Min_Functions.recentHist()
+    const recentHistory = Thirty_Min_Functions.recentHisto
+    const slope = Thirty_Min_Functions.slopes()
     const maxes = []
     const mins = []
     for (let value = 3; value < slope.length - 2; value++) {
@@ -1091,22 +1077,22 @@ class Fifteen_Min_Functions {
         if (slope[value - 2] < 0 && slope[value + 1] > 0) { mins.push(recentHistory[value]) } else if (slope[value - 3] < 0 && slope[value + 1] > 0) { mins.push(recentHistory[value]) }
       }
     }
-    Fifteen_Min_Functions.maxes = maxes
-    Fifteen_Min_Functions.mins = mins
+    Thirty_Min_Functions.maxes = maxes
+    Thirty_Min_Functions.mins = mins
   }
 
   /** used to determine regression lines (moving averages, for example) */
   static regression () {
-    Fifteen_Min_Functions.maxes_mins()
+    Thirty_Min_Functions.maxes_mins()
     const x = []
-    const length = Fifteen_Min_Functions.maxes.length
+    const length = Thirty_Min_Functions.maxes.length
     for (let value = 0; value < length; value++) { x.push(value) }
-    const y = Fifteen_Min_Functions.maxes
+    const y = Thirty_Min_Functions.maxes
     const regressions = new regression.SimpleLinearRegression(x, y)
     const xtwo = []
-    const lengthtwo = Fifteen_Min_Functions.mins.length
+    const lengthtwo = Thirty_Min_Functions.mins.length
     for (let value = 0; value < lengthtwo; value++) { xtwo.push(value) }
-    const ytwo = Fifteen_Min_Functions.mins
+    const ytwo = Thirty_Min_Functions.mins
     const regressionstwo = new regression.SimpleLinearRegression(xtwo, ytwo)
     const roneone = Object.values(regressions.score(x, y))[0]
     const ronetwo = Object.values(regressions.score(x, y))[1]
@@ -1119,7 +1105,7 @@ class Fifteen_Min_Functions {
   /* Key part added, test for results */
   /** finds support and resistance levels, very important for code function, would love to improve this */
   static supreslevs () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const ceiling = Math.max(...history)
     const floor = Math.min(...history)
     const difference = ceiling - floor
@@ -1143,7 +1129,7 @@ class Fifteen_Min_Functions {
     }
     levelsss = [...new Set(levelss)]
     finalLevs = levelsss
-    const price = Fifteen_Min_Functions.getPrice()
+    const price = Thirty_Min_Functions.getPrice()
     const larger = []
     const smaller = []
     const largertwo = []
@@ -1155,20 +1141,20 @@ class Fifteen_Min_Functions {
       if (price < ((finalLevs[item] * difference) + floor)) { larger.push(((finalLevs[item] * difference) + floor)) }
     }
     for (let item = 0; item < smaller.length; item++) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(price, smaller[item])) > 0.05) {
+      if (Math.abs(Thirty_Min_Functions.valdiff(price, smaller[item])) > 0.05) {
         smallertwo.push(smaller[item])
       }
     }
     for (let item = 0; item < larger.length; item++) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(price, larger[item])) > 0.05) {
+      if (Math.abs(Thirty_Min_Functions.valdiff(price, larger[item])) > 0.05) {
         largertwo.push(larger[item])
       }
     }
     if (smallertwo.length < 1) {
-      smallertwo.push(price - Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
+      smallertwo.push(price - Thirty_Min_Functions.pipreverse(price, Thirty_Min_Functions.pipdiffy(price, Thirty_Min_Functions.stoploss())))
     }
     if (largertwo.length < 1) {
-      largertwo.push(price + Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
+      largertwo.push(price + Thirty_Min_Functions.pipreverse(price, Thirty_Min_Functions.pipdiffy(price, Thirty_Min_Functions.stoploss())))
     }
     for (let item = 0; item < smallertwo.length; item++) {
       smaller_diff.push(Math.abs((smallertwo[item] - price)))
@@ -1178,17 +1164,17 @@ class Fifteen_Min_Functions {
     }
     const support = price - Math.min(...smaller_diff)
     const resistance = price + Math.min(...larger_diff)
-    Fifteen_Min_Nexus.support = support
-    Fifteen_Min_Nexus.resistance = resistance
+    Thirty_Min_Nexus.support = support
+    Thirty_Min_Nexus.resistance = resistance
     for (const item in finalLevs) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
-    Fifteen_Min_Nexus.finlevs = finalLevs
+    Thirty_Min_Nexus.finlevs = finalLevs
   }
 
   /** self explanatory, finds RSI and compares the last two */
   static rsi () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const history2 = []
     for (let item = 0; item < history.length; item++) { history2.push(history[item]) }
     history2.splice(-1, 1)
@@ -1202,7 +1188,7 @@ class Fifteen_Min_Functions {
 
   /** self explanatory, finds MACD and compares the last two */
   static macd () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const x = []
     const q = emas.calculate({ period: 12, values: history })
     const r = emas.calculate({ period: 26, values: history })
@@ -1216,7 +1202,7 @@ class Fifteen_Min_Functions {
 
   /** self explanatory, finds ROC and compares the last two */
   static roc () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const history2 = []
     for (let item = 0; item < history.length; item++) { history2.push(history[item]) }
     history2.splice(-1, 1)
@@ -1230,7 +1216,7 @@ class Fifteen_Min_Functions {
 
   /** self explanatory, finds EMA and compares the last two */
   static ema () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const q = emas.calculate({ period: 8, values: history })
     const r = emas.calculate({ period: 14, values: history })
     const qlast = q[q.length - 1]
@@ -1241,7 +1227,7 @@ class Fifteen_Min_Functions {
 
   /** new indicator mix that finds EMAS of RSI and compares the last two values */
   static obv () {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const qs = rsis.calculate({ period: 14, values: history })
     const q = emas.calculate({ period: 8, values: qs })
     const qlast = q[q.length - 1]
@@ -1254,55 +1240,55 @@ class Fifteen_Min_Functions {
   /** pip counter */
   static pip (num1, num2) {
     if (String(num1).indexOf('.') == 2) {
-      Fifteen_Min_Functions.multiplier = 1000
+      Thirty_Min_Functions.multiplier = 1000
     } else if (String(num1).indexOf('.') == 3) {
-      Fifteen_Min_Functions.multiplier = 100
+      Thirty_Min_Functions.multiplier = 100
     } else if (String(num1).indexOf('.') == 4) {
-      Fifteen_Min_Functions.multiplier = 10
+      Thirty_Min_Functions.multiplier = 10
     } else if (String(num1).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 1
+      Thirty_Min_Functions.multiplier = 1
     } else if (String(num1).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 0.1
+      Thirty_Min_Functions.multiplier = 0.1
     } else if (String(num1).indexOf('.') == 6) {
-      Fifteen_Min_Functions.multiplier = 0.01
+      Thirty_Min_Functions.multiplier = 0.01
     } else if (String(num1).indexOf('.') == 7) {
-      Fifteen_Min_Functions.multiplier = 0.001
+      Thirty_Min_Functions.multiplier = 0.001
     } else if (String(num1).indexOf('.') == 8) {
-      Fifteen_Min_Functions.multiplier = 0.0001
+      Thirty_Min_Functions.multiplier = 0.0001
     } else if (String(num1).indexOf('.') == 9) {
-      Fifteen_Min_Functions.multiplier = 0.00001
+      Thirty_Min_Functions.multiplier = 0.00001
     } else if (String(num1).indexOf('.') == 10) {
-      Fifteen_Min_Functions.multiplier = 0.000001
-    } else { Fifteen_Min_Functions.multiplier = 10000 }
-    num1 *= Fifteen_Min_Functions.multiplier
-    num2 *= Fifteen_Min_Functions.multiplier
+      Thirty_Min_Functions.multiplier = 0.000001
+    } else { Thirty_Min_Functions.multiplier = 10000 }
+    num1 *= Thirty_Min_Functions.multiplier
+    num2 *= Thirty_Min_Functions.multiplier
     return [num1, num2]
   }
 
   /** pip converter */
   static pipreverse (num, num2) {
     if (String(num).indexOf('.') == 2) {
-      Fifteen_Min_Functions.multiplier = 0.001
+      Thirty_Min_Functions.multiplier = 0.001
     } else if (String(num).indexOf('.') == 3) {
-      Fifteen_Min_Functions.multiplier = 0.01
+      Thirty_Min_Functions.multiplier = 0.01
     } else if (String(num).indexOf('.') == 4) {
-      Fifteen_Min_Functions.multiplier = 0.1
+      Thirty_Min_Functions.multiplier = 0.1
     } else if (String(num).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 1
+      Thirty_Min_Functions.multiplier = 1
     } else if (String(num).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 10
+      Thirty_Min_Functions.multiplier = 10
     } else if (String(num).indexOf('.') == 6) {
-      Fifteen_Min_Functions.multiplier = 100
+      Thirty_Min_Functions.multiplier = 100
     } else if (String(num).indexOf('.') == 7) {
-      Fifteen_Min_Functions.multiplier = 1000
+      Thirty_Min_Functions.multiplier = 1000
     } else if (String(num).indexOf('.') == 8) {
-      Fifteen_Min_Functions.multiplier = 10000
+      Thirty_Min_Functions.multiplier = 10000
     } else if (String(num).indexOf('.') == 9) {
-      Fifteen_Min_Functions.multiplier = 100000
+      Thirty_Min_Functions.multiplier = 100000
     } else if (String(num).indexOf('.') == 10) {
-      Fifteen_Min_Functions.multiplier = 1000000
-    } else { Fifteen_Min_Functions.multiplier = 0.0001 }
-    num2 *= Fifteen_Min_Functions.multiplier
+      Thirty_Min_Functions.multiplier = 1000000
+    } else { Thirty_Min_Functions.multiplier = 0.0001 }
+    num2 *= Thirty_Min_Functions.multiplier
     return (num2)
   }
 
@@ -1312,7 +1298,7 @@ class Fifteen_Min_Functions {
   /* sets value difference as a decimal-percentage of floor to ceiling */
   /** gets value difference for normalization of data points */
   static valdiff (num1, num2) {
-    const history = Fifteen_Min_Functions.priceHist
+    const history = Thirty_Min_Functions.priceHist
     const floor = Math.min(...history)
     const ceil = Math.max(...history)
     const valdiffer = ceil - floor
@@ -1324,34 +1310,34 @@ class Fifteen_Min_Functions {
   /** Pip difference calculator */
   static pipdiffy (price, num1) {
     if (String(price).indexOf('.') == 2) {
-      Fifteen_Min_Functions.multiplier = 1000
+      Thirty_Min_Functions.multiplier = 1000
     } else if (String(price).indexOf('.') == 3) {
-      Fifteen_Min_Functions.multiplier = 100
+      Thirty_Min_Functions.multiplier = 100
     } else if (String(price).indexOf('.') == 4) {
-      Fifteen_Min_Functions.multiplier = 10
+      Thirty_Min_Functions.multiplier = 10
     } else if (String(price).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 1
+      Thirty_Min_Functions.multiplier = 1
     } else if (String(price).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 0.1
+      Thirty_Min_Functions.multiplier = 0.1
     } else if (String(price).indexOf('.') == 6) {
-      Fifteen_Min_Functions.multiplier = 0.01
+      Thirty_Min_Functions.multiplier = 0.01
     } else if (String(price).indexOf('.') == 7) {
-      Fifteen_Min_Functions.multiplier = 0.001
+      Thirty_Min_Functions.multiplier = 0.001
     } else if (String(price).indexOf('.') == 8) {
-      Fifteen_Min_Functions.multiplier = 0.0001
+      Thirty_Min_Functions.multiplier = 0.0001
     } else if (String(price).indexOf('.') == 9) {
-      Fifteen_Min_Functions.multiplier = 0.00001
+      Thirty_Min_Functions.multiplier = 0.00001
     } else if (String(price).indexOf('.') == 10) {
-      Fifteen_Min_Functions.multiplier = 0.000001
+      Thirty_Min_Functions.multiplier = 0.000001
     } else {
-      Fifteen_Min_Functions.multiplier = 10000
+      Thirty_Min_Functions.multiplier = 10000
     }
-    return num1 * Fifteen_Min_Functions.multiplier
+    return num1 * Thirty_Min_Functions.multiplier
   }
 
   /** finds closest support and resistance level to whatever price u put in */
   static closest (num1) {
-    const values = Fifteen_Min_Nexus.finlevs.concat(Fifteen_Min_Nexus.biggersupres)
+    const values = Thirty_Min_Nexus.finlevs.concat(Thirty_Min_Nexus.biggersupres)
     const valdiffgreater = []
     const valdiffless = []
     for (let item = 0; item < values.length; item++) {
@@ -1362,8 +1348,8 @@ class Fifteen_Min_Functions {
         valdiffless.push(Math.abs(num1 - values[item]))
       }
     }
-    const closestbelow = Fifteen_Min_Functions.price - Math.min(...valdiffless)
-    const closestabove = Fifteen_Min_Functions.price + Math.min(...valdiffgreater)
+    const closestbelow = Thirty_Min_Functions.price - Math.min(...valdiffless)
+    const closestabove = Thirty_Min_Functions.price + Math.min(...valdiffgreater)
     const closests = [closestbelow, closestabove]
     return Math.min(...closests)
   }
@@ -1371,14 +1357,14 @@ class Fifteen_Min_Functions {
   /** Counts pips between two values for buying */
   static pipCountBuy (num1, num2) {
     let nums
-    nums = Fifteen_Min_Functions.pip(num1, num2)
+    nums = Thirty_Min_Functions.pip(num1, num2)
     return (nums[1] - nums[0])
   }
 
   /** Counts pips between two values for selling */
   static pipCountSell (num1, num2) {
     let nums
-    nums = Fifteen_Min_Functions.pip(num1, num2)
+    nums = Thirty_Min_Functions.pip(num1, num2)
     return (nums[0] - nums[1])
   }
 }
@@ -1390,10 +1376,10 @@ class Four_Hour_Functions {
   rejectionzones = new Array()
   extendHigh = []
   extendLow = []
-  support = 0
-  resistance = 0
-  timeperiods = {}
   vals = []
+  timeperiods = {}
+  resistance = 0
+  support = 0
   price = 0
   maxes = []
   mins = []
@@ -1403,7 +1389,7 @@ class Four_Hour_Functions {
 
   /** load instrument name from json file */
   static instrument_name () {
-    Fifteen_Min_Nexus.pair = instrum
+    Thirty_Min_Nexus.pair = instrum
     return instrum
   }
 
@@ -1497,9 +1483,9 @@ class Four_Hour_Functions {
         then register fib levels from the price corresponding to that x value, depending on whether or not its a buy or sell */
   }
 
-  /** Rejection Zone Initiatior */
+  /** Rejection Zone Initiator */
   static rejecinit () {
-    const instrument = Fifteen_Min_Functions.instrument_name()
+    const instrument = Thirty_Min_Functions.instrument_name()
     if (!fs.existsSync('./Rejection_Archive/' + String(instrument) + '.json')) {
       Four_Hour_Functions.timeperiods = {}
       Four_Hour_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
@@ -1513,12 +1499,12 @@ class Four_Hour_Functions {
     }
     const raw = fs.readFileSync('./Rejection_Archive/' + String(instrument) + '.json')
     Four_Hour_Functions.timeperiods = JSON.parse(raw)
-    Four_Hour_Functions.cont = JSON.parse(raw).Four_Hour
+    Four_Hour_Functions.rejectionzones = JSON.parse(raw).Four_Hour
   }
 
   /** Rejection Zone Saver */
   static rejecsave () {
-    const instrument = Fifteen_Min_Functions.instrument_name()
+    const instrument = Thirty_Min_Functions.instrument_name()
     Four_Hour_Functions.rejectionzones = [...new Set(Four_Hour_Functions.rejectionzones)]
     Four_Hour_Functions.timeperiods.Four_Hour = Four_Hour_Functions.rejectionzones
     fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Four_Hour_Functions.timeperiods, null, 2))
@@ -1569,24 +1555,26 @@ class Four_Hour_Functions {
     for (let val = 0; val < cases.length; val++) {
       fractals.push(cases[val][0])
     }
-    for (let val = 3; val < fractals.length - 3; val++) {
+    for (let val = 0; val < fractals.length; val++) {
       let mincount = 0
       let maxcount = 0
-      for (let value = 1; value < 4; value++) {
-        if (fractals[val] > fractals[val - value]) {
-          maxcount++
-        }
-        if (fractals[val] > fractals[val + value]) {
-          maxcount++
-        }
-        if (fractals[val] < fractals[val - value]) {
-          mincount++
-        }
-        if (fractals[val] < fractals[val + value]) {
-          mincount++
+      for (let value = 0; value < 3; value++) {
+        if ((fractals[val] < extendedhistory.length - 2) && (fractals[val] > 1)) {
+          if (extendedhistory[fractals[val]] > extendedhistory[fractals[val] - value]) {
+            maxcount++
+          }
+          if (extendedhistory[fractals[val]] > extendedhistory[fractals[val] + value]) {
+            maxcount++
+          }
+          if (extendedhistory[fractals[val]] < extendedhistory[fractals[val] - value]) {
+            mincount++
+          }
+          if (extendedhistory[fractals[val]] < extendedhistory[fractals[val] + value]) {
+            mincount++
+          }
         }
       }
-      if (mincount + maxcount > 4) {
+      if (mincount || maxcount > 4) {
         rejection++
         if (fractals.length < 1) {
           fractals.push(0)
@@ -1598,7 +1586,7 @@ class Four_Hour_Functions {
       }
     }
     if (Four_Hour_Functions.rejectionzones.length < 1) {
-      Four_Hour_Functions.rejectionzones.push(Four_Hour_Functions.price)
+      Four_Hour_Functions.rejectionzones.push(One_Hour_Functions.price)
     }
     if (rejection > 2) {
       return false
@@ -1613,20 +1601,20 @@ class Four_Hour_Functions {
     const rejects = Four_Hour_Functions.rejectionzones
     const diffs = []
     for (const val in rejects) {
-      if (Fifteen_Min_Nexus.pot_buy) {
+      if (Thirty_Min_Nexus.pot_buy) {
         if (Four_Hour_Functions.price < val) {
           diffs.push(val - Four_Hour_Functions.price)
         }
       }
-      if (Fifteen_Min_Nexus.pot_sell) {
+      if (Thirty_Min_Nexus.pot_sell) {
         if (Four_Hour_Functions.price > val) {
           diffs.push(Four_Hour_Functions.price - val)
         }
       }
     }
-    if (Math.abs(Math.min(...diffs)) < Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Nexus.tp)) {
-      Fifteen_Min_Nexus.pot_buy = false
-      Fifteen_Min_Nexus.pot_sell = false
+    if (Math.abs(Math.min(...diffs)) < Math.abs(Thirty_Min_Functions.price - Thirty_Min_Nexus.tp)) {
+      Thirty_Min_Nexus.pot_buy = false
+      Thirty_Min_Nexus.pot_sell = false
       return true
     } else {
       return false
@@ -1710,7 +1698,7 @@ class Four_Hour_Functions {
     const ceiling = Math.max(...history)
     const floor = Math.min(...history)
     const diffy = ceiling - floor
-    const posdiff = Math.abs(Fifteen_Min_Nexus.posprice - Four_Hour_Functions.price)
+    const posdiff = Math.abs(Thirty_Min_Nexus.posprice - Four_Hour_Functions.price)
     const deci = posdiff / diffy
     const input = deci * 6.18
     const equation = (1 - factor) * (((input * input) + input) / ((input * input) + input + 1))
@@ -1729,11 +1717,6 @@ class Four_Hour_Functions {
 
   /** used to determine consolidation via volatility, is added to consolidationtwo that was recently made now */
   static consolidation () {
-    Four_Hour_Functions.recentHist()
-    const max = Math.max(...Four_Hour_Functions.recentHisto)
-    const min = Math.min(...Four_Hour_Functions.recentHisto)
-    const totmax = Math.max(...Four_Hour_Functions.priceHist)
-    const totmin = Math.min(...Four_Hour_Functions.priceHist)
     if (Four_Hour_Functions.volatility() > 0.618) {
       return false
     } else {
@@ -2028,7 +2011,7 @@ class Four_Hour_Functions {
 
   /** finds closest support and resistance level to whatever price u put in */
   static closest (num1) {
-    const values = Fifteen_Min_Nexus.finlevs.concat(Fifteen_Min_Nexus.biggersupres)
+    const values = Thirty_Min_Nexus.finlevs.concat(Thirty_Min_Nexus.biggersupres)
     const valdiffgreater = []
     const valdiffless = []
     for (let item = 0; item < values.length; item++) {
@@ -2067,15 +2050,17 @@ class One_Hour_Functions {
   price = 0
   maxes = []
   mins = []
+  resistance = 0
+  support = 0
   recentHisto = []
   finlevs = []
   support = 0
   resistance = 0
-  highs = []
-  lows = []
+  highs = highs
+  lows = lows
 
   static HistoryAssigner () {
-    const instrument = Fifteen_Min_Functions.instrument_name()
+    const instrument = Thirty_Min_Functions.instrument_name()
     One_Hour_Functions.priceHist = dataset.One_Hour.c
     One_Hour_Functions.highs = dataset.One_Hour.h
     One_Hour_Functions.lows = dataset.One_Hour.l
@@ -2146,20 +2131,20 @@ class One_Hour_Functions {
       if (price < ((finalLevs[item] * difference) + floor)) { larger.push(((finalLevs[item] * difference) + floor)) }
     }
     for (let item = 0; item < smaller.length; item++) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(price, smaller[item])) > 0.05) {
+      if (Math.abs(Thirty_Min_Functions.valdiff(price, smaller[item])) > 0.05) {
         smallertwo.push(smaller[item])
       }
     }
     for (let item = 0; item < larger.length; item++) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(price, larger[item])) > 0.05) {
+      if (Math.abs(Thirty_Min_Functions.valdiff(price, larger[item])) > 0.05) {
         largertwo.push(larger[item])
       }
     }
     if (smallertwo.length < 1) {
-      smallertwo.push(price - Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
+      smallertwo.push(price - Thirty_Min_Functions.pipreverse(price, Thirty_Min_Functions.pipdiffy(price, Thirty_Min_Functions.stoploss())))
     }
     if (largertwo.length < 1) {
-      largertwo.push(price + Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
+      largertwo.push(price + Thirty_Min_Functions.pipreverse(price, Thirty_Min_Functions.pipdiffy(price, Thirty_Min_Functions.stoploss())))
     }
     for (let item = 0; item < smallertwo.length; item++) {
       smaller_diff.push(Math.abs((smallertwo[item] - price)))
@@ -2214,10 +2199,86 @@ class One_Hour_Functions {
   }
 }
 
+class Fifteen_Min_Functions {
+  multiplier = 0
+  priceHist = []
+  vals = []
+  price = 0
+  resistance = 0
+  support = 0
+  maxes = []
+  mins = []
+  recentHisto = []
+  highs = []
+  lows = []
+
+  static HistoryAssigner () {
+    const instrument = Thirty_Min_Functions.instrument_name()
+    Fifteen_Min_Functions.priceHist = dataset.Fifteen_Min.c
+    Fifteen_Min_Functions.highs = dataset.Fifteen_Min.h
+    Fifteen_Min_Functions.lows = dataset.Fifteen_Min.l
+  }
+
+  static trend () {
+    const history = Fifteen_Min_Functions.priceHist
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+  }
+
+  static rsi () {
+    const history = Fifteen_Min_Functions.priceHist
+    const history2 = []
+    for (let item = 0; item < history.length; item++) { history2.push(history[item]) }
+    history2.splice(-1, 1)
+    const q = rsis.calculate({ period: 14, values: history })
+    const r = rsis.calculate({ period: 14, values: history2 })
+    const qlast = q[q.length - 1]
+    const rlast = r[r.length - 1]
+    if (qlast > rlast) { return true }
+    if (rlast > qlast) { return false }
+  }
+
+  static macd () {
+    const history = Fifteen_Min_Functions.priceHist
+    const x = []
+    const q = emas.calculate({ period: 12, values: history })
+    const r = emas.calculate({ period: 26, values: history })
+    const s = macds.calculate({ values: history, fastPeriod: 12, slowPeriod: 26, signalPeriod: 9, SimpleMAOscillator: false, SimpleMASignal: false })
+    for (let i = 0; i < r.length; i++) { x.push(q[i + 14] - r[i]) }
+    const qlast = s[s.length - 1].histogram
+    const rlast = s[s.length - 2].histogram
+    if (qlast > rlast) { return true }
+    if (rlast > qlast) { return false }
+  }
+
+  static ema () {
+    const history = Fifteen_Min_Functions.priceHist
+    const q = emas.calculate({ period: 8, values: history })
+    const r = emas.calculate({ period: 14, values: history })
+    const qlast = q[q.length - 1]
+    const rlast = r[r.length - 1]
+    if (qlast > rlast) { return true }
+    if (rlast > qlast) { return false }
+  }
+
+  static obv () {
+    const history = Fifteen_Min_Functions.priceHist
+    const qs = rsis.calculate({ period: 14, values: history })
+    const q = emas.calculate({ period: 8, values: qs })
+    const qlast = q[q.length - 1]
+    const r = emas.calculate({ period: 14, values: qs })
+    const rlast = r[r.length - 1]
+    if (qlast > rlast) { return true }
+    if (rlast > qlast) { return false }
+  }
+}
+
 class Five_Min_Functions {
   multiplier = 0
   priceHist = []
   vals = []
+  resistance = 0
+  support = 0
   price = 0
   maxes = []
   mins = []
@@ -2226,7 +2287,7 @@ class Five_Min_Functions {
   highs = []
 
   static HistoryAssigner () {
-    const instrument = Fifteen_Min_Functions.instrument_name()
+    const instrument = Thirty_Min_Functions.instrument_name()
     Five_Min_Functions.priceHist = dataset.Five_Min.c
     Five_Min_Functions.highs = dataset.Five_Min.h
     Five_Min_Functions.lows = dataset.Five_Min.l
@@ -2319,14 +2380,15 @@ class Five_Min_Functions {
     if (rlast > qlast) { return false }
   }
 }
+
 var dataset = {}
 var liveprice = 0
 
-export function testfifteenmin(data, price, instrument) {
+export function testthirtymin (data, price, instrument) {
   instrum = instrument
   liveprice = price
   dataset = data
-  Fifteen_Min_Nexus.controlMain()
+  Thirty_Min_Nexus.controlMain()
 }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
