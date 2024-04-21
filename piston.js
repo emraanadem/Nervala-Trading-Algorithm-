@@ -13,5 +13,5 @@ for (let i = 0; i < instrumentsForex.length; i++, totalIterations++) {
 }
 
 for (let i = 0; i < instrumentsStocks.length; i++, totalIterations++) {
-  checkStock(instrumentsStocks[i], accounts[totalIterations % accounts.length], proxies[totalIterations % proxies.length])
+  checkStock(instrumentsStocks[i], proxies[totalIterations % proxies.length])
 }
