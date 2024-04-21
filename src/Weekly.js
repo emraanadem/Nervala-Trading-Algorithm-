@@ -717,7 +717,7 @@ class Weekly_Functions {
   /** Rejection Zone Initiator */
   static rejecinit () {
     const instrument = Weekly_Functions.instrument_name()
-    if (!fs.existsSync('./Rejection_Archive/' + String(instrument) + '.json')) {
+    if (!fs.existsSync('./src/Rejection_Archive/' + String(instrument) + '.json')) {
       Weekly_Functions.timeperiods = {}
       Weekly_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
       Weekly_Functions.timeperiods.Thirty_Min = [0, 0, 0]
@@ -726,9 +726,9 @@ class Weekly_Functions {
       Weekly_Functions.timeperiods.Four_Hour = [0, 0, 0]
       Weekly_Functions.timeperiods.Daily = [0, 0, 0]
       Weekly_Functions.timeperiods.Weekly = [0, 0, 0]
-      fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Weekly_Functions.timeperiods, null, 2))
+      fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Weekly_Functions.timeperiods, null, 2))
     }
-    const raw = fs.readFileSync('./Rejection_Archive/' + String(instrument) + '.json')
+    const raw = fs.readFileSync('./src/Rejection_Archive/' + String(instrument) + '.json')
     Weekly_Functions.timeperiods = JSON.parse(raw)
     Weekly_Functions.rejectionzones = JSON.parse(raw).Weekly
   }
@@ -738,7 +738,7 @@ class Weekly_Functions {
     const instrument = Weekly_Functions.instrument_name()
     Weekly_Functions.rejectionzones = [...new Set(Weekly_Functions.rejectionzones)]
     Weekly_Functions.timeperiods.Weekly = Weekly_Functions.rejectionzones
-    fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Weekly_Functions.timeperiods, null, 2))
+    fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Weekly_Functions.timeperiods, null, 2))
   }
 
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */

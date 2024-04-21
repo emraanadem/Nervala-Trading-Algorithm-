@@ -8,10 +8,10 @@ import { testfourhour } from './FourHour.js'
 import { testdaily } from './Daily.js'
 import { testweekly } from './Weekly.js'
 
-async function getCandleData (baseURL, options, timescaleLabel) {
+async function getCandleData (baseUrl, options, timescaleLabel) {
   const params = `count=2500&granularity=${timescaleLabel[0]}`
 
-  const res = await fetch(baseURL + params, options)
+  const res = await fetch(baseUrl + params, options)
   const data = await res.json()
 
   const candleData = {}
@@ -29,7 +29,7 @@ async function getCandleData (baseURL, options, timescaleLabel) {
   return candleData
 }
 
-async function getAggregatedCandleData (baseURL, options) {
+async function getAggregatedCandleData (baseUrl, options) {
   const timescaleLabels = [
     ['M5', 'Five_Min'],
     ['M15', 'Fifteen_Min'],
@@ -51,23 +51,23 @@ async function getAggregatedCandleData (baseURL, options) {
     return aggregatedCandleData
   }
 
-  const candleDataDicts = await Promise.all(timescaleLabels.map(x => getCandleData(baseURL, options, x)))
+  const candleDataDicts = await Promise.all(timescaleLabels.map(x => getCandleData(baseUrl, options, x)))
 
   return mergeCandles(...candleDataDicts)
 }
 
-async function getPrice (baseURL, options) {
+async function getPrice (baseUrl, options) {
   const params = 'count=1&granularity=M1'
 
-  const res = await fetch(baseURL + params, options)
+  const res = await fetch(baseUrl + params, options)
   const data = await res.json()
 
   return parseFloat(data.candles[0].mid.c)
 }
 
 export async function checkForSignals (instrument, accountInfo, proxy = null, loop = false) {
-  const baseURL = `https://api-fxpractice.oanda.com/v3/accounts/${accountInfo[0]}/instruments/${instrument}/candles?`
-  const options = {
+  const baseUrl = `https://api-fxpractice.oanda.com/v3/accounts/${accountInfo[0]}/instruments/${instrument}/candles?`
+  let options = {
     headers: {
       Authorization: `Bearer ${accountInfo[1]}`
     }
@@ -84,16 +84,16 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, lo
   }
 
   do {
-    const candleData = await getAggregatedCandleData(baseURL, options)
-    const price = await getPrice(baseURL, options)
+    const candleData = await getAggregatedCandleData(baseUrl, options)
+    const price = await getPrice(baseUrl, options)
 
-    testdaily.testdaily(candleData, price, instrument)
-    testfifteen.testfifteenmin(candleData, price, instrument)
-    testfourhour.testfourhour(candleData, price, instrument)
-    testtwohour.testtwohour(candleData, price, instrument)
-    testonehour.testonehour(candleData, price, instrument)
-    testthirtymin.testthirtymin(candleData, price, instrument)
-    testweekly.testweekly(candleData, price, instrument)
+    testfifteen(candleData, price, instrument)
+    testthirtymin(candleData, price, instrument)
+    testonehour(candleData, price, instrument)
+    testtwohour(candleData, price, instrument)
+    testfourhour(candleData, price, instrument)
+    testdaily(candleData, price, instrument)
+    testweekly(candleData, price, instrument)
   } while (loop)
 }
 

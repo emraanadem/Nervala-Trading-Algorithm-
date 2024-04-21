@@ -745,7 +745,7 @@ class Thirty_Min_Functions {
   /** Rejection Zone Initiator */
   static rejecinit () {
     const instrument = Thirty_Min_Functions.instrument_name()
-    if (!fs.existsSync('./Rejection_Archive/' + String(instrument) + '.json')) {
+    if (!fs.existsSync('./src/Rejection_Archive/' + String(instrument) + '.json')) {
       Thirty_Min_Functions.timeperiods = {}
       Thirty_Min_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
       Thirty_Min_Functions.timeperiods.Thirty_Min = [0, 0, 0]
@@ -754,9 +754,9 @@ class Thirty_Min_Functions {
       Thirty_Min_Functions.timeperiods.Four_Hour = [0, 0, 0]
       Thirty_Min_Functions.timeperiods.Daily = [0, 0, 0]
       Thirty_Min_Functions.timeperiods.Weekly = [0, 0, 0]
-      fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Thirty_Min_Functions.timeperiods, null, 2))
+      fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Thirty_Min_Functions.timeperiods, null, 2))
     }
-    const raw = fs.readFileSync('./Rejection_Archive/' + String(instrument) + '.json')
+    const raw = fs.readFileSync('./src/Rejection_Archive/' + String(instrument) + '.json')
     Thirty_Min_Functions.timeperiods = JSON.parse(raw)
     Thirty_Min_Functions.rejectionzones = JSON.parse(raw).Thirty_Min
   }
@@ -766,7 +766,7 @@ class Thirty_Min_Functions {
     const instrument = Thirty_Min_Functions.instrument_name()
     Thirty_Min_Functions.rejectionzones = [...new Set(Thirty_Min_Functions.rejectionzones)]
     Thirty_Min_Functions.timeperiods.Thirty_Min = Thirty_Min_Functions.rejectionzones
-    fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Thirty_Min_Functions.timeperiods, null, 2))
+    fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Thirty_Min_Functions.timeperiods, null, 2))
   }
 
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
@@ -1486,7 +1486,7 @@ class Four_Hour_Functions {
   /** Rejection Zone Initiator */
   static rejecinit () {
     const instrument = Thirty_Min_Functions.instrument_name()
-    if (!fs.existsSync('./Rejection_Archive/' + String(instrument) + '.json')) {
+    if (!fs.existsSync('./src/Rejection_Archive/' + String(instrument) + '.json')) {
       Four_Hour_Functions.timeperiods = {}
       Four_Hour_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
       Four_Hour_Functions.timeperiods.Thirty_Min = [0, 0, 0]
@@ -1495,9 +1495,9 @@ class Four_Hour_Functions {
       Four_Hour_Functions.timeperiods.Four_Hour = [0, 0, 0]
       Four_Hour_Functions.timeperiods.Daily = [0, 0, 0]
       Four_Hour_Functions.timeperiods.Weekly = [0, 0, 0]
-      fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Four_Hour_Functions.timeperiods, null, 2))
+      fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Four_Hour_Functions.timeperiods, null, 2))
     }
-    const raw = fs.readFileSync('./Rejection_Archive/' + String(instrument) + '.json')
+    const raw = fs.readFileSync('./src/Rejection_Archive/' + String(instrument) + '.json')
     Four_Hour_Functions.timeperiods = JSON.parse(raw)
     Four_Hour_Functions.rejectionzones = JSON.parse(raw).Four_Hour
   }
@@ -1507,7 +1507,7 @@ class Four_Hour_Functions {
     const instrument = Thirty_Min_Functions.instrument_name()
     Four_Hour_Functions.rejectionzones = [...new Set(Four_Hour_Functions.rejectionzones)]
     Four_Hour_Functions.timeperiods.Four_Hour = Four_Hour_Functions.rejectionzones
-    fs.writeFileSync('./Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Four_Hour_Functions.timeperiods, null, 2))
+    fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Four_Hour_Functions.timeperiods, null, 2))
   }
 
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
