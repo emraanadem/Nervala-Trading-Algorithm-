@@ -65,17 +65,18 @@ async function getPrice (baseUrl, options) {
   return parseFloat(data.candles[0].mid.c)
 }
 
-export async function checkForSignals (instrument, accountInfo, proxy = null, loop = false) {
+export async function checkForSignals (instrument, accountInfo, proxy = null, proxyauths = null, loop = false) {
   const baseUrl = `https://api-fxpractice.oanda.com/v3/accounts/${accountInfo[0]}/instruments/${instrument}/candles?`
   let options = {
     headers: {
       Authorization: `Bearer ${accountInfo[1]}`
     }
   }
-
   if (proxy) {
     const proxyAgent = new ProxyAgent({
-      uri: `http://${proxy[2]}:${proxy[3]}`
+      uri: `http://${proxy[1]}:${proxy[2]}`,
+      token: `Basic ${Buffer.from(`${proxyauths["username"]}:${proxyauths["password"]}`).toString('base64')}`,
+
     })
     options = {
       ...options,

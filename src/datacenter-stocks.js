@@ -98,13 +98,15 @@ function equalizeCandleSetLengths (candleData) {
   return candleData
 }
 
-export async function checkForSignals (instrument, proxy = null, loop = false) {
+export async function checkForSignals (instrument, proxy = null, proxyauths = null, loop = false) {
   const baseUrl = `https://api.polygon.io/v2/aggs/ticker/${instrument}/range/`
   let options = {}
 
   if (proxy) {
     const proxyAgent = new ProxyAgent({
-      uri: `http://${proxy[2]}:${proxy[3]}`
+      uri: `http://${proxy[1]}:${proxy[2]}`,
+      token: `Basic ${Buffer.from(`${proxyauths["username"]}:${proxyauths["password"]}`).toString('base64')}`,
+
     })
     options = {
       ...options,
