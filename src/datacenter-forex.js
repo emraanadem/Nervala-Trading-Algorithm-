@@ -97,7 +97,6 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
   do {
     const candleData = await getAggregatedCandleData(baseUrl, options)
     const price = await getPrice(baseUrl, options)
-    generateCandlestickData(chartData)
     testfifteen(candleData, price, instrument)
     testthirtymin(candleData, price, instrument)
     testonehour(candleData, price, instrument)
