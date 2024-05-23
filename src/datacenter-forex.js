@@ -13,8 +13,18 @@ async function getCandleData (baseUrl, options, timescaleLabel) {
 
   const res = await fetch(baseUrl + params, options)
   const data = await res.json()
-
   const candleData = {}
+  const chartData = {}
+  for(let x in timescaleLabel){
+    chartData[`${timescaleLabel[1]}`] = []
+    for(let i = 0; i < data.candles.length; i++){
+      var close = data.candles[i].mid.c
+      var open = data.candles[i].mid.o
+      var high = data.candles[i].mid.h
+      var low = data.candles[i].mid.l
+      chartData[`${timescaleLabel[1]}`].push({time: data.candles[i].time.split("T")[0] + " " + data.candles[i].time.split("T")[1].split(".")[0], 
+      open: parseFloat(open), high: parseFloat(high), low: parseFloat(low), close: parseFloat(close)})
+    }}
   candleData[`${timescaleLabel[1]}`] = {}
   candleData[`${timescaleLabel[1]}`].o = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.o))
   candleData[`${timescaleLabel[1]}`].h = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.h))
@@ -25,7 +35,7 @@ async function getCandleData (baseUrl, options, timescaleLabel) {
   candleData[`${timescaleLabel[1]} Extend`].h = data.candles.map((x) => parseFloat(x.mid.h))
   candleData[`${timescaleLabel[1]} Extend`].l = data.candles.map((x) => parseFloat(x.mid.l))
   candleData[`${timescaleLabel[1]} Extend`].c = data.candles.map((x) => parseFloat(x.mid.c))
-
+  console.log(chartData)
   return candleData
 }
 
@@ -87,7 +97,7 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
   do {
     const candleData = await getAggregatedCandleData(baseUrl, options)
     const price = await getPrice(baseUrl, options)
-
+    generateCandlestickData(chartData)
     testfifteen(candleData, price, instrument)
     testthirtymin(candleData, price, instrument)
     testonehour(candleData, price, instrument)
