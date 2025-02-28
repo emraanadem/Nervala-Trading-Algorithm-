@@ -9,23 +9,46 @@ import { testdaily } from './Daily.js'
 import { testweekly } from './Weekly.js'
 
 async function getCandleData (baseUrl, options, timescaleLabel) {
-  const params = `count=2500&granularity=${timescaleLabel[0]}`
+  let retryCount = 0;
 
-  const res = await fetch(baseUrl + params, options)
-  const data = await res.json()
+  while (true) {
+    try {
+      const params = `count=2500&granularity=${timescaleLabel[0]}`
+      const res = await fetch(baseUrl + params, {
+        ...options,
+        signal: AbortSignal.timeout(30000) // 30 second timeout
+      })
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const data = await res.json()
 
-  const candleData = {}
-  candleData[`${timescaleLabel[1]}`] = {}
-  candleData[`${timescaleLabel[1]}`].o = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.o))
-  candleData[`${timescaleLabel[1]}`].h = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.h))
-  candleData[`${timescaleLabel[1]}`].l = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.l))
-  candleData[`${timescaleLabel[1]}`].c = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.c))
-  candleData[`${timescaleLabel[1]} Extend`] = {}
-  candleData[`${timescaleLabel[1]} Extend`].o = data.candles.map((x) => parseFloat(x.mid.o))
-  candleData[`${timescaleLabel[1]} Extend`].h = data.candles.map((x) => parseFloat(x.mid.h))
-  candleData[`${timescaleLabel[1]} Extend`].l = data.candles.map((x) => parseFloat(x.mid.l))
-  candleData[`${timescaleLabel[1]} Extend`].c = data.candles.map((x) => parseFloat(x.mid.c))
-  return candleData
+      const candleData = {}
+      candleData[`${timescaleLabel[1]}`] = {}
+      candleData[`${timescaleLabel[1]}`].o = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.o))
+      candleData[`${timescaleLabel[1]}`].h = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.h))
+      candleData[`${timescaleLabel[1]}`].l = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.l))
+      candleData[`${timescaleLabel[1]}`].c = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.c))
+      candleData[`${timescaleLabel[1]} Extend`] = {}
+      candleData[`${timescaleLabel[1]} Extend`].o = data.candles.map((x) => parseFloat(x.mid.o))
+      candleData[`${timescaleLabel[1]} Extend`].h = data.candles.map((x) => parseFloat(x.mid.h))
+      candleData[`${timescaleLabel[1]} Extend`].l = data.candles.map((x) => parseFloat(x.mid.l))
+      candleData[`${timescaleLabel[1]} Extend`].c = data.candles.map((x) => parseFloat(x.mid.c))
+      return candleData
+
+    } catch (error) {
+      retryCount++;
+      /*
+      console.error(`Attempt ${retryCount} failed for ${timescaleLabel[1]}: ${error.message}`);
+      
+      if (retryCount === maxRetries) {
+        throw new Error(`Failed to fetch ${timescaleLabel[1]} data after ${maxRetries} attempts`);
+      }
+      */
+    }
+  }
 }
 
 async function getAggregatedCandleData (baseUrl, options) {
@@ -56,12 +79,33 @@ async function getAggregatedCandleData (baseUrl, options) {
 }
 
 async function getPrice (baseUrl, options) {
-  const params = 'count=1&granularity=M1'
+  let retryCount = 0;
 
-  const res = await fetch(baseUrl + params, options)
-  const data = await res.json()
+  while (true) {
+    try {
+      const params = 'count=1&granularity=M1'
+      const res = await fetch(baseUrl + params, {
+        ...options,
+        signal: AbortSignal.timeout(30000) // 30 second timeout
+      })
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const data = await res.json()
+      return parseFloat(data.candles[0].mid.c)
 
-  return parseFloat(data.candles[0].mid.c)
+    } catch (error) {
+      retryCount++;
+      /*
+      console.error(`Attempt ${retryCount} failed for price fetch: ${error.message}`);
+      
+      if (retryCount === maxRetries) {
+        throw new Error(`Failed to fetch price data after ${maxRetries} attempts`);
+      }*/
+    }
+  }
 }
 
 export async function checkForSignals (instrument, accountInfo, proxy = null, proxyauths = null, loop = true) {
@@ -75,7 +119,6 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
     const proxyAgent = new ProxyAgent({
       uri: `http://${proxy[1]}:${proxy[2]}`,
       token: `Basic ${Buffer.from(`${proxyauths["username"]}:${proxyauths["password"]}`).toString('base64')}`,
-
     })
     options = {
       ...options,
@@ -83,7 +126,26 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
     }
   }
 
-  do {
+  while (loop) {
+    try {
+      // Each API call naturally takes some time, acting as an implicit delay
+      const candleData = await getAggregatedCandleData(baseUrl, options)
+      const price = await getPrice(baseUrl, options)
+      // Run all tests with fresh data
+      testfifteen(candleData, price, instrument)
+      testthirtymin(candleData, price, instrument)
+      testonehour(candleData, price, instrument)
+      testtwohour(candleData, price, instrument)
+      testfourhour(candleData, price, instrument)
+      testdaily(candleData, price, instrument)
+      testweekly(candleData, price, instrument)
+    } catch (error) {
+      console.error('Error in checkForSignals:', "test")
+    }
+  }
+
+  // Single run if loop is false
+  if (!loop) {
     const candleData = await getAggregatedCandleData(baseUrl, options)
     const price = await getPrice(baseUrl, options)
     testfifteen(candleData, price, instrument)
@@ -93,7 +155,7 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
     testfourhour(candleData, price, instrument)
     testdaily(candleData, price, instrument)
     testweekly(candleData, price, instrument)
-  } while (loop)
+  }
 }
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
