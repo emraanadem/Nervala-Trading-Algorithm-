@@ -37,6 +37,7 @@ class One_Hour_Nexus {
   bigsupport = 0
   bigresistance = 0
   pair = ''
+  backtest = false
 
   /** announce price zones and price channels */
   static announcer () {
@@ -97,11 +98,12 @@ class One_Hour_Nexus {
             One_Hour_Nexus.posprice = One_Hour_Nexus.tp
             One_Hour_Nexus.tp = One_Hour_Nexus.tptwo
             One_Hour_Functions.tpvariation()
+            if (One_Hour_Nexus.backtest ==  false){
             console.log('pair: ' + One_Hour_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(One_Hour_Nexus.tp))
             console.log('New Take Profit 2: ' + String(One_Hour_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         One_Hour_Nexus.closePosTP()
@@ -123,12 +125,14 @@ class One_Hour_Nexus {
             One_Hour_Nexus.posprice = One_Hour_Nexus.tp
             One_Hour_Nexus.tp = One_Hour_Nexus.tptwo
             One_Hour_Functions.tpvariation()
+            if (One_Hour_Nexus.backtest == false){
             console.log('pair: ' + One_Hour_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(One_Hour_Nexus.tp))
             console.log('New Take Profit 2: ' + String(One_Hour_Nexus.tptwo))
           }
         }
+      }
       } else {
         One_Hour_Nexus.closePosTP()
       }
@@ -271,6 +275,7 @@ class One_Hour_Nexus {
         One_Hour_Nexus.posprice = One_Hour_Functions.price
         One_Hour_Nexus.stoploss()
         One_Hour_Nexus.tpvariation()
+        if (One_Hour_Nexus.backtest == false){
         console.log('pair: ' + One_Hour_Nexus.pair)
         console.log('Open Buy Order on One Hour')
         console.log('Entry Price: ' + String(One_Hour_Nexus.posprice))
@@ -281,6 +286,7 @@ class One_Hour_Nexus {
       }
     }
   }
+}
 
   /* static buy(){
         One_Hour_Functions.supreslevs()
@@ -309,6 +315,7 @@ class One_Hour_Nexus {
         One_Hour_Nexus.posprice = One_Hour_Functions.price
         One_Hour_Nexus.stoploss()
         One_Hour_Nexus.tpvariation()
+        if (One_Hour_Nexus.backtest == false){
         console.log('pair: ' + One_Hour_Nexus.pair)
         console.log('Open Sell Order on One Hour')
         console.log('Entry Price: ' + String(One_Hour_Nexus.posprice))
@@ -319,6 +326,7 @@ class One_Hour_Nexus {
       }
     }
   }
+}
 
   /* static sell(){
         One_Hour_Functions.supreslevs()
@@ -469,12 +477,13 @@ class One_Hour_Nexus {
         One_Hour_Nexus.piplog = [0, 0, 0]
         const pipchange = One_Hour_Functions.pipCountBuy(One_Hour_Nexus.posprice, One_Hour_Functions.price)
         One_Hour_Nexus.pips += Math.abs(pipchange)
+        if (One_Hour_Nexus.backtest == false){
         console.log('pair: ' + One_Hour_Nexus.pair)
         console.log('Take Profit Hit on One Hour')
         console.log(One_Hour_Nexus.wins + ' Wins and     ' + One_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + One_Hour_Nexus.wins / One_Hour_Nexus.trades)
         console.log('Pip Count: ' + One_Hour_Nexus.pips)
-      }
+      }}
       if (One_Hour_Nexus.sell_pos) {
         One_Hour_Nexus.sell_pos = false
         One_Hour_Nexus.pos = false
@@ -489,6 +498,7 @@ class One_Hour_Nexus {
         One_Hour_Nexus.piplog = [0, 0, 0]
         const pipchange = One_Hour_Functions.pipCountSell(One_Hour_Nexus.posprice, One_Hour_Functions.price)
         One_Hour_Nexus.pips += Math.abs(pipchange)
+        if (One_Hour_Nexus.backtest == false){
         console.log('pair: ' + One_Hour_Nexus.pair)
         console.log('Take Profit Hit on One Hour')
         console.log(One_Hour_Nexus.wins + ' Wins and     ' + One_Hour_Nexus.losses + ' Losses')
@@ -497,7 +507,7 @@ class One_Hour_Nexus {
       }
     }
   }
-
+}
   /** close position method for stopping out of losses, also gives pip count and win/loss ratio */
   static closePosSL () {
     if (One_Hour_Nexus.pos) {
@@ -515,12 +525,13 @@ class One_Hour_Nexus {
         One_Hour_Nexus.piplog = [0, 0, 0]
         const pipchange = One_Hour_Functions.pipCountSell(One_Hour_Nexus.posprice, One_Hour_Functions.price)
         One_Hour_Nexus.pips -= Math.abs(pipchange)
+        if (One_Hour_Nexus.backtest == false){
         console.log('pair: ' + One_Hour_Nexus.pair)
         console.log('Stop Loss Hit on One Hour')
         console.log(One_Hour_Nexus.wins + ' Wins and     ' + One_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + One_Hour_Nexus.wins / One_Hour_Nexus.trades)
         console.log('Pip Count' + One_Hour_Nexus.pips)
-      }
+      }}
       if (One_Hour_Nexus.buy_pos) {
         One_Hour_Nexus.buy_pos = false
         One_Hour_Nexus.pos = false
@@ -535,12 +546,13 @@ class One_Hour_Nexus {
         One_Hour_Nexus.piplog = [0, 0, 0]
         const pipchange = One_Hour_Functions.pipCountBuy(One_Hour_Nexus.posprice, One_Hour_Functions.price)
         One_Hour_Nexus.pips -= Math.abs(pipchange)
+        if (One_Hour_Nexus.backtest == false){
         console.log('pair: ' + One_Hour_Nexus.pair)
         console.log('Stop Loss Hit on One Hour')
         console.log(One_Hour_Nexus.wins + ' Wins and     ' + One_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + One_Hour_Nexus.wins / One_Hour_Nexus.trades)
         console.log('Pip Count' + One_Hour_Nexus.pips)
-      }
+      }}
     }
   }
 }
@@ -697,9 +709,9 @@ class One_Hour_Functions {
     One_Hour_Nexus.tptwo = nexttp
   }
 
-  /** Method that uses flowise to determine if the qualitative end of things agrees
+  /** Method that uses flowise to determine if the visual end of things agrees
      * with the trade analysis on the quantitative side */
-  static qualitative () {
+  static visual () {
     const sell = true
     const buy = true
     if (sell) {
@@ -2512,7 +2524,6 @@ export function testonehour (data, price, instrument) {
   dataset = data
   One_Hour_Nexus.controlMain()
 }
-
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */

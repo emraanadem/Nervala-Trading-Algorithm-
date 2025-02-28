@@ -37,6 +37,7 @@ class Four_Hour_Nexus {
   bigsupport = 0
   bigresistance = 0
   pair = ''
+  backtest = false
 
   /** announce price zones and price channels */
   static announcer () {
@@ -97,11 +98,12 @@ class Four_Hour_Nexus {
             Four_Hour_Nexus.posprice = Four_Hour_Nexus.tp
             Four_Hour_Nexus.tp = Four_Hour_Nexus.tptwo
             Four_Hour_Functions.tpvariation()
+            if (Four_Hour_Nexus.backtest == false){
             console.log('pair: ' + Four_Hour_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Four_Hour_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Four_Hour_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Four_Hour_Nexus.closePosTP()
@@ -123,12 +125,13 @@ class Four_Hour_Nexus {
             Four_Hour_Nexus.posprice = Four_Hour_Nexus.tp
             Four_Hour_Nexus.tp = Four_Hour_Nexus.tptwo
             Four_Hour_Functions.tpvariation()
+            if (Four_Hour_Nexus.backtest == false){
             console.log('pair: ' + Four_Hour_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Four_Hour_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Four_Hour_Nexus.tptwo))
           }
-        }
+        }}
       } else {
         Four_Hour_Nexus.closePosTP()
       }
@@ -271,6 +274,7 @@ class Four_Hour_Nexus {
         Four_Hour_Nexus.posprice = Four_Hour_Functions.price
         Four_Hour_Functions.stoploss()
         Four_Hour_Functions.tpvariation()
+        if (Four_Hour_Nexus.backtest == false){
         console.log('pair: ' + Four_Hour_Nexus.pair)
         console.log('Open Buy Order on Four Hour')
         console.log('Entry Price: ' + String(Four_Hour_Nexus.posprice))
@@ -281,7 +285,7 @@ class Four_Hour_Nexus {
       }
     }
   }
-
+}
   /* static buy(){
         Four_Hour_Functions.supreslevs()
         Four_Hour_Functions.getPrice()
@@ -310,6 +314,7 @@ class Four_Hour_Nexus {
         Four_Hour_Nexus.posprice = Four_Hour_Functions.price
         Four_Hour_Functions.stoploss()
         Four_Hour_Functions.tpvariation()
+        if (Four_Hour_Nexus.backtest == false){
         console.log('pair: ' + Four_Hour_Nexus.pair)
         console.log('Open Sell Order on Four Hour')
         console.log('Entry Price: ' + String(Four_Hour_Nexus.posprice))
@@ -320,7 +325,7 @@ class Four_Hour_Nexus {
       }
     }
   }
-
+}
   /* static sell(){
         Four_Hour_Functions.supreslevs()
         Four_Hour_Functions.getPrice()
@@ -471,12 +476,13 @@ class Four_Hour_Nexus {
         Four_Hour_Nexus.piplog = [0, 0, 0]
         const pipchange = Four_Hour_Functions.pipCountBuy(Four_Hour_Nexus.posprice, Four_Hour_Functions.price)
         Four_Hour_Nexus.pips += Math.abs(pipchange)
+        if (Four_Hour_Nexus.backtest == false){
         console.log('pair: ' + Four_Hour_Nexus.pair)
         console.log('Take Profit Hit on Four Hour')
         console.log(Four_Hour_Nexus.wins + ' Wins and     ' + Four_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Four_Hour_Nexus.wins / Four_Hour_Nexus.trades)
         console.log('Pip Count: ' + Four_Hour_Nexus.pips)
-      }
+      }}
       if (Four_Hour_Nexus.sell_pos) {
         Four_Hour_Nexus.sell_pos = false
         Four_Hour_Nexus.pos = false
@@ -491,6 +497,7 @@ class Four_Hour_Nexus {
         Four_Hour_Nexus.piplog = [0, 0, 0]
         const pipchange = Four_Hour_Functions.pipCountSell(Four_Hour_Nexus.posprice, Four_Hour_Functions.price)
         Four_Hour_Nexus.pips += Math.abs(pipchange)
+        if (Four_Hour_Nexus.backtest == false){
         console.log('pair: ' + Four_Hour_Nexus.pair)
         console.log('Take Profit Hit on Four Hour')
         console.log(Four_Hour_Nexus.wins + ' Wins and     ' + Four_Hour_Nexus.losses + ' Losses')
@@ -499,6 +506,7 @@ class Four_Hour_Nexus {
       }
     }
   }
+}
 
   /** close position method for stopping out of losses, also gives pip count and win/loss ratio */
   static closePosSL () {
@@ -517,12 +525,13 @@ class Four_Hour_Nexus {
         Four_Hour_Nexus.piplog = [0, 0, 0]
         const pipchange = Four_Hour_Functions.pipCountSell(Four_Hour_Nexus.posprice, Four_Hour_Functions.price)
         Four_Hour_Nexus.pips -= Math.abs(pipchange)
+        if (Four_Hour_Nexus.backtest == false){
         console.log('pair: ' + Four_Hour_Nexus.pair)
         console.log('Stop Loss Hit on Four Hour')
         console.log(Four_Hour_Nexus.wins + ' Wins and     ' + Four_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Four_Hour_Nexus.wins / Four_Hour_Nexus.trades)
         console.log('Pip Count' + Four_Hour_Nexus.pips)
-      }
+      }}
       if (Four_Hour_Nexus.buy_pos) {
         Four_Hour_Nexus.buy_pos = false
         Four_Hour_Nexus.pos = false
@@ -537,12 +546,13 @@ class Four_Hour_Nexus {
         Four_Hour_Nexus.piplog = [0, 0, 0]
         const pipchange = Four_Hour_Functions.pipCountBuy(Four_Hour_Nexus.posprice, Four_Hour_Functions.price)
         Four_Hour_Nexus.pips -= Math.abs(pipchange)
+        if (Four_Hour_Nexus.backtest == false){
         console.log('pair: ' + Four_Hour_Nexus.pair)
         console.log('Stop Loss Hit on Four Hour')
         console.log(Four_Hour_Nexus.wins + ' Wins and     ' + Four_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Four_Hour_Nexus.wins / Four_Hour_Nexus.trades)
         console.log('Pip Count' + Four_Hour_Nexus.pips)
-      }
+      }}
     }
   }
 }

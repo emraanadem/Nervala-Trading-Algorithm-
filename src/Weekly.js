@@ -37,6 +37,7 @@ class Weekly_Nexus {
   bigsupport = 0
   bigresistance = 0
   pair = ''
+  backtest = false
 
   /** announce price zones and price channels */
   static announcer () {
@@ -97,11 +98,12 @@ class Weekly_Nexus {
             Weekly_Nexus.posprice = Weekly_Nexus.tp
             Weekly_Nexus.tp = Weekly_Nexus.tptwo
             Weekly_Functions.tpvariation()
+            if (Weekly_Nexus.backtest == false){
             console.log('pair: ' + Weekly_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Weekly_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Weekly_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Weekly_Nexus.closePosTP()
@@ -123,11 +125,12 @@ class Weekly_Nexus {
             Weekly_Nexus.posprice = Weekly_Nexus.tp
             Weekly_Nexus.tp = Weekly_Nexus.tptwo
             Weekly_Functions.tpvariation()
+            if (One_Hour_Nexus.backtest == false){
             console.log('pair: ' + Weekly_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Weekly_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Weekly_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Weekly_Nexus.closePosTP()
@@ -271,6 +274,7 @@ class Weekly_Nexus {
         Weekly_Nexus.posprice = Weekly_Functions.price
         Weekly_Functions.stoploss()
         Weekly_Functions.tpvariation()
+        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Open Buy Order on Weekly')
         console.log('Entry Price: ' + String(Weekly_Nexus.posprice))
@@ -278,7 +282,7 @@ class Weekly_Nexus {
         console.log('Target Take Profit: ' + String(Weekly_Nexus.tp))
         console.log('Take Profit 2: ' + String(Weekly_Nexus.tptwo))
         fs.writeFileSync('trade.json', JSON.stringify('true'))
-      }
+      }}
     }
   }
 
@@ -310,7 +314,8 @@ class Weekly_Nexus {
         Weekly_Nexus.posprice = Weekly_Functions.price
         Weekly_Functions.stoploss()
         Weekly_Functions.tpvariation()
-        console.log('pair: ' + Weekly_Nexus.pair)
+        if (Weekly_Nexus.backtest == false){
+          console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Open Sell Order on Weekly')
         console.log('Entry Price: ' + String(Weekly_Nexus.posprice))
         console.log('Stop Loss: ' + String(Weekly_Nexus.sl))
@@ -320,6 +325,7 @@ class Weekly_Nexus {
       }
     }
   }
+}
 
   /* static sell(){
         Weekly_Functions.supreslevs()
@@ -446,12 +452,13 @@ class Weekly_Nexus {
         Weekly_Nexus.piplog = [0, 0, 0]
         const pipchange = Weekly_Functions.pipCountBuy(Weekly_Nexus.posprice, Weekly_Functions.price)
         Weekly_Nexus.pips += Math.abs(pipchange)
+        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Take Profit Hit on Weekly')
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count: ' + Weekly_Nexus.pips)
-      }
+      }}
       if (Weekly_Nexus.sell_pos) {
         Weekly_Nexus.sell_pos = false
         Weekly_Nexus.pos = false
@@ -466,12 +473,13 @@ class Weekly_Nexus {
         Weekly_Nexus.piplog = [0, 0, 0]
         const pipchange = Weekly_Functions.pipCountSell(Weekly_Nexus.posprice, Weekly_Functions.price)
         Weekly_Nexus.pips += Math.abs(pipchange)
+        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Take Profit Hit on Weekly')
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count: ' + Weekly_Nexus.pips)
-      }
+      }}
     }
   }
 
@@ -492,12 +500,13 @@ class Weekly_Nexus {
         Weekly_Nexus.piplog = [0, 0, 0]
         const pipchange = Weekly_Functions.pipCountSell(Weekly_Nexus.posprice, Weekly_Functions.price)
         Weekly_Nexus.pips -= Math.abs(pipchange)
+        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Stop Loss Hit on Weekly')
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count' + Weekly_Nexus.pips)
-      }
+      }}
       if (Weekly_Nexus.buy_pos) {
         Weekly_Nexus.buy_pos = false
         Weekly_Nexus.pos = false
@@ -512,6 +521,7 @@ class Weekly_Nexus {
         Weekly_Nexus.piplog = [0, 0, 0]
         const pipchange = Weekly_Functions.pipCountBuy(Weekly_Nexus.posprice, Weekly_Functions.price)
         Weekly_Nexus.pips -= Math.abs(pipchange)
+        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Stop Loss Hit on Weekly')
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
@@ -520,7 +530,7 @@ class Weekly_Nexus {
       }
     }
   }
-}
+}}
 
 class Weekly_Functions {
   multiplier = 0
@@ -1634,7 +1644,6 @@ export function testweekly (data, price, instrument) {
   dataset = data
   Weekly_Nexus.controlMain()
 }
-
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
 /* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */

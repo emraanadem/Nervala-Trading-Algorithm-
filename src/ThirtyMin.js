@@ -37,6 +37,7 @@ class Thirty_Min_Nexus {
   bigsupport = 0
   bigresistance = 0
   pair = ''
+  backtest = false
 
   /** announce price zones and price channels */
   static announcer () {
@@ -97,11 +98,12 @@ class Thirty_Min_Nexus {
             Thirty_Min_Nexus.posprice = Thirty_Min_Nexus.tp
             Thirty_Min_Nexus.tp = Thirty_Min_Nexus.tptwo
             Thirty_Min_Functions.tpvariation()
+            if (Thirty_Min_Nexus.backtest == false){
             console.log('pair: ' + Thirty_Min_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Thirty_Min_Nexus.closePosTP()
@@ -123,11 +125,12 @@ class Thirty_Min_Nexus {
             Thirty_Min_Nexus.posprice = Thirty_Min_Nexus.tp
             Thirty_Min_Nexus.tp = Thirty_Min_Nexus.tptwo
             Thirty_Min_Functions.tpvariation()
+            if (Thirty_Min_Nexus.backtest == false){
             console.log('pair: ' + Thirty_Min_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Thirty_Min_Nexus.closePosTP()
@@ -271,6 +274,7 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.posprice = Thirty_Min_Functions.price
         Thirty_Min_Functions.stoploss()
         Thirty_Min_Functions.tpvariation()
+        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Open Buy Order on Thirty Min')
         console.log('Entry Price: ' + String(Thirty_Min_Nexus.posprice))
@@ -279,6 +283,7 @@ class Thirty_Min_Nexus {
         console.log('Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
         fs.writeFileSync('trade.json', JSON.stringify('true'))
       }
+    }
     }
   }
 
@@ -310,6 +315,7 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.posprice = Thirty_Min_Functions.price
         Thirty_Min_Functions.stoploss()
         Thirty_Min_Functions.tpvariation()
+        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Open Sell Order on Thirty Min')
         console.log('Entry Price: ' + String(Thirty_Min_Nexus.posprice))
@@ -317,7 +323,7 @@ class Thirty_Min_Nexus {
         console.log('Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
         console.log('Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
         fs.writeFileSync('trade.json', JSON.stringify('true'))
-      }
+      }}
     }
   }
 
@@ -473,12 +479,13 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Thirty_Min_Functions.pipCountBuy(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
         Thirty_Min_Nexus.pips += Math.abs(pipchange)
+        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Take Profit Hit on Thirty Min')
         console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
         console.log('Pip Count: ' + Thirty_Min_Nexus.pips)
-      }
+      }}
       if (Thirty_Min_Nexus.sell_pos) {
         Thirty_Min_Nexus.sell_pos = false
         Thirty_Min_Nexus.pos = false
@@ -493,12 +500,13 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Thirty_Min_Functions.pipCountSell(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
         Thirty_Min_Nexus.pips += Math.abs(pipchange)
+        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Take Profit Hit on Thirty Min')
         console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
         console.log('Pip Count: ' + Thirty_Min_Nexus.pips)
-      }
+      }}
     }
   }
 
@@ -519,12 +527,13 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Thirty_Min_Functions.pipCountSell(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
         Thirty_Min_Nexus.pips -= Math.abs(pipchange)
+        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Stop Loss Hit on Thirty Min')
         console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
         console.log('Pip Count' + Thirty_Min_Nexus.pips)
-      }
+      }}
       if (Thirty_Min_Nexus.buy_pos) {
         Thirty_Min_Nexus.buy_pos = false
         Thirty_Min_Nexus.pos = false
@@ -539,12 +548,13 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Thirty_Min_Functions.pipCountBuy(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
         Thirty_Min_Nexus.pips -= Math.abs(pipchange)
+        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Stop Loss Hit on Thirty Min')
         console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
         console.log('Pip Count' + Thirty_Min_Nexus.pips)
-      }
+      }}
     }
   }
 }

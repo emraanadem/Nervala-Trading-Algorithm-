@@ -16,5 +16,4 @@ for (let i = 0; i < instrumentsForex.length; i++, totalIterations++) {
 /*
 for (let i = 0; i < instrumentsStocks.length; i++, totalIterations++) {
   checkStock(instrumentsStocks[i], proxies[totalIterations % proxies.length], proxyauth) 
-} 
-*/
+} */

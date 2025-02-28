@@ -36,6 +36,7 @@ class Daily_Nexus {
   bigsupport = 0
   bigresistance = 0
   pair = ''
+  backtest = false
 
   /** announce price zones and price channels */
   static announcer () {
@@ -96,11 +97,12 @@ class Daily_Nexus {
             Daily_Nexus.posprice = Daily_Nexus.tp
             Daily_Nexus.tp = Daily_Nexus.tptwo
             Daily_Functions.tpvariation()
+            if (Daily_Nexus.backtest == false){
             console.log('pair: ' + Daily_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Daily_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Daily_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Daily_Nexus.closePosTP()
@@ -122,11 +124,12 @@ class Daily_Nexus {
             Daily_Nexus.posprice = Daily_Nexus.tp
             Daily_Nexus.tp = Daily_Nexus.tptwo
             Daily_Functions.tpvariation()
+            if (Daily_Nexus.backtest == false){
             console.log('pair: ' + Daily_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Daily_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Daily_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Daily_Nexus.closePosTP()
@@ -270,6 +273,7 @@ class Daily_Nexus {
         Daily_Nexus.posprice = Daily_Functions.price
         Daily_Functions.stoploss()
         Daily_Functions.tpvariation()
+        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Open Buy Order on Daily')
         console.log('Entry Price: ' + String(Daily_Nexus.posprice))
@@ -277,7 +281,7 @@ class Daily_Nexus {
         console.log('Target Take Profit: ' + String(Daily_Nexus.tp))
         console.log('Take Profit 2: ' + String(Daily_Nexus.tptwo))
         fs.writeFileSync('trade.json', JSON.stringify('true'))
-      }
+      }}
     }
   }
 
@@ -307,6 +311,7 @@ class Daily_Nexus {
         Daily_Nexus.posprice = Daily_Functions.price
         Daily_Functions.stoploss()
         Daily_Functions.tpvariation()
+        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Open Sell Order on Daily')
         console.log('Entry Price: ' + String(Daily_Nexus.posprice))
@@ -314,7 +319,7 @@ class Daily_Nexus {
         console.log('Target Take Profit: ' + String(Daily_Nexus.tp))
         console.log('Take Profit 2: ' + String(Daily_Nexus.tptwo))
         fs.writeFileSync('trade.json', JSON.stringify('true'))
-      }
+      }}
     }
   }
 
@@ -462,11 +467,13 @@ class Daily_Nexus {
         Daily_Nexus.piplog = [0, 0, 0]
         const pipchange = Daily_Functions.pipCountBuy(Daily_Nexus.posprice, Daily_Functions.price)
         Daily_Nexus.pips += Math.abs(pipchange)
+        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Take Profit Hit on Daily')
         console.log(Daily_Nexus.wins + ' Wins and     ' + Daily_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Daily_Nexus.wins / Daily_Nexus.trades)
         console.log('Pip Count: ' + Daily_Nexus.pips)
+        }
       }
       if (Daily_Nexus.sell_pos) {
         Daily_Nexus.sell_pos = false
@@ -482,6 +489,7 @@ class Daily_Nexus {
         Daily_Nexus.piplog = [0, 0, 0]
         const pipchange = Daily_Functions.pipCountSell(Daily_Nexus.posprice, Daily_Functions.price)
         Daily_Nexus.pips += Math.abs(pipchange)
+        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Take Profit Hit on Daily')
         console.log(Daily_Nexus.wins + ' Wins and     ' + Daily_Nexus.losses + ' Losses')
@@ -490,6 +498,7 @@ class Daily_Nexus {
       }
     }
   }
+}
 
   /** close position method for stopping out of losses, also gives pip count and win/loss ratio */
   static closePosSL () {
@@ -508,12 +517,14 @@ class Daily_Nexus {
         Daily_Nexus.piplog = [0, 0, 0]
         const pipchange = Daily_Functions.pipCountSell(Daily_Nexus.posprice, Daily_Functions.price)
         Daily_Nexus.pips -= Math.abs(pipchange)
+        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Stop Loss Hit on Daily')
         console.log(Daily_Nexus.wins + ' Wins and     ' + Daily_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Daily_Nexus.wins / Daily_Nexus.trades)
         console.log('Pip Count' + Daily_Nexus.pips)
       }
+    }
       if (Daily_Nexus.buy_pos) {
         Daily_Nexus.buy_pos = false
         Daily_Nexus.pos = false
@@ -528,6 +539,7 @@ class Daily_Nexus {
         Daily_Nexus.piplog = [0, 0, 0]
         const pipchange = Daily_Functions.pipCountBuy(Daily_Nexus.posprice, Daily_Functions.price)
         Daily_Nexus.pips -= Math.abs(pipchange)
+        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Stop Loss Hit on Daily')
         console.log(Daily_Nexus.wins + ' Wins and     ' + Daily_Nexus.losses + ' Losses')
@@ -536,7 +548,7 @@ class Daily_Nexus {
       }
     }
   }
-}
+}}
 
 class Daily_Functions {
   multiplier = 0

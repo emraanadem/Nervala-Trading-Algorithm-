@@ -38,6 +38,7 @@ class Fifteen_Min_Nexus {
   bigsupport = 0
   bigresistance = 0
   pair = ''
+  backtest = false
 
   /** announce price zones and price channels */
   static announcer () {
@@ -98,11 +99,12 @@ class Fifteen_Min_Nexus {
             Fifteen_Min_Nexus.posprice = Fifteen_Min_Nexus.tp
             Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.tptwo
             Fifteen_Min_Functions.tpvariation()
+            if (Fifteen_Min_Nexus.backtest == false){
             console.log('pair: ' + Fifteen_Min_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Fifteen_Min_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Fifteen_Min_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Fifteen_Min_Nexus.closePosTP()
@@ -124,11 +126,12 @@ class Fifteen_Min_Nexus {
             Fifteen_Min_Nexus.posprice = Fifteen_Min_Nexus.tp
             Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.tptwo
             Fifteen_Min_Functions.tpvariation()
+            if (Fifteen_Min_Nexus.backtest == false){
             console.log('pair: ' + Fifteen_Min_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Fifteen_Min_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Fifteen_Min_Nexus.tptwo))
-          }
+          }}
         }
       } else {
         Fifteen_Min_Nexus.closePosTP()
@@ -273,6 +276,7 @@ class Fifteen_Min_Nexus {
         Fifteen_Min_Nexus.posprice = Fifteen_Min_Functions.price
         Fifteen_Min_Functions.stoploss()
         Fifteen_Min_Functions.tpvariation()
+        if (Fifteen_Min_Nexus.backtest == false){
         console.log('pair: ' + Fifteen_Min_Nexus.pair)
         console.log('Open Buy Order on Fifteen Min')
         console.log('Entry Price: ' + String(Fifteen_Min_Nexus.posprice))
@@ -283,7 +287,7 @@ class Fifteen_Min_Nexus {
       }
     }
   }
-
+}
   /* static buy(){
         Fifteen_Min_Functions.supreslevs()
         Fifteen_Min_Functions.getPrice()
@@ -313,6 +317,7 @@ class Fifteen_Min_Nexus {
         Fifteen_Min_Nexus.posprice = Fifteen_Min_Functions.price
         Fifteen_Min_Functions.stoploss()
         Fifteen_Min_Functions.tpvariation()
+        if (Fifteen_Min_Nexus.backtest == false){
         console.log('pair: ' + Fifteen_Min_Nexus.pair)
         console.log('Open Sell Order on Fifteen Min')
         console.log('Entry Price: ' + String(Fifteen_Min_Nexus.posprice))
@@ -323,6 +328,7 @@ class Fifteen_Min_Nexus {
       }
     }
   }
+}
 
   /* static sell(){
         Fifteen_Min_Functions.supreslevs()
@@ -476,12 +482,13 @@ class Fifteen_Min_Nexus {
         Fifteen_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price)
         Fifteen_Min_Nexus.pips += Math.abs(pipchange)
+        if (Fifteen_Min_Nexus.backtest == false){
         console.log('pair: ' + Fifteen_Min_Nexus.pair)
         console.log('Take Profit Hit on Fifteen Min')
         console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
         console.log('Pip Count: ' + Fifteen_Min_Nexus.pips)
-      }
+      }}
       if (Fifteen_Min_Nexus.sell_pos) {
         Fifteen_Min_Nexus.sell_pos = false
         Fifteen_Min_Nexus.pos = false
@@ -496,12 +503,13 @@ class Fifteen_Min_Nexus {
         Fifteen_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Fifteen_Min_Functions.pipCountSell(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price)
         Fifteen_Min_Nexus.pips += Math.abs(pipchange)
+        if (Fifteen_Min_Nexus.backtest == false){
         console.log('pair: ' + Fifteen_Min_Nexus.pair)
         console.log('Take Profit Hit on Fifteen Min')
         console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
         console.log('Pip Count: ' + Fifteen_Min_Nexus.pips)
-      }
+      }}
     }
   }
 
@@ -522,12 +530,13 @@ class Fifteen_Min_Nexus {
         Fifteen_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Fifteen_Min_Functions.pipCountSell(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price)
         Fifteen_Min_Nexus.pips -= Math.abs(pipchange)
+        if (Fifteen_Min_Nexus.backtest == false){
         console.log('pair: ' + Fifteen_Min_Nexus.pair)
         console.log('Stop Loss Hit on Fifteen Min')
         console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
         console.log('Pip Count' + Fifteen_Min_Nexus.pips)
-      }
+      }}
       if (Fifteen_Min_Nexus.buy_pos) {
         Fifteen_Min_Nexus.buy_pos = false
         Fifteen_Min_Nexus.pos = false
@@ -542,12 +551,13 @@ class Fifteen_Min_Nexus {
         Fifteen_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Nexus.posprice, Fifteen_Min_Functions.price)
         Fifteen_Min_Nexus.pips -= Math.abs(pipchange)
+        if (Fifteen_Min_Nexus.backtest == false){
         console.log('pair: ' + Fifteen_Min_Nexus.pair)
         console.log('Stop Loss Hit on Fifteen Min')
         console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
         console.log('Pip Count' + Fifteen_Min_Nexus.pips)
-      }
+      }}
     }
   }
 }
