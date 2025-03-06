@@ -410,9 +410,12 @@ class Fifteen_Min_Nexus {
       Fifteen_Min_Functions.rejecinit()
       Fifteen_Min_Functions.HistoryAssigner()
       Fifteen_Min_Functions.ValueAssigner()
+      Five_Min_Functions.HistoryAssigner()
+      Four_Hour_Functions.HistoryAssigner()
+      Fifteen_Min_Functions.supreslevs()
+      Fifteen_Min_Nexus.controlSmallerPeriod()
       Fifteen_Min_Functions.stoploss()
       Fifteen_Min_Functions.getPrice()
-      Fifteen_Min_Functions.supreslevs()
       Fifteen_Min_Nexus.controlBiggerPeriod()
       if (!Fifteen_Min_Functions.consolidationtwo() && !Fifteen_Min_Functions.consolidation() && !Fifteen_Min_Functions.overall() &&
             !Fifteen_Min_Functions.keylev()) {
@@ -592,9 +595,9 @@ class Fifteen_Min_Functions {
     Fifteen_Min_Functions.priceHist = dataset.Fifteen_Min.c
     Fifteen_Min_Functions.highs = dataset.Fifteen_Min.h
     Fifteen_Min_Functions.lows = dataset.Fifteen_Min.l
-    Fifteen_Min_Functions.extendHist = dataset['Fifteen_Min Extend'].c
-    Fifteen_Min_Functions.extendHigh = dataset['Fifteen_Min Extend'].h
-    Fifteen_Min_Functions.extendLow = dataset['Fifteen_Min Extend'].l
+    Fifteen_Min_Functions.extendHist = dataset.Fifteen_Min_Extend.c
+    Fifteen_Min_Functions.extendHigh = dataset.Fifteen_Min_Extend.h
+    Fifteen_Min_Functions.extendLow = dataset.Fifteen_Min_Extend.l
   }
 
   /** load price from json file */
@@ -611,7 +614,19 @@ class Fifteen_Min_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []
@@ -1184,7 +1199,7 @@ class Fifteen_Min_Functions {
     const resistance = price + Math.min(...larger_diff)
     Fifteen_Min_Nexus.support = support
     Fifteen_Min_Nexus.resistance = resistance
-    for (const item in finalLevs) {
+    for (let item = 0; item < finalLevs.length; item++) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
     Fifteen_Min_Nexus.finlevs = finalLevs
@@ -1417,9 +1432,9 @@ class Four_Hour_Functions {
     Four_Hour_Functions.priceHist = dataset.Four_Hour.c
     Four_Hour_Functions.highs = dataset.Four_Hour.h
     Four_Hour_Functions.lows = dataset.Four_Hour.l
-    Four_Hour_Functions.extendHist = dataset['Four_Hour Extend'].c
-    Four_Hour_Functions.extendHigh = dataset['Four_Hour Extend'].h
-    Four_Hour_Functions.extendLow = dataset['Four_Hour Extend'].l
+    Four_Hour_Functions.extendHist = dataset.Four_Hour_Extend.c
+    Four_Hour_Functions.extendHigh = dataset.Four_Hour_Extend.h
+    Four_Hour_Functions.extendLow = dataset.Four_Hour_Extend.l
   }
 
   /** load price from json file */
@@ -1436,7 +1451,19 @@ class Four_Hour_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []
@@ -1861,7 +1888,7 @@ class Four_Hour_Functions {
     const resistance = price + Math.min(...larger_diff)
     Four_Hour_Functions.support = support
     Four_Hour_Functions.resistance = resistance
-    for (const item in finalLevs) {
+    for (let item = 0; item < finalLevs.length; item++) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
     Four_Hour_Functions.finlevs = finalLevs
@@ -2175,7 +2202,7 @@ class One_Hour_Functions {
     const resistance = price + Math.min(...larger_diff)
     One_Hour_Functions.support = support
     One_Hour_Functions.resistance = resistance
-    for (const item in finalLevs) {
+    for (let item = 0; item < finalLevs.length; item++) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
     One_Hour_Functions.finlevs = finalLevs
@@ -2244,7 +2271,19 @@ class Five_Min_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []
@@ -2331,6 +2370,7 @@ export function testfifteen (data, price, instrument) {
   liveprice = price
   dataset = data
   Fifteen_Min_Nexus.controlMain()
+  
 }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */

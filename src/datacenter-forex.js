@@ -9,8 +9,6 @@ import { testdaily } from './Daily.js'
 import { testweekly } from './Weekly.js'
 
 async function getCandleData (baseUrl, options, timescaleLabel) {
-  let retryCount = 0;
-
   while (true) {
     try {
       const params = `count=2500&granularity=${timescaleLabel[0]}`
@@ -31,15 +29,13 @@ async function getCandleData (baseUrl, options, timescaleLabel) {
       candleData[`${timescaleLabel[1]}`].h = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.h))
       candleData[`${timescaleLabel[1]}`].l = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.l))
       candleData[`${timescaleLabel[1]}`].c = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.c))
-      candleData[`${timescaleLabel[1]} Extend`] = {}
-      candleData[`${timescaleLabel[1]} Extend`].o = data.candles.map((x) => parseFloat(x.mid.o))
-      candleData[`${timescaleLabel[1]} Extend`].h = data.candles.map((x) => parseFloat(x.mid.h))
-      candleData[`${timescaleLabel[1]} Extend`].l = data.candles.map((x) => parseFloat(x.mid.l))
-      candleData[`${timescaleLabel[1]} Extend`].c = data.candles.map((x) => parseFloat(x.mid.c))
+      candleData[`${timescaleLabel[1]}_Extend`] = {}
+      candleData[`${timescaleLabel[1]}_Extend`].o = data.candles.map((x) => parseFloat(x.mid.o))
+      candleData[`${timescaleLabel[1]}_Extend`].h = data.candles.map((x) => parseFloat(x.mid.h))
+      candleData[`${timescaleLabel[1]}_Extend`].l = data.candles.map((x) => parseFloat(x.mid.l))
+      candleData[`${timescaleLabel[1]}_Extend`].c = data.candles.map((x) => parseFloat(x.mid.c))
       return candleData
-
     } catch (error) {
-      retryCount++;
       /*
       console.error(`Attempt ${retryCount} failed for ${timescaleLabel[1]}: ${error.message}`);
       
@@ -73,13 +69,18 @@ async function getAggregatedCandleData (baseUrl, options) {
     return aggregatedCandleData
   }
 
-  const candleDataDicts = await Promise.all(timescaleLabels.map(x => getCandleData(baseUrl, options, x)))
-
-  return mergeCandles(...candleDataDicts)
+  try {
+    const candleDataDicts = await Promise.all(timescaleLabels.map(x => {
+      return getCandleData(baseUrl, options, x)
+    }))
+    return mergeCandles(...candleDataDicts)
+  } catch (error) {
+    console.error('Error in getAggregatedCandleData:', error)
+    throw error
+  }
 }
 
 async function getPrice (baseUrl, options) {
-  let retryCount = 0;
 
   while (true) {
     try {
@@ -97,7 +98,6 @@ async function getPrice (baseUrl, options) {
       return parseFloat(data.candles[0].mid.c)
 
     } catch (error) {
-      retryCount++;
       /*
       console.error(`Attempt ${retryCount} failed for price fetch: ${error.message}`);
       
@@ -128,33 +128,69 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
 
   while (loop) {
     try {
-      // Each API call naturally takes some time, acting as an implicit delay
       const candleData = await getAggregatedCandleData(baseUrl, options)
       const price = await getPrice(baseUrl, options)
-      // Run all tests with fresh data
-      testfifteen(candleData, price, instrument)
-      testthirtymin(candleData, price, instrument)
-      testonehour(candleData, price, instrument)
-      testtwohour(candleData, price, instrument)
-      testfourhour(candleData, price, instrument)
-      testdaily(candleData, price, instrument)
-      testweekly(candleData, price, instrument)
-    } catch (error) {
-      console.error('Error in checkForSignals:', "test")
-    }
-  }
 
-  // Single run if loop is false
-  if (!loop) {
-    const candleData = await getAggregatedCandleData(baseUrl, options)
-    const price = await getPrice(baseUrl, options)
-    testfifteen(candleData, price, instrument)
-    testthirtymin(candleData, price, instrument)
-    testonehour(candleData, price, instrument)
-    testtwohour(candleData, price, instrument)
-    testfourhour(candleData, price, instrument)
-    testdaily(candleData, price, instrument)
-    testweekly(candleData, price, instrument)
+      if (candleData != null) {
+        const timeframePairs = [
+          ['Fifteen_Min', 'Fifteen_Min_Extend'],
+          ['Thirty_Min', 'Thirty_Min_Extend'],
+          ['One_Hour', 'One_Hour_Extend'],
+          ['Two_Hour', 'Two_Hour_Extend'],
+          ['Four_Hour', 'Four_Hour_Extend'],
+          ['Daily', 'Daily_Extend'],
+          ['Weekly', 'Weekly_Extend']
+        ]
+
+        let globalMinLength = Infinity
+        for (const [regular, extended] of timeframePairs) {
+          if (!candleData[regular] || !candleData[extended]) continue
+
+          const lengths = [
+            candleData[regular].o?.length || 0,
+            candleData[regular].h?.length || 0,
+            candleData[regular].l?.length || 0,
+            candleData[regular].c?.length || 0,
+            candleData[extended].o?.length || 0,
+            candleData[extended].h?.length || 0,
+            candleData[extended].l?.length || 0,
+            candleData[extended].c?.length || 0
+          ]
+
+          const minLength = Math.min(...lengths)
+          globalMinLength = Math.min(globalMinLength, minLength)
+        }
+
+        if (globalMinLength === 0 || globalMinLength === Infinity) {
+          continue
+        }
+
+        for (const [regular, extended] of timeframePairs) {
+          if (!candleData[regular] || !candleData[extended]) continue
+
+          // Take the last (newest) globalMinLength elements
+          candleData[regular].o = candleData[regular].o.slice(-globalMinLength)
+          candleData[regular].h = candleData[regular].h.slice(-globalMinLength)
+          candleData[regular].l = candleData[regular].l.slice(-globalMinLength)
+          candleData[regular].c = candleData[regular].c.slice(-globalMinLength)
+
+          candleData[extended].o = candleData[extended].o.slice(-globalMinLength)
+          candleData[extended].h = candleData[extended].h.slice(-globalMinLength)
+          candleData[extended].l = candleData[extended].l.slice(-globalMinLength)
+          candleData[extended].c = candleData[extended].c.slice(-globalMinLength)
+        }
+
+        testfifteen(candleData, price, instrument)
+        testthirtymin(candleData, price, instrument)
+        testonehour(candleData, price, instrument)
+        testtwohour(candleData, price, instrument)
+        testfourhour(candleData, price, instrument)
+        testdaily(candleData, price, instrument)
+        testweekly(candleData, price, instrument)
+      }
+    } catch (error) {
+      console.error('Error in checkForSignals:', error)
+    }
   }
 }
 

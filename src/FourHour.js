@@ -405,9 +405,14 @@ class Four_Hour_Nexus {
       Four_Hour_Functions.rejecinit()
       Four_Hour_Functions.HistoryAssigner()
       Four_Hour_Functions.ValueAssigner()
-      Four_Hour_Functions.stoploss()
       Four_Hour_Functions.getPrice()
+      Four_Hour_Functions.stoploss()
+      One_Hour_Functions.HistoryAssigner()
+      Thirty_Min_Functions.HistoryAssigner()
+      Daily_Functions.HistoryAssigner()
+      Fifteen_Min_Functions.HistoryAssigner()
       Four_Hour_Functions.supreslevs()
+      Four_Hour_Nexus.controlSmallerPeriod()
       Four_Hour_Nexus.controlBiggerPeriod()
       if (!Four_Hour_Functions.consolidationtwo() && Four_Hour_Functions.overall() && !Four_Hour_Functions.consolidation() &&
             !Four_Hour_Functions.keylev()) {
@@ -585,9 +590,9 @@ class Four_Hour_Functions {
     Four_Hour_Functions.priceHist = dataset.Four_Hour.c
     Four_Hour_Functions.highs = dataset.Four_Hour.h
     Four_Hour_Functions.lows = dataset.Four_Hour.l
-    Four_Hour_Functions.extendHist = dataset['Four_Hour Extend'].c
-    Four_Hour_Functions.extendHigh = dataset['Four_Hour Extend'].h
-    Four_Hour_Functions.extendLow = dataset['Four_Hour Extend'].l
+    Four_Hour_Functions.extendHist = dataset.Four_Hour_Extend.c
+    Four_Hour_Functions.extendHigh = dataset.Four_Hour_Extend.h
+    Four_Hour_Functions.extendLow = dataset.Four_Hour_Extend.l
   }
 
   /** load price from json file */
@@ -604,7 +609,19 @@ class Four_Hour_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []
@@ -1171,7 +1188,7 @@ class Four_Hour_Functions {
     const resistance = price + Math.min(...larger_diff)
     Four_Hour_Nexus.support = support
     Four_Hour_Nexus.resistance = resistance
-    for (const item in finalLevs) {
+    for (let item = 0; item < finalLevs.length; item++) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
     Four_Hour_Nexus.finlevs = finalLevs
@@ -1393,9 +1410,9 @@ class Daily_Functions {
     Daily_Functions.priceHist = dataset.Daily.c
     Daily_Functions.highs = dataset.Daily.h
     Daily_Functions.lows = dataset.Daily.l
-    Daily_Functions.extendHist = dataset['Daily Extend'].c
-    Daily_Functions.extendHigh = dataset['Daily Extend'].h
-    Daily_Functions.extendLow = dataset['Daily Extend'].l
+    Daily_Functions.extendHist = dataset.Daily_Extend.c
+    Daily_Functions.extendHigh = dataset.Daily_Extend.h
+    Daily_Functions.extendLow = dataset.Daily_Extend.l
   }
 
   static ValueAssigner () {
@@ -1504,7 +1521,7 @@ class Daily_Functions {
     const resistance = price + Math.min(...larger_diff)
     Daily_Functions.support = support
     Daily_Functions.resistance = resistance
-    for (const item in finalLevs) {
+    for (let item = 0; item < finalLevs.length; item++) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
     Daily_Functions.finlevs = finalLevs
@@ -1658,7 +1675,7 @@ class Weekly_Functions {
     const resistance = price + Math.min(...larger_diff)
     Weekly_Functions.support = support
     Weekly_Functions.resistance = resistance
-    for (const item in finalLevs) {
+    for (let item = 0; item < finalLevs.length; item++) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
     Weekly_Functions.finlevs = finalLevs
@@ -1717,9 +1734,9 @@ class One_Hour_Functions {
     One_Hour_Functions.priceHist = dataset.One_Hour.c
     One_Hour_Functions.highs = dataset.One_Hour.h
     One_Hour_Functions.lows = dataset.One_Hour.l
-    One_Hour_Functions.extendHist = dataset['One_Hour Extend'].c
-    One_Hour_Functions.extendHigh = dataset['One_Hour Extend'].h
-    One_Hour_Functions.extendLow = dataset['One_Hour Extend'].l
+    One_Hour_Functions.extendHist = dataset.One_Hour_Extend.c
+    One_Hour_Functions.extendHigh = dataset.One_Hour_Extend.h
+    One_Hour_Functions.extendLow = dataset.One_Hour_Extend.l
   }
 
   static trend () {
@@ -1802,7 +1819,19 @@ class Thirty_Min_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []
@@ -1908,7 +1937,19 @@ class Fifteen_Min_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []

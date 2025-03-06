@@ -396,9 +396,14 @@ class Daily_Nexus {
       Daily_Functions.rejecinit()
       Daily_Functions.HistoryAssigner()
       Daily_Functions.ValueAssigner()
+      Four_Hour_Functions.HistoryAssigner()
+      One_Hour_Functions.HistoryAssigner()
+      Weekly_Functions.HistoryAssigner()
+      Fifteen_Min_Functions.HistoryAssigner()
+      Daily_Functions.supreslevs()
       Daily_Functions.stoploss()
       Daily_Functions.getPrice()
-      Daily_Functions.supreslevs()
+      Daily_Nexus.controlSmallerPeriod()
       Daily_Nexus.controlBiggerPeriod()
       if (!Daily_Functions.consolidationtwo() && Daily_Functions.overall() && !Daily_Functions.consolidation() &&
             !Daily_Functions.keylev()) {
@@ -578,9 +583,9 @@ class Daily_Functions {
     Daily_Functions.priceHist = dataset.Daily.c
     Daily_Functions.highs = dataset.Daily.h
     Daily_Functions.lows = dataset.Daily.l
-    Daily_Functions.extendHist = dataset['Daily Extend'].c
-    Daily_Functions.extendHigh = dataset['Daily Extend'].h
-    Daily_Functions.extendLow = dataset['Daily Extend'].l
+    Daily_Functions.extendHist = dataset.Daily_Extend.c
+    Daily_Functions.extendHigh = dataset.Daily_Extend.h
+    Daily_Functions.extendLow = dataset.Daily_Extend.l
   }
 
   /** load price from json file */
@@ -597,7 +602,19 @@ class Daily_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []
@@ -1163,7 +1180,7 @@ class Daily_Functions {
     const resistance = price + Math.min(...larger_diff)
     Daily_Nexus.support = support
     Daily_Nexus.resistance = resistance
-    for (const item in finalLevs) {
+    for (let item = 0; item < finalLevs.length; item++) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
     Daily_Nexus.finlevs = finalLevs
@@ -1494,7 +1511,7 @@ class Weekly_Functions {
     const resistance = price + Math.min(...larger_diff)
     Weekly_Functions.support = support
     Weekly_Functions.resistance = resistance
-    for (const item in finalLevs) {
+    for (let item = 0; item < finalLevs.length; item++) {
       finalLevs[item] = (finalLevs[item] * difference) + floor
     }
     Weekly_Functions.finlevs = finalLevs
@@ -1635,7 +1652,19 @@ class One_Hour_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []
@@ -1741,7 +1770,19 @@ class Fifteen_Min_Functions {
     const histmin = Math.min(...history)
     const histdiff = histmax - histmin
     const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    const n = tr.calculate({ high: highs, low: lows, close: history, period: 8 })
+    // Find tr.calculate and replace with normalized version
+    
+    // Before any tr.calculate call
+    const trMinLength = Math.min(highs.length, lows.length, history.length)
+    if (trMinLength === 0) return true; // Skip calculation if no data
+    
+    // Normalize arrays - keeping newest values
+    const normHighs = highs.slice(-trMinLength)
+    const normLows = lows.slice(-trMinLength)
+    const normHistory = history.slice(-trMinLength)
+    
+    // Use normalized arrays
+    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
     const h = new Array()
     const i = []
     const j = []
