@@ -98,12 +98,11 @@ class Thirty_Min_Nexus {
             Thirty_Min_Nexus.posprice = Thirty_Min_Nexus.tp
             Thirty_Min_Nexus.tp = Thirty_Min_Nexus.tptwo
             Thirty_Min_Functions.tpvariation()
-            if (Thirty_Min_Nexus.backtest == false){
             console.log('pair: ' + Thirty_Min_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
-          }}
+          }
         }
       } else {
         Thirty_Min_Nexus.closePosTP()
@@ -125,12 +124,11 @@ class Thirty_Min_Nexus {
             Thirty_Min_Nexus.posprice = Thirty_Min_Nexus.tp
             Thirty_Min_Nexus.tp = Thirty_Min_Nexus.tptwo
             Thirty_Min_Functions.tpvariation()
-            if (Thirty_Min_Nexus.backtest == false){
             console.log('pair: ' + Thirty_Min_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
-          }}
+          }
         }
       } else {
         Thirty_Min_Nexus.closePosTP()
@@ -274,15 +272,12 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.posprice = Thirty_Min_Functions.price
         Thirty_Min_Functions.stoploss()
         Thirty_Min_Functions.tpvariation()
-        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Open Buy Order on Thirty Min')
         console.log('Entry Price: ' + String(Thirty_Min_Nexus.posprice))
         console.log('Stop Loss: ' + String(Thirty_Min_Nexus.sl))
         console.log('Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
         console.log('Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
-        fs.writeFileSync('trade.json', JSON.stringify('true'))
-      }
     }
     }
   }
@@ -315,15 +310,13 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.posprice = Thirty_Min_Functions.price
         Thirty_Min_Functions.stoploss()
         Thirty_Min_Functions.tpvariation()
-        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Open Sell Order on Thirty Min')
         console.log('Entry Price: ' + String(Thirty_Min_Nexus.posprice))
         console.log('Stop Loss: ' + String(Thirty_Min_Nexus.sl))
         console.log('Target Take Profit: ' + String(Thirty_Min_Nexus.tp))
         console.log('Take Profit 2: ' + String(Thirty_Min_Nexus.tptwo))
-        fs.writeFileSync('trade.json', JSON.stringify('true'))
-      }}
+      }
     }
   }
 
@@ -403,8 +396,6 @@ class Thirty_Min_Nexus {
   /** main control method, takes control of the entire program and serves as the brain */
   static controlMain () {
     try {
-      Thirty_Min_Functions.rejecinit()
-      Four_Hour_Functions.rejecinit()
       Thirty_Min_Functions.HistoryAssigner()
       Thirty_Min_Functions.ValueAssigner()
       Thirty_Min_Functions.getPrice()
@@ -458,8 +449,6 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.tstoplosscont()
         Thirty_Min_Nexus.takeProfitSell()
       }
-      Thirty_Min_Functions.rejecsave()
-      Four_Hour_Functions.rejecsave()
     } catch (error) {
       console.log(error)
     }
@@ -483,13 +472,12 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Thirty_Min_Functions.pipCountBuy(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
         Thirty_Min_Nexus.pips += Math.abs(pipchange)
-        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Take Profit Hit on Thirty Min')
         console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
         console.log('Pip Count: ' + Thirty_Min_Nexus.pips)
-      }}
+      }
       if (Thirty_Min_Nexus.sell_pos) {
         Thirty_Min_Nexus.sell_pos = false
         Thirty_Min_Nexus.pos = false
@@ -504,13 +492,12 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Thirty_Min_Functions.pipCountSell(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
         Thirty_Min_Nexus.pips += Math.abs(pipchange)
-        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Take Profit Hit on Thirty Min')
         console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
         console.log('Pip Count: ' + Thirty_Min_Nexus.pips)
-      }}
+      }
     }
   }
 
@@ -531,13 +518,12 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Thirty_Min_Functions.pipCountSell(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
         Thirty_Min_Nexus.pips -= Math.abs(pipchange)
-        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Stop Loss Hit on Thirty Min')
         console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
-        console.log('Pip Count' + Thirty_Min_Nexus.pips)
-      }}
+        console.log('Pip Count: ' + Thirty_Min_Nexus.pips)
+      }
       if (Thirty_Min_Nexus.buy_pos) {
         Thirty_Min_Nexus.buy_pos = false
         Thirty_Min_Nexus.pos = false
@@ -552,13 +538,12 @@ class Thirty_Min_Nexus {
         Thirty_Min_Nexus.piplog = [0, 0, 0]
         const pipchange = Thirty_Min_Functions.pipCountBuy(Thirty_Min_Nexus.posprice, Thirty_Min_Functions.price)
         Thirty_Min_Nexus.pips -= Math.abs(pipchange)
-        if (Thirty_Min_Nexus.backtest == false){
         console.log('pair: ' + Thirty_Min_Nexus.pair)
         console.log('Stop Loss Hit on Thirty Min')
         console.log(Thirty_Min_Nexus.wins + ' Wins and     ' + Thirty_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Thirty_Min_Nexus.wins / Thirty_Min_Nexus.trades)
-        console.log('Pip Count' + Thirty_Min_Nexus.pips)
-      }}
+        console.log('Pip Count: ' + Thirty_Min_Nexus.pips)
+      }
     }
   }
 }
@@ -768,33 +753,6 @@ class Thirty_Min_Functions {
         then register fib levels from the price corresponding to that x value, depending on whether or not its a buy or sell */
   }
 
-  /** Rejection Zone Initiator */
-  static rejecinit () {
-    const instrument = Thirty_Min_Functions.instrument_name()
-    if (!fs.existsSync('./src/Rejection_Archive/' + String(instrument) + '.json')) {
-      Thirty_Min_Functions.timeperiods = {}
-      Thirty_Min_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
-      Thirty_Min_Functions.timeperiods.Thirty_Min = [0, 0, 0]
-      Thirty_Min_Functions.timeperiods.One_Hour = [0, 0, 0]
-      Thirty_Min_Functions.timeperiods.Two_Hour = [0, 0, 0]
-      Thirty_Min_Functions.timeperiods.Four_Hour = [0, 0, 0]
-      Thirty_Min_Functions.timeperiods.Daily = [0, 0, 0]
-      Thirty_Min_Functions.timeperiods.Weekly = [0, 0, 0]
-      fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Thirty_Min_Functions.timeperiods, null, 2))
-    }
-    const raw = fs.readFileSync('./src/Rejection_Archive/' + String(instrument) + '.json')
-    Thirty_Min_Functions.timeperiods = JSON.parse(raw)
-    Thirty_Min_Functions.rejectionzones = JSON.parse(raw).Thirty_Min
-  }
-
-  /** Rejection Zone Saver */
-  static rejecsave () {
-    const instrument = Thirty_Min_Functions.instrument_name()
-    Thirty_Min_Functions.rejectionzones = [...new Set(Thirty_Min_Functions.rejectionzones)]
-    Thirty_Min_Functions.timeperiods.Thirty_Min = Thirty_Min_Functions.rejectionzones
-    fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Thirty_Min_Functions.timeperiods, null, 2))
-  }
-
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
   static overall () {
     const extendedhistory = Thirty_Min_Functions.extendHist
@@ -818,6 +776,7 @@ class Thirty_Min_Functions {
 
   /** Do past Analysis to see if this is a good trade, based on static overall() method */
   static analysis (cases, extendedhistory, pricerange) {
+    Thirty_Min_Functions.rejectionzones = [0, 0, 0]
     const histnorm = Thirty_Min_Functions.priceHist
     const normdiff = (Math.max(...histnorm) - Math.min(...histnorm)) * 0.025
     const q = bolls.calculate({ period: 10, values: extendedhistory, stdDev: 1 })
@@ -1521,33 +1480,6 @@ class Four_Hour_Functions {
         then register fib levels from the price corresponding to that x value, depending on whether or not its a buy or sell */
   }
 
-  /** Rejection Zone Initiator */
-  static rejecinit () {
-    const instrument = Thirty_Min_Functions.instrument_name()
-    if (!fs.existsSync('./src/Rejection_Archive/' + String(instrument) + '.json')) {
-      Four_Hour_Functions.timeperiods = {}
-      Four_Hour_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
-      Four_Hour_Functions.timeperiods.Thirty_Min = [0, 0, 0]
-      Four_Hour_Functions.timeperiods.One_Hour = [0, 0, 0]
-      Four_Hour_Functions.timeperiods.Two_Hour = [0, 0, 0]
-      Four_Hour_Functions.timeperiods.Four_Hour = [0, 0, 0]
-      Four_Hour_Functions.timeperiods.Daily = [0, 0, 0]
-      Four_Hour_Functions.timeperiods.Weekly = [0, 0, 0]
-      fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Four_Hour_Functions.timeperiods, null, 2))
-    }
-    const raw = fs.readFileSync('./src/Rejection_Archive/' + String(instrument) + '.json')
-    Four_Hour_Functions.timeperiods = JSON.parse(raw)
-    Four_Hour_Functions.rejectionzones = JSON.parse(raw).Four_Hour
-  }
-
-  /** Rejection Zone Saver */
-  static rejecsave () {
-    const instrument = Thirty_Min_Functions.instrument_name()
-    Four_Hour_Functions.rejectionzones = [...new Set(Four_Hour_Functions.rejectionzones)]
-    Four_Hour_Functions.timeperiods.Four_Hour = Four_Hour_Functions.rejectionzones
-    fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Four_Hour_Functions.timeperiods, null, 2))
-  }
-
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
   static overall () {
     const extendedhistory = Four_Hour_Functions.extendHist
@@ -1571,6 +1503,7 @@ class Four_Hour_Functions {
 
   /** Do past Analysis to see if this is a good trade, based on static overall() method */
   static analysis (cases, extendedhistory, pricerange) {
+    Four_Hour_Functions.rejectionzones = [0, 0, 0]
     const histnorm = Four_Hour_Functions.priceHist
     const normdiff = (Math.max(...histnorm) - Math.min(...histnorm)) * 0.025
     const q = bolls.calculate({ period: 10, values: extendedhistory, stdDev: 1 })

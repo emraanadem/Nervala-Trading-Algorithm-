@@ -97,12 +97,11 @@ class Daily_Nexus {
             Daily_Nexus.posprice = Daily_Nexus.tp
             Daily_Nexus.tp = Daily_Nexus.tptwo
             Daily_Functions.tpvariation()
-            if (Daily_Nexus.backtest == false){
             console.log('pair: ' + Daily_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Daily_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Daily_Nexus.tptwo))
-          }}
+          }
         }
       } else {
         Daily_Nexus.closePosTP()
@@ -124,12 +123,11 @@ class Daily_Nexus {
             Daily_Nexus.posprice = Daily_Nexus.tp
             Daily_Nexus.tp = Daily_Nexus.tptwo
             Daily_Functions.tpvariation()
-            if (Daily_Nexus.backtest == false){
             console.log('pair: ' + Daily_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Daily_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Daily_Nexus.tptwo))
-          }}
+          }
         }
       } else {
         Daily_Nexus.closePosTP()
@@ -273,16 +271,13 @@ class Daily_Nexus {
         Daily_Nexus.posprice = Daily_Functions.price
         Daily_Functions.stoploss()
         Daily_Functions.tpvariation()
-        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Open Buy Order on Daily')
         console.log('Entry Price: ' + String(Daily_Nexus.posprice))
         console.log('Stop Loss: ' + String(Daily_Nexus.sl))
         console.log('Target Take Profit: ' + String(Daily_Nexus.tp))
         console.log('Take Profit 2: ' + String(Daily_Nexus.tptwo))
-        fs.writeFileSync('trade.json', JSON.stringify('true'))
       }}
-    }
   }
 
   /* static buy(){
@@ -311,16 +306,13 @@ class Daily_Nexus {
         Daily_Nexus.posprice = Daily_Functions.price
         Daily_Functions.stoploss()
         Daily_Functions.tpvariation()
-        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Open Sell Order on Daily')
         console.log('Entry Price: ' + String(Daily_Nexus.posprice))
         console.log('Stop Loss: ' + String(Daily_Nexus.sl))
         console.log('Target Take Profit: ' + String(Daily_Nexus.tp))
         console.log('Take Profit 2: ' + String(Daily_Nexus.tptwo))
-        fs.writeFileSync('trade.json', JSON.stringify('true'))
       }}
-    }
   }
 
   /* static sell(){
@@ -393,7 +385,6 @@ class Daily_Nexus {
   /** main control method, takes control of the entire program and serves as the brain */
   static controlMain () {
     try {
-      Daily_Functions.rejecinit()
       Daily_Functions.HistoryAssigner()
       Daily_Functions.ValueAssigner()
       Four_Hour_Functions.HistoryAssigner()
@@ -448,7 +439,6 @@ class Daily_Nexus {
         Daily_Nexus.tstoplosscont()
         Daily_Nexus.takeProfitSell()
       }
-      Daily_Functions.rejecsave()
     } catch (error) {
       console.log(error)
     }
@@ -472,14 +462,12 @@ class Daily_Nexus {
         Daily_Nexus.piplog = [0, 0, 0]
         const pipchange = Daily_Functions.pipCountBuy(Daily_Nexus.posprice, Daily_Functions.price)
         Daily_Nexus.pips += Math.abs(pipchange)
-        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Take Profit Hit on Daily')
         console.log(Daily_Nexus.wins + ' Wins and     ' + Daily_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Daily_Nexus.wins / Daily_Nexus.trades)
         console.log('Pip Count: ' + Daily_Nexus.pips)
         }
-      }
       if (Daily_Nexus.sell_pos) {
         Daily_Nexus.sell_pos = false
         Daily_Nexus.pos = false
@@ -494,13 +482,11 @@ class Daily_Nexus {
         Daily_Nexus.piplog = [0, 0, 0]
         const pipchange = Daily_Functions.pipCountSell(Daily_Nexus.posprice, Daily_Functions.price)
         Daily_Nexus.pips += Math.abs(pipchange)
-        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Take Profit Hit on Daily')
         console.log(Daily_Nexus.wins + ' Wins and     ' + Daily_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Daily_Nexus.wins / Daily_Nexus.trades)
         console.log('Pip Count: ' + Daily_Nexus.pips)
-      }
     }
   }
 }
@@ -522,14 +508,12 @@ class Daily_Nexus {
         Daily_Nexus.piplog = [0, 0, 0]
         const pipchange = Daily_Functions.pipCountSell(Daily_Nexus.posprice, Daily_Functions.price)
         Daily_Nexus.pips -= Math.abs(pipchange)
-        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Stop Loss Hit on Daily')
         console.log(Daily_Nexus.wins + ' Wins and     ' + Daily_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Daily_Nexus.wins / Daily_Nexus.trades)
-        console.log('Pip Count' + Daily_Nexus.pips)
+        console.log('Pip Count: ' + Daily_Nexus.pips)
       }
-    }
       if (Daily_Nexus.buy_pos) {
         Daily_Nexus.buy_pos = false
         Daily_Nexus.pos = false
@@ -544,16 +528,15 @@ class Daily_Nexus {
         Daily_Nexus.piplog = [0, 0, 0]
         const pipchange = Daily_Functions.pipCountBuy(Daily_Nexus.posprice, Daily_Functions.price)
         Daily_Nexus.pips -= Math.abs(pipchange)
-        if (Daily_Nexus.backtest == false){
         console.log('pair: ' + Daily_Nexus.pair)
         console.log('Stop Loss Hit on Daily')
         console.log(Daily_Nexus.wins + ' Wins and     ' + Daily_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Daily_Nexus.wins / Daily_Nexus.trades)
-        console.log('Pip Count' + Daily_Nexus.pips)
+        console.log('Pip Count: ' + Daily_Nexus.pips)
       }
     }
   }
-}}
+}
 
 class Daily_Functions {
   multiplier = 0
@@ -758,33 +741,6 @@ class Daily_Functions {
         then register fib levels from the price corresponding to that x value, depending on whether or not its a buy or sell */
   }
 
-  /** Rejection Zone Initiatior */
-  static rejecinit () {
-    const instrument = Daily_Functions.instrument_name()
-    if (!fs.existsSync('./src/Rejection_Archive/' + String(instrument) + '.json')) {
-      Daily_Functions.timeperiods = {}
-      Daily_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
-      Daily_Functions.timeperiods.Thirty_Min = [0, 0, 0]
-      Daily_Functions.timeperiods.One_Hour = [0, 0, 0]
-      Daily_Functions.timeperiods.Two_Hour = [0, 0, 0]
-      Daily_Functions.timeperiods.Four_Hour = [0, 0, 0]
-      Daily_Functions.timeperiods.Daily = [0, 0, 0]
-      Daily_Functions.timeperiods.Weekly = [0, 0, 0]
-      fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Daily_Functions.timeperiods, null, 2))
-    }
-    const raw = fs.readFileSync('./src/Rejection_Archive/' + String(instrument) + '.json')
-    Daily_Functions.timeperiods = JSON.parse(raw)
-    Daily_Functions.rejectionzones = JSON.parse(raw).Daily
-  }
-
-  /** Rejection Zone Saver */
-  static rejecsave () {
-    const instrument = Daily_Functions.instrument_name()
-    Daily_Functions.rejectionzones = [...new Set(Daily_Functions.rejectionzones)]
-    Daily_Functions.timeperiods.Daily = Daily_Functions.rejectionzones
-    fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Daily_Functions.timeperiods, null, 2))
-  }
-
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
   static overall () {
     const extendedhistory = Daily_Functions.extendHist
@@ -807,6 +763,7 @@ class Daily_Functions {
 
   /** Do past Analysis to see if this is a good trade, based on static overall() method */
   static analysis (cases, extendedhistory, pricerange) {
+    Daily_Functions.rejectionzones = [0, 0, 0]
     const histnorm = Daily_Functions.priceHist
     const normdiff = (Math.max(...histnorm) - Math.min(...histnorm)) * 0.025
     const q = bolls.calculate({ period: 10, values: extendedhistory, stdDev: 1 })

@@ -98,12 +98,11 @@ class Weekly_Nexus {
             Weekly_Nexus.posprice = Weekly_Nexus.tp
             Weekly_Nexus.tp = Weekly_Nexus.tptwo
             Weekly_Functions.tpvariation()
-            if (Weekly_Nexus.backtest == false){
             console.log('pair: ' + Weekly_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Weekly_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Weekly_Nexus.tptwo))
-          }}
+          }
         }
       } else {
         Weekly_Nexus.closePosTP()
@@ -125,12 +124,11 @@ class Weekly_Nexus {
             Weekly_Nexus.posprice = Weekly_Nexus.tp
             Weekly_Nexus.tp = Weekly_Nexus.tptwo
             Weekly_Functions.tpvariation()
-            if (One_Hour_Nexus.backtest == false){
             console.log('pair: ' + Weekly_Nexus.pair)
             console.log('\nTarget Take Profit Has been Surpassed, Anticipating approaching higher level TPs. New Trade Information Loading...')
             console.log('New Target Take Profit: ' + String(Weekly_Nexus.tp))
             console.log('New Take Profit 2: ' + String(Weekly_Nexus.tptwo))
-          }}
+          }
         }
       } else {
         Weekly_Nexus.closePosTP()
@@ -274,16 +272,13 @@ class Weekly_Nexus {
         Weekly_Nexus.posprice = Weekly_Functions.price
         Weekly_Functions.stoploss()
         Weekly_Functions.tpvariation()
-        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Open Buy Order on Weekly')
         console.log('Entry Price: ' + String(Weekly_Nexus.posprice))
         console.log('Stop Loss: ' + String(Weekly_Nexus.sl))
         console.log('Target Take Profit: ' + String(Weekly_Nexus.tp))
         console.log('Take Profit 2: ' + String(Weekly_Nexus.tptwo))
-        fs.writeFileSync('trade.json', JSON.stringify('true'))
       }}
-    }
   }
 
   /* static buy(){
@@ -314,15 +309,12 @@ class Weekly_Nexus {
         Weekly_Nexus.posprice = Weekly_Functions.price
         Weekly_Functions.stoploss()
         Weekly_Functions.tpvariation()
-        if (Weekly_Nexus.backtest == false){
           console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Open Sell Order on Weekly')
         console.log('Entry Price: ' + String(Weekly_Nexus.posprice))
         console.log('Stop Loss: ' + String(Weekly_Nexus.sl))
         console.log('Target Take Profit: ' + String(Weekly_Nexus.tp))
         console.log('Take Profit 2: ' + String(Weekly_Nexus.tptwo))
-        fs.writeFileSync('trade.json', JSON.stringify('true'))
-      }
     }
   }
 }
@@ -379,7 +371,6 @@ class Weekly_Nexus {
   /** main control method, takes control of the entire program and serves as the brain */
   static controlMain () {
     try {
-      Weekly_Functions.rejecinit()
       Weekly_Functions.HistoryAssigner()
       Weekly_Functions.ValueAssigner()
       Daily_Functions.HistoryAssigner()
@@ -432,7 +423,6 @@ class Weekly_Nexus {
         Weekly_Nexus.tstoplosscont()
         Weekly_Nexus.takeProfitSell()
       }
-      Weekly_Functions.rejecsave()
     } catch (error) {
       console.log(error)
     }
@@ -456,13 +446,12 @@ class Weekly_Nexus {
         Weekly_Nexus.piplog = [0, 0, 0]
         const pipchange = Weekly_Functions.pipCountBuy(Weekly_Nexus.posprice, Weekly_Functions.price)
         Weekly_Nexus.pips += Math.abs(pipchange)
-        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Take Profit Hit on Weekly')
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count: ' + Weekly_Nexus.pips)
-      }}
+      }
       if (Weekly_Nexus.sell_pos) {
         Weekly_Nexus.sell_pos = false
         Weekly_Nexus.pos = false
@@ -477,13 +466,12 @@ class Weekly_Nexus {
         Weekly_Nexus.piplog = [0, 0, 0]
         const pipchange = Weekly_Functions.pipCountSell(Weekly_Nexus.posprice, Weekly_Functions.price)
         Weekly_Nexus.pips += Math.abs(pipchange)
-        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Take Profit Hit on Weekly')
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count: ' + Weekly_Nexus.pips)
-      }}
+      }
     }
   }
 
@@ -504,13 +492,12 @@ class Weekly_Nexus {
         Weekly_Nexus.piplog = [0, 0, 0]
         const pipchange = Weekly_Functions.pipCountSell(Weekly_Nexus.posprice, Weekly_Functions.price)
         Weekly_Nexus.pips -= Math.abs(pipchange)
-        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Stop Loss Hit on Weekly')
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
-        console.log('Pip Count' + Weekly_Nexus.pips)
-      }}
+        console.log('Pip Count: ' + Weekly_Nexus.pips)
+      }
       if (Weekly_Nexus.buy_pos) {
         Weekly_Nexus.buy_pos = false
         Weekly_Nexus.pos = false
@@ -525,13 +512,12 @@ class Weekly_Nexus {
         Weekly_Nexus.piplog = [0, 0, 0]
         const pipchange = Weekly_Functions.pipCountBuy(Weekly_Nexus.posprice, Weekly_Functions.price)
         Weekly_Nexus.pips -= Math.abs(pipchange)
-        if (Weekly_Nexus.backtest == false){
         console.log('pair: ' + Weekly_Nexus.pair)
         console.log('Stop Loss Hit on Weekly')
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
-        console.log('Pip Count' + Weekly_Nexus.pips)
-      }
+        console.log('Pip Count: ' + Weekly_Nexus.pips)
+      
     }
   }
 }}
@@ -739,33 +725,6 @@ class Weekly_Functions {
     then register fib levels from the price corresponding to that x value, depending on whether or not its a buy or sell */
   }
 
-  /** Rejection Zone Initiator */
-  static rejecinit () {
-    const instrument = Weekly_Functions.instrument_name()
-    if (!fs.existsSync('./src/Rejection_Archive/' + String(instrument) + '.json')) {
-      Weekly_Functions.timeperiods = {}
-      Weekly_Functions.timeperiods.Fifteen_Min = [0, 0, 0]
-      Weekly_Functions.timeperiods.Thirty_Min = [0, 0, 0]
-      Weekly_Functions.timeperiods.One_Hour = [0, 0, 0]
-      Weekly_Functions.timeperiods.Two_Hour = [0, 0, 0]
-      Weekly_Functions.timeperiods.Four_Hour = [0, 0, 0]
-      Weekly_Functions.timeperiods.Daily = [0, 0, 0]
-      Weekly_Functions.timeperiods.Weekly = [0, 0, 0]
-      fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Weekly_Functions.timeperiods, null, 2))
-    }
-    const raw = fs.readFileSync('./src/Rejection_Archive/' + String(instrument) + '.json')
-    Weekly_Functions.timeperiods = JSON.parse(raw)
-    Weekly_Functions.rejectionzones = JSON.parse(raw).Weekly
-  }
-
-  /** Rejection Zone Saver */
-  static rejecsave () {
-    const instrument = Weekly_Functions.instrument_name()
-    Weekly_Functions.rejectionzones = [...new Set(Weekly_Functions.rejectionzones)]
-    Weekly_Functions.timeperiods.Weekly = Weekly_Functions.rejectionzones
-    fs.writeFileSync('./src/Rejection_Archive/' + String(instrument) + '.json', JSON.stringify(Weekly_Functions.timeperiods, null, 2))
-  }
-
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
   static overall () {
     const extendedhistory = Weekly_Functions.extendHist
@@ -789,6 +748,7 @@ class Weekly_Functions {
 
   /** Do past Analysis to see if this is a good trade, based on static overall() method */
   static analysis (cases, extendedhistory, pricerange) {
+    Weekly_Functions.rejectionzones = [0, 0, 0]
     const histnorm = Weekly_Functions.priceHist
     const normdiff = (Math.max(...histnorm) - Math.min(...histnorm)) * 0.025
     const q = bolls.calculate({ period: 10, values: extendedhistory, stdDev: 1 })
