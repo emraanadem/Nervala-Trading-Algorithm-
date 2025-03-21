@@ -4,6 +4,7 @@ import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as
 import { createModel } from 'polynomial-regression'
 import * as nerdamer from 'nerdamer/all.min.js'
 import * as roots from 'kld-polynomial'
+import { sendSignal } from './metatrader-connector.js'
 
 let instrum = ''
 
@@ -281,21 +282,15 @@ class Fifteen_Min_Nexus {
         console.log('Target Take Profit: ' + String(Fifteen_Min_Nexus.tp))
         console.log('Take Profit 2: ' + String(Fifteen_Min_Nexus.tptwo))
     }
-  }
-}
-  /* static buy(){
-        Fifteen_Min_Functions.supreslevs()
-        Fifteen_Min_Functions.getPrice()
-        Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.resistance
-        Fifteen_Min_Nexus.pos = true
-        Fifteen_Min_Nexus.buy_pos = true
-        Fifteen_Min_Nexus.posprice = Fifteen_Min_Functions.price
-                Fifteen_Min_Functions.stoploss()
-                Fifteen_Min_Functions.tpvariation()
-        console.log("Open Buy Order")
-        console.log(Fifteen_Min_Nexus.sl + " : Stop Loss")
-        console.log(Fifteen_Min_Nexus.tp + " : Target Take Profit")
-        } */
+    sendSignal(
+      'BUY',
+      Fifteen_Min_Nexus.pair,
+      Fifteen_Min_Nexus.sl,
+      Fifteen_Min_Nexus.tp,
+      0.01, // Smaller size for shorter timeframe
+      'FifteenMin'
+    );
+  }}
 
   /** initiates a sell order */
   static sell () {
@@ -319,22 +314,15 @@ class Fifteen_Min_Nexus {
         console.log('Target Take Profit: ' + String(Fifteen_Min_Nexus.tp))
         console.log('Take Profit 2: ' + String(Fifteen_Min_Nexus.tptwo))
     }
-  }
-}
-
-  /* static sell(){
-        Fifteen_Min_Functions.supreslevs()
-        Fifteen_Min_Functions.getPrice()
-        Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.support
-        Fifteen_Min_Nexus.pos = true
-        Fifteen_Min_Nexus.sell_pos = true
-        Fifteen_Min_Nexus.posprice = Fifteen_Min_Functions.price
-                Fifteen_Min_Functions.stoploss()
-                Fifteen_Min_Functions.tpvariation()
-        console.log("Open Sell Order")
-        console.log(Fifteen_Min_Nexus.sl + " : Stop Loss")
-        console.log(Fifteen_Min_Nexus.tp + " : Target Take Profit")
-        } */
+    sendSignal(
+      'SELL',
+      Fifteen_Min_Nexus.pair,
+      Fifteen_Min_Nexus.sl,
+      Fifteen_Min_Nexus.tp,
+      0.01, // Smaller size for shorter timeframe
+      'FifteenMin'
+    );
+  }}
 
   /** checks for price movement in lower periods to get better idea of the trend */
   static controlSmallerPeriod () {
@@ -478,6 +466,14 @@ class Fifteen_Min_Nexus {
         console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
         console.log('Pip Count: ' + Fifteen_Min_Nexus.pips)
+        sendSignal(
+          'CLOSE_BUY',
+          Fifteen_Min_Nexus.pair,
+          0,
+          0,
+          0.01,
+          'FifteenMin'
+        );
       }
       if (Fifteen_Min_Nexus.sell_pos) {
         Fifteen_Min_Nexus.sell_pos = false
@@ -498,6 +494,14 @@ class Fifteen_Min_Nexus {
         console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
         console.log('Pip Count: ' + Fifteen_Min_Nexus.pips)
+        sendSignal(
+          'CLOSE_SELL',
+          Fifteen_Min_Nexus.pair,
+          0,
+          0,
+          0.01,
+          'FifteenMin'
+        );
       }
     }
   }
@@ -524,6 +528,14 @@ class Fifteen_Min_Nexus {
         console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
         console.log('Pip Count: ' + Fifteen_Min_Nexus.pips)
+        sendSignal(
+          'CLOSE_SELL',
+          Fifteen_Min_Nexus.pair,
+          0,
+          0,
+          0.01,
+          'FifteenMin'
+        );
       }
       if (Fifteen_Min_Nexus.buy_pos) {
         Fifteen_Min_Nexus.buy_pos = false
@@ -544,7 +556,28 @@ class Fifteen_Min_Nexus {
         console.log(Fifteen_Min_Nexus.wins + ' Wins and     ' + Fifteen_Min_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Fifteen_Min_Nexus.wins / Fifteen_Min_Nexus.trades)
         console.log('Pip Count: ' + Fifteen_Min_Nexus.pips)
+        sendSignal(
+          'CLOSE_BUY',
+          Fifteen_Min_Nexus.pair,
+          0,
+          0,
+          0.01,
+          'FifteenMin'
+        );
       }
+    }
+  }
+
+  // Add a method for trailing stop modifications if applicable
+  static updateTrailingStop() {
+    if (Fifteen_Min_Nexus.tstop && Fifteen_Min_Nexus.pos) {
+      sendSignal('FifteenMin', {
+        action: 'MODIFY',
+        symbol: Fifteen_Min_Nexus.pair,
+        stopLoss: Fifteen_Min_Nexus.tstoploss,
+        takeProfit: Fifteen_Min_Nexus.tp,
+        reason: 'Trailing stop update from 15-min strategy'
+      });
     }
   }
 }
@@ -819,7 +852,7 @@ class Fifteen_Min_Functions {
           }
         }
       }
-      if (mincount || maxcount > 4) {
+      if (mincount > 4 || maxcount > 4) {
         rejection++
         if (fractals.length < 1) {
           fractals.push(0)
@@ -880,8 +913,8 @@ class Fifteen_Min_Functions {
   /** find whether trend is going up or down */
   static trend () {
     const history = Fifteen_Min_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   /** recent history, shortens history array into last 50 digits for different analyses */
@@ -1609,8 +1642,8 @@ class Four_Hour_Functions {
   /** find whether trend is going up or down */
   static trend () {
     const history = Four_Hour_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   /** recent history, shortens history array into last 50 digits for different analyses */
@@ -2243,8 +2276,8 @@ class Five_Min_Functions {
 
   static trend () {
     const history = Five_Min_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   static rsi () {

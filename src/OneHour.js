@@ -4,6 +4,8 @@ import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as
 import { createModel } from 'polynomial-regression'
 import * as nerdamer from 'nerdamer/all.min.js'
 import * as roots from 'kld-polynomial'
+// Import MetaTrader connector
+import { sendSignal } from './metatrader-connector.js'
 
 let instrum = ''
 
@@ -278,23 +280,19 @@ class One_Hour_Nexus {
         console.log('Stop Loss: ' + String(One_Hour_Nexus.sl))
         console.log('Target Take Profit: ' + String(One_Hour_Nexus.tp))
         console.log('Take Profit 2: ' + String(One_Hour_Nexus.tptwo))
-      
+        
+        // Send signal to MetaTrader
+        sendSignal(
+          'BUY',
+          One_Hour_Nexus.pair,
+          One_Hour_Nexus.sl,
+          One_Hour_Nexus.tp,
+          0.01,
+          'OneHour'
+        );
+      }
     }
   }
-}
-
-  /* static buy(){
-        One_Hour_Functions.supreslevs()
-        One_Hour_Functions.getPrice()
-        One_Hour_Nexus.tp = One_Hour_Nexus.resistance
-        One_Hour_Nexus.pos = true
-        One_Hour_Nexus.buy_pos = true
-        One_Hour_Nexus.posprice = One_Hour_Functions.price
-                One_Hour_Nexus.stoplossdef()
-        console.log("Open Buy Order")
-        console.log(One_Hour_Nexus.sl + " : Stop Loss")
-        console.log(One_Hour_Nexus.tp + " : Target Take Profit")
-        } */
 
   /** initiates a sell order */
   static sell () {
@@ -316,22 +314,19 @@ class One_Hour_Nexus {
         console.log('Stop Loss: ' + String(One_Hour_Nexus.sl))
         console.log('Target Take Profit: ' + String(One_Hour_Nexus.tp))
         console.log('Take Profit 2: ' + String(One_Hour_Nexus.tptwo))
+        
+        // Send signal to MetaTrader
+        sendSignal(
+          'SELL',
+          One_Hour_Nexus.pair,
+          One_Hour_Nexus.sl,
+          One_Hour_Nexus.tp,
+          0.01,
+          'OneHour'
+        );
+      }
     }
   }
-}
-
-  /* static sell(){
-        One_Hour_Functions.supreslevs()
-        One_Hour_Functions.getPrice()
-        One_Hour_Nexus.tp = One_Hour_Nexus.support
-        One_Hour_Nexus.pos = true
-        One_Hour_Nexus.sell_pos = true
-        One_Hour_Nexus.posprice = One_Hour_Functions.price
-                One_Hour_Nexus.stoplossdef()
-        console.log("Open Sell Order")
-        console.log(One_Hour_Nexus.sl + " : Stop Loss")
-        console.log(One_Hour_Nexus.tp + " : Target Take Profit")
-        } */
 
   /** checks for price movement in lower periods to get better idea of the trend */
   static controlSmallerPeriod () {
@@ -350,8 +345,8 @@ class One_Hour_Nexus {
     let sell = false
     if (!Four_Hour_Functions.rejectionzoning() &&
             !Fifteen_Min_Functions.consolidationtwo() && !Five_Min_Functions.consolidationtwo()) {
-      if (Daily_Functions.trend() && Thirty_Min_Functions.ema()) {
-        if (Fifteen_Min_Functions.trend() && Thirty_Min_Functions.macd() && Thirty_Min_Functions.obv()) {
+      if (Thirty_Min_Functions.ema()) {
+        if (Thirty_Min_Functions.macd() && Thirty_Min_Functions.obv()) {
           if (Fifteen_Min_Functions.ema()) {
             if (Fifteen_Min_Functions.rsi() && Fifteen_Min_Functions.obv()) {
               buy = true
@@ -359,8 +354,8 @@ class One_Hour_Nexus {
           }
         }
       }
-      if (!Daily_Functions.trend() && !Thirty_Min_Functions.ema()) {
-        if (!Fifteen_Min_Functions.trend() && !Thirty_Min_Functions.macd() && !Thirty_Min_Functions.obv()) {
+      if (!Thirty_Min_Functions.ema()) {
+        if (!Thirty_Min_Functions.macd() && !Thirty_Min_Functions.obv()) {
           if (!Fifteen_Min_Functions.ema()) {
             if (!Fifteen_Min_Functions.rsi() && !Fifteen_Min_Functions.obv()) {
               sell = true
@@ -476,6 +471,14 @@ class One_Hour_Nexus {
         console.log(One_Hour_Nexus.wins + ' Wins and     ' + One_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + One_Hour_Nexus.wins / One_Hour_Nexus.trades)
         console.log('Pip Count: ' + One_Hour_Nexus.pips)
+        sendSignal(
+          'CLOSE_BUY',
+          One_Hour_Nexus.pair,
+          0,
+          0,
+          0.01,
+          'OneHour'
+        );
       }
       if (One_Hour_Nexus.sell_pos) {
         One_Hour_Nexus.sell_pos = false
@@ -496,9 +499,18 @@ class One_Hour_Nexus {
         console.log(One_Hour_Nexus.wins + ' Wins and     ' + One_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + One_Hour_Nexus.wins / One_Hour_Nexus.trades)
         console.log('Pip Count: ' + One_Hour_Nexus.pips)
+        sendSignal(
+          'CLOSE_SELL',
+          One_Hour_Nexus.pair,
+          0,
+          0,
+          0.01,
+          'OneHour'
+        );
+      }
     }
   }
-}
+  
   /** close position method for stopping out of losses, also gives pip count and win/loss ratio */
   static closePosSL () {
     if (One_Hour_Nexus.pos) {
@@ -521,6 +533,14 @@ class One_Hour_Nexus {
         console.log(One_Hour_Nexus.wins + ' Wins and     ' + One_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + One_Hour_Nexus.wins / One_Hour_Nexus.trades)
         console.log('Pip Count: ' + One_Hour_Nexus.pips)
+        sendSignal(
+          'CLOSE_BUY',
+          One_Hour_Nexus.pair,
+          0,
+          0,
+          0.01,
+          'OneHour'
+        );
       }
       if (One_Hour_Nexus.buy_pos) {
         One_Hour_Nexus.buy_pos = false
@@ -541,6 +561,58 @@ class One_Hour_Nexus {
         console.log(One_Hour_Nexus.wins + ' Wins and     ' + One_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + One_Hour_Nexus.wins / One_Hour_Nexus.trades)
         console.log('Pip Count: ' + One_Hour_Nexus.pips)
+        sendSignal(
+          'CLOSE_SELL',
+          One_Hour_Nexus.pair,
+          0,
+          0,
+          0.01,
+          'OneHour'
+        );
+      }
+    }
+  }
+
+  // Add a method for trailing stop loss modification
+  static updateTrailingStop() {
+    if (One_Hour_Nexus.tstop && One_Hour_Nexus.pos) {
+      // Send modification signal to MetaTrader
+      sendSignal('OneHour', {
+        action: 'MODIFY',
+        symbol: One_Hour_Nexus.pair,
+        stopLoss: One_Hour_Nexus.tstoploss,
+        takeProfit: One_Hour_Nexus.tp,
+        reason: 'Trailing stop update from One Hour strategy'
+      });
+    }
+  }
+
+  // Modify to call updateTrailingStop when tstoploss changes
+  static tstoplossdef() {
+    One_Hour_Nexus.sldiff = One_Hour_Functions.stoploss()
+    const stoploss = One_Hour_Nexus.sldiff
+    if (One_Hour_Nexus.buy_pos) {
+      if (One_Hour_Functions.price > One_Hour_Nexus.posprice + 0.3 * stoploss) {
+        One_Hour_Nexus.tstop = true
+        const previousTstoploss = One_Hour_Nexus.tstoploss
+        One_Hour_Nexus.tstoploss = One_Hour_Nexus.posprice + One_Hour_Functions.pipreverse(One_Hour_Nexus.posprice, 0.618 * One_Hour_Nexus.bigpipprice)
+        
+        // If trailing stop changed significantly, update it in MetaTrader
+        if (Math.abs(previousTstoploss - One_Hour_Nexus.tstoploss) > 0.0001 && previousTstoploss !== 0) {
+          One_Hour_Nexus.updateTrailingStop();
+        }
+      }
+    }
+    if (One_Hour_Nexus.sell_pos) {
+      if (One_Hour_Functions.price < One_Hour_Nexus.posprice - 0.3 * stoploss) {
+        One_Hour_Nexus.tstop = true
+        const previousTstoploss = One_Hour_Nexus.tstoploss
+        One_Hour_Nexus.tstoploss = One_Hour_Nexus.posprice - One_Hour_Functions.pipreverse(One_Hour_Nexus.posprice, 0.618 * One_Hour_Nexus.bigpipprice)
+        
+        // If trailing stop changed significantly, update it in MetaTrader
+        if (Math.abs(previousTstoploss - One_Hour_Nexus.tstoploss) > 0.0001 && previousTstoploss !== 0) {
+          One_Hour_Nexus.updateTrailingStop();
+        }
       }
     }
   }
@@ -826,7 +898,8 @@ class One_Hour_Functions {
           }
         }
       }
-      if (mincount || maxcount > 4) {
+      // FIXED: Only count as rejection if mincount OR maxcount exceed threshold
+      if (mincount > 4 || maxcount > 4) {
         rejection++
         if (fractals.length < 1) {
           fractals.push(0)
@@ -838,7 +911,6 @@ class One_Hour_Functions {
       }
     }
     if (One_Hour_Functions.rejectionzones.length < 1) {
-      One_Hour_Functions.rejectionzones.push(One_Hour_Functions.price)
     }
     if (rejection > 2) {
       return false
@@ -887,8 +959,8 @@ class One_Hour_Functions {
   /** find whether trend is going up or down */
   static trend () {
     const history = One_Hour_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   /** recent history, shortens history array into last 50 digits for different analyses */
@@ -1703,24 +1775,27 @@ class Four_Hour_Functions {
     for (let val = 0; val < cases.length; val++) {
       fractals.push(cases[val][0])
     }
-    for (let val = 3; val < fractals.length - 3; val++) {
+    for (let val = 0; val < fractals.length; val++) {
       let mincount = 0
       let maxcount = 0
-      for (let value = 1; value < 4; value++) {
-        if (fractals[val] > fractals[val - value]) {
-          maxcount++
-        }
-        if (fractals[val] > fractals[val + value]) {
-          maxcount++
-        }
-        if (fractals[val] < fractals[val - value]) {
-          mincount++
-        }
-        if (fractals[val] < fractals[val + value]) {
-          mincount++
+      for (let value = 0; value < 3; value++) {
+        if ((fractals[val] < extendedhistory.length - 2) && (fractals[val] > 1)) {
+          if (extendedhistory[fractals[val]] > extendedhistory[fractals[val] - value]) {
+            maxcount++
+          }
+          if (extendedhistory[fractals[val]] > extendedhistory[fractals[val] + value]) {
+            maxcount++
+          }
+          if (extendedhistory[fractals[val]] < extendedhistory[fractals[val] - value]) {
+            mincount++
+          }
+          if (extendedhistory[fractals[val]] < extendedhistory[fractals[val] + value]) {
+            mincount++
+          }
         }
       }
-      if (mincount + maxcount > 4) {
+      // FIXED: Only count as rejection if mincount OR maxcount exceed threshold
+      if (mincount > 4 || maxcount > 4) {
         rejection++
         if (fractals.length < 1) {
           fractals.push(0)
@@ -1732,7 +1807,6 @@ class Four_Hour_Functions {
       }
     }
     if (Four_Hour_Functions.rejectionzones.length < 1) {
-      Four_Hour_Functions.rejectionzones.push(Four_Hour_Functions.price)
     }
     if (rejection > 2) {
       return false

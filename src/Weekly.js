@@ -4,6 +4,7 @@ import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as
 import { createModel } from 'polynomial-regression'
 import * as nerdamer from 'nerdamer/all.min.js'
 import * as roots from 'kld-polynomial'
+import { sendSignal } from './metatrader-connector.js'
 
 let instrum = ''
 
@@ -279,6 +280,14 @@ class Weekly_Nexus {
         console.log('Target Take Profit: ' + String(Weekly_Nexus.tp))
         console.log('Take Profit 2: ' + String(Weekly_Nexus.tptwo))
       }}
+    sendSignal(
+      'BUY',
+      Weekly_Nexus.pair,
+      Weekly_Nexus.sl,
+      Weekly_Nexus.tp,
+      0.1, // Higher volume for longest timeframe
+      'Weekly'
+    );
   }
 
   /* static buy(){
@@ -316,6 +325,14 @@ class Weekly_Nexus {
         console.log('Target Take Profit: ' + String(Weekly_Nexus.tp))
         console.log('Take Profit 2: ' + String(Weekly_Nexus.tptwo))
     }
+    sendSignal(
+      'SELL',
+      Weekly_Nexus.pair,
+      Weekly_Nexus.sl,
+      Weekly_Nexus.tp,
+      0.1, // Higher volume for longest timeframe
+      'Weekly'
+    );
   }
 }
 
@@ -451,6 +468,14 @@ class Weekly_Nexus {
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count: ' + Weekly_Nexus.pips)
+        sendSignal(
+          'CLOSE_BUY',
+          Weekly_Nexus.pair,
+          0,
+          0,
+          0.1,
+          'Weekly'
+        );
       }
       if (Weekly_Nexus.sell_pos) {
         Weekly_Nexus.sell_pos = false
@@ -471,8 +496,21 @@ class Weekly_Nexus {
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count: ' + Weekly_Nexus.pips)
+        sendSignal(
+          'CLOSE_SELL',
+          Weekly_Nexus.pair,
+          0,
+          0,
+          0.1,
+          'Weekly'
+        );
       }
     }
+    sendSignal('Weekly', {
+      action: 'CLOSE',
+      symbol: Weekly_Nexus.pair,
+      reason: 'Take profit signal from Weekly strategy'
+    });
   }
 
   /** close position method for stopping out of losses, also gives pip count and win/loss ratio */
@@ -497,6 +535,14 @@ class Weekly_Nexus {
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count: ' + Weekly_Nexus.pips)
+        sendSignal(
+          'CLOSE_BUY',
+          Weekly_Nexus.pair,
+          0,
+          0,
+          0.1,
+          'Weekly'
+        );
       }
       if (Weekly_Nexus.buy_pos) {
         Weekly_Nexus.buy_pos = false
@@ -517,10 +563,35 @@ class Weekly_Nexus {
         console.log(Weekly_Nexus.wins + ' Wins and     ' + Weekly_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Weekly_Nexus.wins / Weekly_Nexus.trades)
         console.log('Pip Count: ' + Weekly_Nexus.pips)
-      
+        sendSignal(
+          'CLOSE_SELL',
+          Weekly_Nexus.pair,
+          0,
+          0,
+          0.1,
+          'Weekly'
+        );
+      }
+    }
+    sendSignal('Weekly', {
+      action: 'CLOSE',
+      symbol: Weekly_Nexus.pair,
+      reason: 'Stop loss signal from Weekly strategy'
+    });
+  }
+
+  static updateTrailingStop() {
+    if (Weekly_Nexus.tstop && Weekly_Nexus.pos) {
+      sendSignal('Weekly', {
+        action: 'MODIFY',
+        symbol: Weekly_Nexus.pair,
+        stopLoss: Weekly_Nexus.tstoploss,
+        takeProfit: Weekly_Nexus.tp,
+        reason: 'Trailing stop update from Weekly strategy'
+      });
     }
   }
-}}
+}
 
 class Weekly_Functions {
   multiplier = 0
@@ -790,7 +861,7 @@ class Weekly_Functions {
           }
         }
       }
-      if (mincount || maxcount > 4) {
+      if (mincount > 4 || maxcount > 4) {
         rejection++
         if (fractals.length < 1) {
           fractals.push(0)
@@ -851,8 +922,8 @@ class Weekly_Functions {
   /** find whether trend is going up or down */
   static trend () {
     const history = Weekly_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   /** recent history, shortens history array into last 50 digits for different analyses */
@@ -1346,8 +1417,8 @@ class Daily_Functions {
 
   static trend () {
     const history = Daily_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   static rsi () {
@@ -1464,8 +1535,8 @@ class One_Hour_Functions {
 
   static trend () {
     const history = One_Hour_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   static rsi () {
@@ -1582,8 +1653,8 @@ class Thirty_Min_Functions {
 
   static trend () {
     const history = Thirty_Min_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   static rsi () {

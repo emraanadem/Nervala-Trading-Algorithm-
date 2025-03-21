@@ -11,7 +11,7 @@ import { testweekly } from './Weekly.js'
 async function getCandleData (baseUrl, options, timescaleLabel) {
   while (true) {
     try {
-      const params = `count=2500&granularity=${timescaleLabel[0]}`
+      const params = `count=5000&granularity=${timescaleLabel[0]}`
       const res = await fetch(baseUrl + params, {
         ...options,
         signal: AbortSignal.timeout(30000) // 30 second timeout
@@ -22,13 +22,12 @@ async function getCandleData (baseUrl, options, timescaleLabel) {
       }
       
       const data = await res.json()
-
       const candleData = {}
       candleData[`${timescaleLabel[1]}`] = {}
-      candleData[`${timescaleLabel[1]}`].o = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.o))
-      candleData[`${timescaleLabel[1]}`].h = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.h))
-      candleData[`${timescaleLabel[1]}`].l = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.l))
-      candleData[`${timescaleLabel[1]}`].c = data.candles.slice(Math.max(data.candles.length - 1000, 0), data.candles.length).map((x) => parseFloat(x.mid.c))
+      candleData[`${timescaleLabel[1]}`].o = data.candles.slice(Math.max(data.candles.length - 4000, 0), data.candles.length).map((x) => parseFloat(x.mid.o))
+      candleData[`${timescaleLabel[1]}`].h = data.candles.slice(Math.max(data.candles.length - 4000, 0), data.candles.length).map((x) => parseFloat(x.mid.h))
+      candleData[`${timescaleLabel[1]}`].l = data.candles.slice(Math.max(data.candles.length - 4000, 0), data.candles.length).map((x) => parseFloat(x.mid.l))
+      candleData[`${timescaleLabel[1]}`].c = data.candles.slice(Math.max(data.candles.length - 4000, 0), data.candles.length).map((x) => parseFloat(x.mid.c))
       candleData[`${timescaleLabel[1]}_Extend`] = {}
       candleData[`${timescaleLabel[1]}_Extend`].o = data.candles.map((x) => parseFloat(x.mid.o))
       candleData[`${timescaleLabel[1]}_Extend`].h = data.candles.map((x) => parseFloat(x.mid.h))
@@ -126,7 +125,9 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
     }
   }
 
-  while (loop) {
+  
+  // CRITICAL FIX: Use while(true) instead of do-while to ensure true infinite loop
+  while (true) {
     try {
       const candleData = await getAggregatedCandleData(baseUrl, options)
       const price = await getPrice(baseUrl, options)
@@ -180,6 +181,7 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
           candleData[extended].c = candleData[extended].c.slice(-globalMinLength)
         }
 
+        // Run all the test functions for each timeframe
         testfifteen(candleData, price, instrument)
         testthirtymin(candleData, price, instrument)
         testonehour(candleData, price, instrument)
@@ -189,10 +191,50 @@ export async function checkForSignals (instrument, accountInfo, proxy = null, pr
         testweekly(candleData, price, instrument)
       }
     } catch (error) {
-      console.error('Error in checkForSignals:', error)
+      console.error(`Error in checkForSignals for ${instrument}:`, error)
+      console.log(`Error encountered but continuing loop for ${instrument}...`);
+      // Don't break the loop - just continue after a delay
     }
+    
+    // Always add a delay between cycles to prevent API rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100)); // 1 second between cycles
   }
+  
+  // This line should never be reached
+  console.log(`WARNING: Loop unexpectedly ended for ${instrument}`);
+  return true;
 }
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
 have been included with this distribution. */
+
+// Queue instruments in batches to avoid memory spikes
+function queueInstruments(instruments) {
+  console.log(`Queueing ${instruments.length} instruments`);
+  
+  let accountIndex = 0;
+  let proxyIndex = 0;
+  
+  // Process instruments in smaller batches
+  for (let i = 0; i < instruments.length; i += BATCH_SIZE) {
+    const batch = instruments.slice(i, i + BATCH_SIZE);
+    console.log(`Scheduling batch ${Math.floor(i / BATCH_SIZE) + 1} with ${batch.length} instruments`);
+    
+    // Add delay between batches to allow memory to be freed
+    setTimeout(() => {
+      batch.forEach(instrument => {
+        const account = accounts[accountIndex % accounts.length];
+        const proxy = proxies[proxyIndex % proxies.length];
+        
+        console.log(`Adding to queue: ${instrument}`);
+        workerQueue.push({ instrument, account, proxy });
+        
+        accountIndex++;
+        proxyIndex++;
+      });
+      
+      // Start processing this batch
+      processQueue();
+    }, Math.floor(i / BATCH_SIZE) * 1000); // 1 second delay between batches
+  }
+}

@@ -4,6 +4,7 @@ import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as
 import { createModel } from 'polynomial-regression'
 import * as nerdamer from 'nerdamer/all.min.js'
 import * as roots from 'kld-polynomial'
+import { sendSignal } from './metatrader-connector.js'
 
 let instrum = ''
 
@@ -277,21 +278,17 @@ class Four_Hour_Nexus {
         console.log('Target Take Profit: ' + String(Four_Hour_Nexus.tp))
         console.log('Take Profit 2: ' + String(Four_Hour_Nexus.tptwo))
     }
-  }
-}
-  /* static buy(){
-        Four_Hour_Functions.supreslevs()
-        Four_Hour_Functions.getPrice()
-        Four_Hour_Nexus.tp = Four_Hour_Nexus.resistance
-        Four_Hour_Nexus.pos = true
-        Four_Hour_Nexus.buy_pos = true
-        Four_Hour_Nexus.posprice = Four_Hour_Functions.price
-                Four_Hour_Functions.stoploss()
-                Four_Hour_Functions.tpvariation()
-        console.log("Open Buy Order")
-        console.log(Four_Hour_Nexus.sl + " : Stop Loss")
-        console.log(Four_Hour_Nexus.tp + " : Target Take Profit")
-        } */
+    
+    // Add at the end of the buy method, before the closing bracket
+    sendSignal(
+      'BUY',
+      Four_Hour_Nexus.pair,
+      Four_Hour_Nexus.sl,
+      Four_Hour_Nexus.tp,
+      0.02, // Higher volume for longer timeframe
+      'FourHour'
+    );
+  }}
 
   /** initiates a sell order */
   static sell () {
@@ -314,21 +311,18 @@ class Four_Hour_Nexus {
         console.log('Target Take Profit: ' + String(Four_Hour_Nexus.tp))
         console.log('Take Profit 2: ' + String(Four_Hour_Nexus.tptwo))
       }
+    }
+    
+    // Add at the end of the sell method, before the closing bracket
+    sendSignal(
+      'SELL',
+      Four_Hour_Nexus.pair,
+      Four_Hour_Nexus.sl,
+      Four_Hour_Nexus.tp,
+      0.02, // Higher volume for longer timeframe
+      'FourHour'
+    );
   }
-}
-  /* static sell(){
-        Four_Hour_Functions.supreslevs()
-        Four_Hour_Functions.getPrice()
-        Four_Hour_Nexus.tp = Four_Hour_Nexus.support
-        Four_Hour_Nexus.pos = true
-        Four_Hour_Nexus.sell_pos = true
-        Four_Hour_Nexus.posprice = Four_Hour_Functions.price
-                Four_Hour_Functions.stoploss()
-                Four_Hour_Functions.tpvariation()
-        console.log("Open Sell Order")
-        console.log(Four_Hour_Nexus.sl + " : Stop Loss")
-        console.log(Four_Hour_Nexus.tp + " : Target Take Profit")
-        } */
 
   /** checks for price movement in lower periods to get better idea of the trend */
   static controlSmallerPeriod () {
@@ -474,6 +468,14 @@ class Four_Hour_Nexus {
         console.log(Four_Hour_Nexus.wins + ' Wins and     ' + Four_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Four_Hour_Nexus.wins / Four_Hour_Nexus.trades)
         console.log('Pip Count: ' + Four_Hour_Nexus.pips)
+        sendSignal(
+          'CLOSE_BUY',
+          Four_Hour_Nexus.pair,
+          0,
+          0,
+          0.02,
+          'FourHour'
+        );
       }
       if (Four_Hour_Nexus.sell_pos) {
         Four_Hour_Nexus.sell_pos = false
@@ -494,6 +496,14 @@ class Four_Hour_Nexus {
         console.log(Four_Hour_Nexus.wins + ' Wins and     ' + Four_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Four_Hour_Nexus.wins / Four_Hour_Nexus.trades)
         console.log('Pip Count: ' + Four_Hour_Nexus.pips)
+        sendSignal(
+          'CLOSE_SELL',
+          Four_Hour_Nexus.pair,
+          0,
+          0,
+          0.02,
+          'FourHour'
+        );
       }
     }
   }
@@ -520,6 +530,14 @@ class Four_Hour_Nexus {
         console.log(Four_Hour_Nexus.wins + ' Wins and     ' + Four_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Four_Hour_Nexus.wins / Four_Hour_Nexus.trades)
         console.log('Pip Count: ' + Four_Hour_Nexus.pips)
+        sendSignal(
+          'CLOSE_SELL',
+          Four_Hour_Nexus.pair,
+          0,
+          0,
+          0.02,
+          'FourHour'
+        );
       }
       if (Four_Hour_Nexus.buy_pos) {
         Four_Hour_Nexus.buy_pos = false
@@ -540,10 +558,31 @@ class Four_Hour_Nexus {
         console.log(Four_Hour_Nexus.wins + ' Wins and     ' + Four_Hour_Nexus.losses + ' Losses')
         console.log('Win Ratio: ' + Four_Hour_Nexus.wins / Four_Hour_Nexus.trades)
         console.log('Pip Count: ' + Four_Hour_Nexus.pips)
-      }}
+        sendSignal(
+          'CLOSE_BUY',
+          Four_Hour_Nexus.pair,
+          0,
+          0,
+          0.02,
+          'FourHour'
+        );
+      }
     }
   }
 
+  // Add this new method after closePosSL and before the class ends
+  static updateTrailingStop() {
+    if (Four_Hour_Nexus.tstop && Four_Hour_Nexus.pos) {
+      sendSignal('FourHour', {
+        action: 'MODIFY',
+        symbol: Four_Hour_Nexus.pair,
+        stopLoss: Four_Hour_Nexus.tstoploss,
+        takeProfit: Four_Hour_Nexus.tp,
+        reason: 'Trailing stop update from FourHour strategy'
+      });
+    }
+  }
+}
 
 class Four_Hour_Functions {
   multiplier = 0
@@ -813,7 +852,7 @@ class Four_Hour_Functions {
           }
         }
       }
-      if (mincount || maxcount > 4) {
+      if (mincount > 4 || maxcount > 4) {
         rejection++
         if (fractals.length < 1) {
           fractals.push(0)
@@ -873,8 +912,8 @@ class Four_Hour_Functions {
   /** find whether trend is going up or down */
   static trend () {
     const history = Four_Hour_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   /** recent history, shortens history array into last 50 digits for different analyses */
@@ -1698,8 +1737,8 @@ class One_Hour_Functions {
 
   static trend () {
     const history = One_Hour_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   static rsi () {
@@ -1816,8 +1855,8 @@ class Thirty_Min_Functions {
 
   static trend () {
     const history = Thirty_Min_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   static rsi () {
@@ -1934,8 +1973,8 @@ class Fifteen_Min_Functions {
 
   static trend () {
     const history = Fifteen_Min_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] > history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] < history[history.length - 3]) { return false }
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
 
   static rsi () {
