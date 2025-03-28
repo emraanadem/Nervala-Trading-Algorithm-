@@ -2,7 +2,14 @@ import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardR
 import { createChart, CrosshairMode, LineStyle } from 'lightweight-charts';
 import { Activity, ArrowDown, ArrowUp, X, Clock } from 'lucide-react';
 
-export default forwardRef(({ pair, timeframe }, ref) => {
+// Add helper function for formatting price values consistently
+const formatPrice = (price, pair) => {
+  if (price === null || price === undefined) return '';
+  const precision = pair.includes('JPY') ? 3 : 5;
+  return price.toFixed(precision);
+};
+
+export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
   // First, ensure all references are initialized at the component top level
   // to avoid "Cannot access uninitialized variable" errors
 
@@ -12,6 +19,7 @@ export default forwardRef(({ pair, timeframe }, ref) => {
   const candlestickSeriesRef = useRef(null);
   const volumeSeriesRef = useRef(null);
   const priceLabelRef = useRef(null);
+  const markerSeriesRef = useRef(null);
   const resizeObserverRef = useRef(null);
   const timerRef = useRef(null);
   const updateIntervalRef = useRef(null);
@@ -20,6 +28,7 @@ export default forwardRef(({ pair, timeframe }, ref) => {
   const chartInitializedRef = useRef(false);
   const isRetryingRef = useRef(false);
   const containerReadyRef = useRef(false);
+  const tradesContainerRef = useRef(null);
 
   // Define state variables next
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +36,8 @@ export default forwardRef(({ pair, timeframe }, ref) => {
   const [currentPrice, setCurrentPrice] = useState(null);
   const [priceChangePositive, setPriceChangePositive] = useState(true);
   const [lastUpdateTime, setLastUpdateTime] = useState(null);
+  const [trades, setTrades] = useState([]);
+  const [isFetchingTrades, setIsFetchingTrades] = useState(false);
 
   // Define utility functions before they're used
   const cleanupTimersAndIntervals = useCallback(() => {
@@ -137,7 +148,7 @@ export default forwardRef(({ pair, timeframe }, ref) => {
               try {
                 priceLabelRef.current.applyOptions({
                   price: numericPrice,
-                  title: `Live: ${numericPrice.toFixed(pair.includes('JPY') ? 3 : 5)}`,
+                  title: `Live: ${formatPrice(numericPrice, pair)}`,
                 });
               } catch (err) {
                 console.error("Error updating price line:", err);
@@ -158,6 +169,32 @@ export default forwardRef(({ pair, timeframe }, ref) => {
         setIsLoading(false);
         setError(null);
         
+        // Ensure chart is showing appropriate price range
+        try {
+          // Adjust the visible range to ensure we see enough price levels
+          const visibleRange = chartRef.current.timeScale().getVisibleRange();
+          if (visibleRange) {
+            const priceScale = chartRef.current.priceScale('right');
+            if (priceScale) {
+              // Force price scale update
+              priceScale.applyOptions({
+                autoScale: true,
+                mode: 0,
+                ticksVisible: true,
+                scaleMargins: {
+                  top: 0.1, 
+                  bottom: 0.1,
+                },
+              });
+            }
+          }
+          
+          // Fit content with animation
+          chartRef.current.timeScale().fitContent();
+        } catch (err) {
+          console.error("Error adjusting price scale:", err);
+        }
+        
         return data;
       })
       .catch(error => {
@@ -172,6 +209,132 @@ export default forwardRef(({ pair, timeframe }, ref) => {
         isFetchingRef.current = false;
       });
   }, [pair, timeframe, currentPrice]);
+
+  // Define fetchTrades function to get trade data
+  const fetchTrades = useCallback(() => {
+    if (isFetchingTrades || !isMountedRef.current) {
+      console.log("Trades fetch already in progress or component unmounted, skipping");
+      return Promise.resolve();
+    }
+    
+    console.log(`Fetching trades for ${pair}/${timeframe}`);
+    setIsFetchingTrades(true);
+    
+    return fetch(`/api/trades?pair=${pair}&timeframe=${timeframe}&_=${Date.now()}`, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store',
+        'Pragma': 'no-cache'
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (!isMountedRef.current) {
+          console.log("Component unmounted during trades fetch");
+          return;
+        }
+        
+        console.log(`Received ${data.trades?.length || 0} trades`);
+        
+        if (!data.trades || !Array.isArray(data.trades)) {
+          throw new Error('No valid trade data received');
+        }
+        
+        setTrades(data.trades);
+        
+        // Update markers on chart if chart is initialized
+        if (chartRef.current && candlestickSeriesRef.current) {
+          updateTradeMarkers(data.trades);
+        }
+        
+        return data.trades;
+      })
+      .catch(error => {
+        console.error('Error fetching trade data:', error);
+        return [];
+      })
+      .finally(() => {
+        setIsFetchingTrades(false);
+      });
+  }, [pair, timeframe]);
+  
+  // Function to update trade markers on the chart
+  const updateTradeMarkers = useCallback((tradeData) => {
+    if (!chartRef.current) return;
+    
+    try {
+      // Ensure we have valid trade data
+      if (!tradeData || !Array.isArray(tradeData) || tradeData.length === 0) {
+        // Clear markers if no trades
+        if (markerSeriesRef.current) {
+          markerSeriesRef.current.setMarkers([]);
+        } else if (candlestickSeriesRef.current) {
+          candlestickSeriesRef.current.setMarkers([]);
+        }
+        return;
+      }
+      
+      // Filter trades for this pair and timeframe
+      const relevantTrades = tradeData.filter(trade => 
+        trade.pair === pair && (trade.timeframe === timeframe || !timeframe)
+      );
+      
+      console.log(`Creating markers for ${relevantTrades.length} relevant trades`);
+      
+      // Create markers for entry/exit points
+      const markers = relevantTrades.flatMap(trade => {
+        const time = new Date(trade.timestamp).getTime() / 1000;
+        const markers = [];
+        
+        // Entry marker
+        markers.push({
+          time,
+          position: trade.direction === 'buy' ? 'belowBar' : 'aboveBar',
+          color: trade.direction === 'buy' ? '#10b981' : '#ef4444',
+          shape: trade.direction === 'buy' ? 'arrowUp' : 'arrowDown',
+          text: `Entry ${formatPrice(trade.entry, pair)}`,
+          size: 2
+        });
+        
+        // Exit marker (for closed trades)
+        if (trade.status !== 'open') {
+          markers.push({
+            time: time + (60 * 60), // Add some time offset for visualization
+            position: trade.direction === 'buy' ? 'aboveBar' : 'belowBar',
+            color: trade.status === 'win' ? '#10b981' : '#ef4444',
+            shape: 'circle',
+            text: `Exit (${trade.status.toUpperCase()})`,
+            size: 2
+          });
+        }
+        
+        return markers;
+      });
+      
+      console.log(`Setting ${markers.length} markers on chart`);
+      
+      // Set markers to the series
+      if (markerSeriesRef.current) {
+        try {
+          markerSeriesRef.current.setMarkers(markers);
+        } catch (err) {
+          console.error("Error setting markers on marker series:", err);
+          // Fall back to candlestick series
+          if (candlestickSeriesRef.current) {
+            candlestickSeriesRef.current.setMarkers(markers);
+          }
+        }
+      } else if (candlestickSeriesRef.current) {
+        candlestickSeriesRef.current.setMarkers(markers);
+      }
+    } catch (err) {
+      console.error("Error updating trade markers:", err);
+    }
+  }, [pair, timeframe]);
 
   // Now define handleRetry after fetchCandleData is defined
   const handleRetry = useCallback(() => {
@@ -221,6 +384,7 @@ export default forwardRef(({ pair, timeframe }, ref) => {
           layout: {
             background: { color: '#121212' },
             textColor: '#d1d4dc',
+            fontSize: 12,
           },
           grid: {
             vertLines: {
@@ -232,7 +396,76 @@ export default forwardRef(({ pair, timeframe }, ref) => {
               style: 1,
             },
           },
+          rightPriceScale: {
+            borderColor: 'rgba(197, 203, 206, 0.3)',
+            borderVisible: true,
+            scaleMargins: {
+              top: 0.1,
+              bottom: 0.1,
+            },
+            // Ensure more price labels on the y-axis
+            minimumHeight: 20, // Even smaller value = more labels
+            textColor: '#d1d4dc',
+            fontSize: 11,
+            alignLabels: true,
+            mode: 0, // 0 = Normal is better for standard price display
+            autoScale: true,
+            entireTextOnly: false,
+            ticksVisible: true,
+            visible: true,
+          },
+          timeScale: {
+            borderColor: 'rgba(197, 203, 206, 0.3)',
+            timeVisible: true,
+            secondsVisible: false,
+            tickMarkFormatter: (time, tickMarkType, locale) => {
+              const date = new Date(time * 1000);
+              // Format based on timeframe
+              if (timeframe === '1d' || timeframe === 'Daily' || timeframe === 'Weekly') {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+              } else {
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+              }
+            },
+          },
+          crosshair: {
+            mode: CrosshairMode.Normal,
+            vertLine: {
+              color: 'rgba(224, 227, 235, 0.4)',
+              width: 1,
+              style: 1,
+              visible: true,
+              labelVisible: true,
+            },
+            horzLine: {
+              color: 'rgba(224, 227, 235, 0.4)',
+              width: 1,
+              style: 1,
+              visible: true,
+              labelVisible: true,
+            },
+          },
+          // Handle watermark
+          watermark: {
+            visible: false,
+          },
         });
+        
+        // Function to determine appropriate price precision based on pair and current price level
+        const determinePricePrecision = (pair, currentPrice) => {
+          if (pair.includes('JPY')) return 3;
+          
+          // For pairs with very small price movements (like some crypto pairs)
+          if (currentPrice < 0.01) return 8;
+          
+          // Default for forex pairs like EUR_USD
+          return 5;
+        };
+        
+        // Get appropriate precision for this pair
+        const precision = determinePricePrecision(pair, currentPrice || 1.0);
         
         const series = chart.addCandlestickSeries({
           upColor: '#10b981', 
@@ -240,11 +473,100 @@ export default forwardRef(({ pair, timeframe }, ref) => {
           borderVisible: false,
           wickUpColor: '#10b981',
           wickDownColor: '#ef4444',
+          priceFormat: {
+            type: 'price',
+            precision: precision,
+            minMove: Math.pow(10, -precision), // Dynamically set minimum price movement
+          },
+          // Additional formatting for price labels
+          lastValueVisible: true,
+          priceLineVisible: true,
+          priceLineWidth: 1,
+          priceLineColor: 'rgba(255, 255, 255, 0.5)',
+          priceLineStyle: LineStyle.Dotted,
         });
+        
+        // After creating the chart, make sure the rightPriceScale is properly configured
+        chart.applyOptions({
+          rightPriceScale: {
+            autoScale: true,
+            mode: 0,
+            invertScale: false,
+            alignLabels: true,
+            borderVisible: true,
+            scaleMargins: {
+              top: 0.1, 
+              bottom: 0.1,
+            },
+            ticksVisible: true,
+            // Adjust the number of price labels
+            minimumHeight: 20,
+          }
+        });
+        
+        // Force price format update
+        series.applyOptions({
+          priceFormat: {
+            type: 'price',
+            precision: precision,
+            minMove: Math.pow(10, -precision),
+          }
+        });
+        
+        // Add volume histogram with proper configuration
+        try {
+          const volumeSeries = chart.addHistogramSeries({
+            priceScaleId: '', // Use default scale
+            scaleMargins: {
+              top: 0.85, // Position volume at the bottom
+              bottom: 0,
+            },
+            priceFormat: {
+              type: 'volume',
+            },
+            color: 'rgba(76, 175, 80, 0.5)',
+          });
+          
+          volumeSeriesRef.current = volumeSeries;
+        } catch (err) {
+          console.error("Failed to add volume series:", err);
+          // Continue without volume series
+        }
         
         // Save references
         chartRef.current = chart;
         candlestickSeriesRef.current = series;
+        
+        // Add marker series for trade entry/exit points
+        try {
+          const markerSeries = chart.addLineSeries({
+            lineVisible: false,
+            lastValueVisible: false,
+            priceLineVisible: false,
+            baseLineVisible: false,
+            crosshairMarkerVisible: false,
+            priceFormat: {
+              type: 'price',
+              precision: precision,
+              minMove: Math.pow(10, -precision),
+            }
+          });
+          markerSeriesRef.current = markerSeries;
+          
+          // If we already have trades, immediately add markers
+          if (trades && trades.length > 0) {
+            updateTradeMarkers(trades);
+          } else if (externalTrades && Array.isArray(externalTrades)) {
+            // Or use external trades if available
+            const relevantTrades = externalTrades.filter(trade => 
+              trade.pair === pair && (trade.timeframe === timeframe || !timeframe)
+            );
+            updateTradeMarkers(relevantTrades);
+          }
+        } catch (err) {
+          console.error("Failed to add marker series:", err);
+          // Continue without marker series, will fall back to candlestick series for markers
+        }
         
         // Add price line
         const priceLine = series.createPriceLine({
@@ -283,8 +605,45 @@ export default forwardRef(({ pair, timeframe }, ref) => {
         
         // Load data
         fetchCandleData()
-          .then(() => {
+          .then((data) => {
             console.log("Initial data loaded successfully");
+            
+            // If we have volume data, set up volume series
+            if (data && data.candles && data.candles.length > 0 && data.candles[0].volume && volumeSeriesRef.current) {
+              try {
+                const volumeData = data.candles.map(candle => ({
+                  time: candle.time,
+                  value: candle.volume || 0,
+                  color: candle.c >= candle.o 
+                    ? 'rgba(16, 185, 129, 0.5)'  // green for up
+                    : 'rgba(239, 68, 68, 0.5)'   // red for down
+                }));
+                
+                volumeSeriesRef.current.setData(volumeData);
+              } catch (err) {
+                console.error("Error setting volume data:", err);
+              }
+            }
+            
+            // Apply trade markers after chart data is loaded
+            setTimeout(() => {
+              if (externalTrades && Array.isArray(externalTrades) && externalTrades.length > 0) {
+                console.log("Applying external trade markers after chart initialization");
+                updateTradeMarkers(externalTrades);
+              } else {
+                // Try to fetch and apply trade data
+                fetchTrades()
+                  .then(fetchedTrades => {
+                    if (fetchedTrades && fetchedTrades.length > 0) {
+                      console.log("Applying fetched trade markers after chart initialization");
+                      updateTradeMarkers(fetchedTrades);
+                    }
+                  })
+                  .catch(err => {
+                    console.error("Error fetching trades for markers:", err);
+                  });
+              }
+            }, 500);
           })
           .catch(err => {
             console.error("Failed to load initial data:", err);
@@ -292,7 +651,6 @@ export default forwardRef(({ pair, timeframe }, ref) => {
           .finally(() => {
             isRetryingRef.current = false;
           });
-          
       } catch (err) {
         console.error("Error in chart creation:", err);
         setError(`Chart creation failed: ${err.message}`);
@@ -300,7 +658,7 @@ export default forwardRef(({ pair, timeframe }, ref) => {
         isRetryingRef.current = false;
       }
     }, 300);
-  }, [pair, timeframe, cleanupChart, cleanupTimersAndIntervals, fetchCandleData]);
+  }, [pair, timeframe, cleanupChart, cleanupTimersAndIntervals, fetchCandleData, currentPrice]);
 
   // Initialize chart only once
   useEffect(() => {
@@ -339,6 +697,29 @@ export default forwardRef(({ pair, timeframe }, ref) => {
       }
     };
   }, [fetchCandleData]);
+
+  // Set up trade data fetch
+  useEffect(() => {
+    if (!chartRef.current || !candlestickSeriesRef.current) return;
+    
+    console.log("Fetching initial trade data");
+    fetchTrades().catch(err => {
+      console.error("Error fetching initial trade data:", err);
+    });
+    
+    // Set up interval to refresh trade data
+    const tradeUpdateInterval = setInterval(() => {
+      if (isMountedRef.current && !isFetchingTrades) {
+        fetchTrades().catch(err => {
+          console.error("Error in trade interval fetch:", err);
+        });
+      }
+    }, 30000);
+    
+    return () => {
+      clearInterval(tradeUpdateInterval);
+    };
+  }, [fetchTrades]);
 
   // Use useLayoutEffect to check container dimensions before mounting
   useLayoutEffect(() => {
@@ -422,6 +803,116 @@ export default forwardRef(({ pair, timeframe }, ref) => {
     };
   }, [handleRetry, fetchCandleData, cleanupChart, cleanupTimersAndIntervals]);
 
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    reloadChart: () => {
+      console.log("Reload chart method called from parent");
+      if (chartRef.current) {
+        fetchCandleData().catch(err => {
+          console.error("Error reloading chart data:", err);
+        });
+        
+        fetchTrades().catch(err => {
+          console.error("Error reloading trade data:", err);
+        });
+      } else {
+        console.warn("Chart not initialized, cannot reload");
+      }
+    }
+  }));
+  
+  // Sync with external trades
+  useEffect(() => {
+    if (externalTrades && Array.isArray(externalTrades)) {
+      console.log(`Received ${externalTrades.length} external trades`);
+      
+      // Filter trades for the current pair and timeframe
+      const filteredTrades = externalTrades.filter(trade => 
+        trade.pair === pair && 
+        (trade.timeframe === timeframe || !timeframe)
+      );
+      
+      setTrades(filteredTrades);
+      
+      // Update markers if chart is ready
+      if (chartRef.current && candlestickSeriesRef.current) {
+        updateTradeMarkers(filteredTrades);
+      }
+    }
+  }, [externalTrades, pair, timeframe, updateTradeMarkers]);
+
+  // Create a separate effect specifically for updating markers when externalTrades change
+  useEffect(() => {
+    if (!chartRef.current) return;
+    
+    // Local function to update markers without dependency on updateTradeMarkers
+    const applyMarkers = () => {
+      if (externalTrades && Array.isArray(externalTrades)) {
+        console.log(`External trades updated, updating markers (${externalTrades.length} trades)`);
+        
+        // Filter trades for this pair and timeframe
+        const relevantTrades = externalTrades.filter(trade => 
+          trade.pair === pair && (trade.timeframe === timeframe || !timeframe)
+        );
+        
+        if (relevantTrades.length === 0) {
+          console.log('No relevant trades to display');
+          return;
+        }
+        
+        console.log(`Found ${relevantTrades.length} relevant trades for markers`);
+        
+        try {
+          // Create markers for entry/exit points
+          const markers = relevantTrades.flatMap(trade => {
+            const time = new Date(trade.timestamp).getTime() / 1000;
+            const markers = [];
+            
+            // Entry marker
+            markers.push({
+              time,
+              position: trade.direction === 'buy' ? 'belowBar' : 'aboveBar',
+              color: trade.direction === 'buy' ? '#10b981' : '#ef4444',
+              shape: trade.direction === 'buy' ? 'arrowUp' : 'arrowDown',
+              text: `Entry ${formatPrice(trade.entry, pair)}`,
+              size: 2
+            });
+            
+            // Exit marker (for closed trades)
+            if (trade.status !== 'open') {
+              markers.push({
+                time: time + (60 * 60), // Add some time offset for visualization
+                position: trade.direction === 'buy' ? 'aboveBar' : 'belowBar',
+                color: trade.status === 'win' ? '#10b981' : '#ef4444',
+                shape: 'circle',
+                text: `Exit (${trade.status.toUpperCase()})`,
+                size: 2
+              });
+            }
+            
+            return markers;
+          });
+          
+          console.log(`Setting ${markers.length} markers on chart`);
+          
+          // Set markers to the appropriate series
+          if (markerSeriesRef.current) {
+            markerSeriesRef.current.setMarkers(markers);
+          } else if (candlestickSeriesRef.current) {
+            candlestickSeriesRef.current.setMarkers(markers);
+          }
+        } catch (err) {
+          console.error("Error setting markers:", err);
+        }
+      }
+    };
+    
+    // Apply with a short timeout to ensure chart is ready
+    const timerId = setTimeout(applyMarkers, 100);
+    
+    return () => clearTimeout(timerId);
+  }, [externalTrades, pair, timeframe]);
+
   // Return component JSX
   return (
     <div className="flex flex-col w-full h-full relative" style={{ minHeight: '400px' }}>
@@ -458,7 +949,7 @@ export default forwardRef(({ pair, timeframe }, ref) => {
       {currentPrice && (
         <div className="absolute top-2 right-2 flex items-center space-x-2 z-20">
           <span className={`text-sm font-mono ${priceChangePositive ? 'text-green-500' : 'text-red-500'}`}>
-            {currentPrice.toFixed(pair.includes('JPY') ? 3 : 5)}
+            {formatPrice(currentPrice, pair)}
           </span>
           {lastUpdateTime && (
             <span className="text-xs text-gray-400">
@@ -467,6 +958,83 @@ export default forwardRef(({ pair, timeframe }, ref) => {
           )}
         </div>
       )}
+      
+      {/* Trades panel */}
+      <div 
+        ref={tradesContainerRef}
+        className="w-full bg-gray-900 border-t border-gray-700 overflow-auto"
+        style={{ height: '150px', minHeight: '150px' }}
+      >
+        <div className="p-2 border-b border-gray-700 bg-gray-800 flex justify-between items-center">
+          <h3 className="text-sm font-semibold text-white">Trades</h3>
+          <div className="text-xs text-gray-400">
+            {trades.length} {trades.length === 1 ? 'trade' : 'trades'} for {pair} / {timeframe}
+          </div>
+        </div>
+        
+        {trades.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+            No trades found for this pair and timeframe
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-gray-800">
+                <tr>
+                  <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Direction</th>
+                  <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Entry</th>
+                  <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Stop Loss</th>
+                  <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Take Profit</th>
+                  <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">R:R</th>
+                  <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                  <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Time</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-900 divide-y divide-gray-800">
+                {trades.map(trade => (
+                  <tr key={trade.id} className="hover:bg-gray-800">
+                    <td className="px-3 py-2 whitespace-nowrap text-sm">
+                      <div className="flex items-center">
+                        {trade.direction === 'buy' ? (
+                          <ArrowUp size={14} className="text-green-500 mr-1" />
+                        ) : (
+                          <ArrowDown size={14} className="text-red-500 mr-1" />
+                        )}
+                        <span className={trade.direction === 'buy' ? 'text-green-500' : 'text-red-500'}>
+                          {trade.direction.toUpperCase()}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm font-mono">
+                      {formatPrice(trade.entry, pair)}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm font-mono text-red-500">
+                      {formatPrice(trade.stopLoss, pair)}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm font-mono text-green-500">
+                      {formatPrice(trade.takeProfit, pair)}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm">
+                      {trade.riskReward}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm">
+                      <span className={`inline-flex px-2 text-xs leading-5 font-semibold rounded-full
+                        ${trade.status === 'win' ? 'bg-green-100 text-green-800' : 
+                          trade.status === 'loss' ? 'bg-red-100 text-red-800' : 
+                          'bg-blue-100 text-blue-800'}`}>
+                        {trade.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-400">
+                      {new Date(trade.timestamp).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }); 

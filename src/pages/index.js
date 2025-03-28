@@ -138,6 +138,7 @@ export default function Home() {
             ref={chartRef}
             pair={selectedPair} 
             timeframe={selectedTimeframe} 
+            externalTrades={trades}
           />
         </section>
       </main>
