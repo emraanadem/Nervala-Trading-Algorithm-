@@ -392,6 +392,7 @@ class Weekly_Nexus {
       Weekly_Functions.ValueAssigner()
       Daily_Functions.HistoryAssigner()
       One_Hour_Functions.HistoryAssigner()
+      Daily_Functions.supreslevs()
       Thirty_Min_Functions.HistoryAssigner()
       Weekly_Functions.supreslevs()
       Weekly_Nexus.controlSmallerPeriod()
@@ -631,51 +632,71 @@ class Weekly_Functions {
     Weekly_Functions.price = liveprice
   }
 
-  /** second consolidation method, meant to strengthen consolidation identification */
-  static consolidationtwo () {
+  /** Advanced consolidation detection using cycle analysis and adaptive thresholds */
+  static consolidation() {
     const history = Weekly_Functions.priceHist
     const highs = Weekly_Functions.highs
     const lows = Weekly_Functions.lows
-    const histmax = Math.max(...history)
-    const histmin = Math.min(...history)
-    const histdiff = histmax - histmin
-    const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    // Find tr.calculate and replace with normalized version
     
-    // Before any tr.calculate call
-    const trMinLength = Math.min(highs.length, lows.length, history.length)
-    if (trMinLength === 0) return true; // Skip calculation if no data
+    // Need at least 4 weeks of data
+    if (history.length < 4) return false
     
-    // Normalize arrays - keeping newest values
-    const normHighs = highs.slice(-trMinLength)
-    const normLows = lows.slice(-trMinLength)
-    const normHistory = history.slice(-trMinLength)
-    
-    // Use normalized arrays
-    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
-    const h = []
-    const i = []
-    const j = []
-    for (let value = 0; value < q.length; value++) {
-      h.push(q[value].lower)
-      i.push(q[value].upper)
-      j.push(q[value].middle)
+    // Get recent data
+    const recentCandles = {
+      closes: history.slice(-4),
+      highs: highs.slice(-4),
+      lows: lows.slice(-4)
     }
-    const smmas = smas.calculate({ period: 14, values: h })
-    const smmass = smas.calculate({ period: 14, values: i })
-    /* keep midpoint just in case */
-    const smmasss = smas.calculate({ period: 14, values: j })
-    const smmaslast = smmas[smmas.length - 1]
-    const smmasslast = smmass[smmass.length - 1]
-    const smadiff = smmasslast - smmaslast
-    const ndiffone = n[n.length - 1] - n[n.length - 2]
-    const ndifftwo = n[n.length - 2] - n[n.length - 3]
-    const benchmark = 0.025 * histdiff
-    if (smadiff > benchmark && (n[n.length - 1] > n[n.length - 2] && ndiffone > ndifftwo)) {
-      return false
-    } else {
-      return true
+    
+    // 1. Calculate total range as percentage
+    const highest = Math.max(...recentCandles.highs)
+    const lowest = Math.min(...recentCandles.lows)
+    const avgPrice = recentCandles.closes.reduce((sum, price) => sum + price, 0) / 4
+    const totalRangePercent = ((highest - lowest) / avgPrice) * 100
+    
+    // 2. Calculate weekly movements
+    const weeklyMoves = []
+    for (let i = 1; i < recentCandles.closes.length; i++) {
+      const move = Math.abs(recentCandles.closes[i] - recentCandles.closes[i-1])
+      weeklyMoves.push((move / recentCandles.closes[i]) * 100)
     }
+    const avgWeeklyMove = weeklyMoves.reduce((sum, move) => sum + move, 0) / weeklyMoves.length
+    
+    // 3. Simple checks for consolidation
+    
+    // Check 1: Range should be between 3-12% for weekly timeframe
+    const hasReasonableRange = totalRangePercent >= 3 && totalRangePercent <= 12
+    
+    // Check 2: Average weekly movement should be under 4%
+    const hasModerateMovement = avgWeeklyMove <= 4
+    
+    // Check 3: Price should not be making consecutive higher highs or lower lows
+    let hasDirectionalBias = true
+    let consecutiveUp = 0
+    let consecutiveDown = 0
+    
+    for (let i = 1; i < recentCandles.closes.length; i++) {
+      if (recentCandles.closes[i] > recentCandles.closes[i-1]) {
+        consecutiveUp++
+        consecutiveDown = 0
+      } else {
+        consecutiveDown++
+        consecutiveUp = 0
+      }
+    }
+    
+    if (consecutiveUp < 3 && consecutiveDown < 3) {
+      hasDirectionalBias = false
+    }
+    
+    // Only need 2 out of 3 conditions for weekly consolidation
+    const conditionsMet = [
+      hasReasonableRange,
+      hasModerateMovement,
+      !hasDirectionalBias
+    ].filter(Boolean).length
+    
+    return conditionsMet >= 2
   }
 
   /** TP variation, helps change TP depending on volatility and price movement depending on whether or not the code has surpassed TP1 and
@@ -1069,28 +1090,6 @@ class Weekly_Functions {
     }
   }
 
-  /** used to determine consolidation via volatility, is added to consolidationtwo that was recently made now */
-  static consolidation () {
-    if (Weekly_Functions.volatility() > 0.618) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  /** used to determine slope between two points */
-  static slopes () {
-    Weekly_Functions.recentHist()
-    const recentHistory = Weekly_Functions.recentHisto
-    const slope = []
-    for (let value = 0; value < recentHistory.length - 1; value++) {
-      slope.push(recentHistory[value + 1] - recentHistory[value])
-    }
-    return slope
-  }
-
-  /* Make stricter, 3+ values or more to be a max or min once real data comes thru */
-  /* UPDATE: stricter values not working that well, but its identifying price channels so ... should I change? I don't know */
   /** used to determine relative maxes and mins for identification of price channels */
   static maxes_mins () {
     Weekly_Functions.recentHist()
@@ -1134,70 +1133,121 @@ class Weekly_Functions {
   /** finds support and resistance levels, very important for code function, would love to improve this */
   static supreslevs () {
     const history = Weekly_Functions.priceHist
+    const price = Weekly_Functions.getPrice()
+    
+    // Calculate price range and normalize
     const ceiling = Math.max(...history)
     const floor = Math.min(...history)
     const difference = ceiling - floor
-    const levels = []
-    const levelss = []
-    let levelsss = []
-    let finalLevs = []
-    let count = 0
-    for (let item = 0; item < history.length; item++) { levels.push((history[item] - floor) / (difference)) }
-    for (let item = 0; item < levels.length; item++) { levels[item] = levels[item].toFixed(3) }
-    for (let item = 0; item < levels.length; item++) {
-      for (let items = 0; items < levels.length; items++) {
-        if (levels[item] == levels[items]) {
-          count++
-        }
-      }
-      if (count > 3) {
-        levelss.push(levels[item])
-      }
-      count = 0
+    const avgPrice = history.reduce((sum, p) => sum + p, 0) / history.length
+    
+    // Normalize price levels for easier clustering
+    const normalizedLevels = history.map(price => ((price - floor) / difference).toFixed(3))
+    
+    // Find repeated price levels that indicate support/resistance
+    const levelFrequency = {}
+    normalizedLevels.forEach(level => {
+      levelFrequency[level] = (levelFrequency[level] || 0) + 1
+    })
+    
+    // Filter levels with sufficient frequency (higher threshold for weekly)
+    const significantLevels = Object.keys(levelFrequency)
+      .filter(level => levelFrequency[level] >= 3)
+      .map(level => parseFloat(level))
+    
+    // Convert normalized levels back to actual prices
+    const finalLevels = significantLevels.map(level => (level * difference) + floor)
+    
+    // Separate levels above and below current price
+    const levelsBelow = finalLevels.filter(level => level < price)
+    const levelsAbove = finalLevels.filter(level => level > price)
+    
+    // Filter levels that are too close to price (within 0.5% for weekly)
+    const minimumDistance = avgPrice * 0.005
+    const significantLevelsBelow = levelsBelow.filter(level => 
+      price - level > minimumDistance)
+    const significantLevelsAbove = levelsAbove.filter(level => 
+      level - price > minimumDistance)
+    
+    // Additional filter for levels that are too close to each other
+    const filteredLevelsBelow = Weekly_Functions.filterCloseValues(significantLevelsBelow, minimumDistance * 2)
+    const filteredLevelsAbove = Weekly_Functions.filterCloseValues(significantLevelsAbove, minimumDistance * 2)
+    
+    // Calculate distances to find closest levels
+    const belowDistances = filteredLevelsBelow.map(level => price - level)
+    const aboveDistances = filteredLevelsAbove.map(level => level - price)
+    
+    // Determine support and resistance
+    let support, resistance
+    
+    // Find support - closest significant level below
+    if (belowDistances.length > 0) {
+      const minBelowDistance = Math.min(...belowDistances)
+      const minBelowIndex = belowDistances.indexOf(minBelowDistance)
+      support = filteredLevelsBelow[minBelowIndex]
+    } else {
+      // Fallback: use dynamic calculation based on ATR
+      const atrValue = Weekly_Functions.calculateATR(history.slice(-15), 14) || difference * 0.03
+      support = price - (atrValue * 1.5)
     }
-    levelsss = [...new Set(levelss)]
-    finalLevs = levelsss
-    const price = Weekly_Functions.getPrice()
-    const larger = []
-    const smaller = []
-    const largertwo = []
-    const smallertwo = []
-    const smaller_diff = []
-    const larger_diff = []
-    for (let item = 0; item < finalLevs.length; item++) {
-      if (price > ((finalLevs[item] * difference) + floor)) { smaller.push(((finalLevs[item] * difference) + floor)) }
-      if (price < ((finalLevs[item] * difference) + floor)) { larger.push(((finalLevs[item] * difference) + floor)) }
+    
+    // Find resistance - closest significant level above
+    if (aboveDistances.length > 0) {
+      const minAboveDistance = Math.min(...aboveDistances)
+      const minAboveIndex = aboveDistances.indexOf(minAboveDistance)
+      resistance = filteredLevelsAbove[minAboveIndex]
+    } else {
+      // Fallback: use dynamic calculation based on ATR
+      const atrValue = Weekly_Functions.calculateATR(history.slice(-15), 14) || difference * 0.03
+      resistance = price + (atrValue * 1.5)
     }
-    for (let item = 0; item < smaller.length; item++) {
-      if (Math.abs(Weekly_Functions.valdiff(price, smaller[item])) > 0.05) {
-        smallertwo.push(smaller[item])
-      }
-    }
-    for (let item = 0; item < larger.length; item++) {
-      if (Math.abs(Weekly_Functions.valdiff(price, larger[item])) > 0.05) {
-        largertwo.push(larger[item])
-      }
-    }
-    if (smallertwo.length < 1) {
-      smallertwo.push(price - Weekly_Functions.pipreverse(price, Weekly_Functions.pipdiffy(price, Weekly_Functions.stoploss())))
-    }
-    if (largertwo.length < 1) {
-      largertwo.push(price + Weekly_Functions.pipreverse(price, Weekly_Functions.pipdiffy(price, Weekly_Functions.stoploss())))
-    }
-    for (let item = 0; item < smallertwo.length; item++) {
-      smaller_diff.push(Math.abs((smallertwo[item] - price)))
-    }
-    for (let item = 0; item < largertwo.length; item++) {
-      larger_diff.push(Math.abs((largertwo[item] - price)))
-    }
-    const support = price - Math.min(...smaller_diff)
-    const resistance = price + Math.min(...larger_diff)
+    
+    // Set values for use in trading system
     Weekly_Nexus.support = support
     Weekly_Nexus.resistance = resistance
-    for (let item = 0; item < finalLevs.length; item++) {
-      finalLevs[item] = (finalLevs[item] * difference) + floor
+    Weekly_Nexus.finlevs = finalLevels
+  }
+  
+  /**
+   * Helper function to filter out values that are too close to each other
+   * @param {number[]} values - Array of price values to filter
+   * @param {number} minDistance - Minimum distance between values
+   * @return {number[]} Filtered array with sufficiently spaced values
+   */
+  static filterCloseValues(values, minDistance) {
+    if (values.length <= 1) return values
+    
+    // Sort values
+    const sortedValues = [...values].sort((a, b) => a - b)
+    const result = [sortedValues[0]]
+    
+    for (let i = 1; i < sortedValues.length; i++) {
+      if (sortedValues[i] - result[result.length - 1] >= minDistance) {
+        result.push(sortedValues[i])
+      }
     }
-    Weekly_Nexus.finlevs = finalLevs
+    
+    return result
+  }
+  
+  /**
+   * Helper function to calculate Average True Range
+   * @param {number[]} prices - Array of prices
+   * @param {number} period - Period for ATR calculation
+   * @return {number} ATR value
+   */
+  static calculateATR(prices, period = 14) {
+    if (prices.length < period + 1) return null
+    
+    // Calculate True Ranges
+    const trueRanges = []
+    for (let i = 1; i < prices.length; i++) {
+      trueRanges.push(Math.abs(prices[i] - prices[i-1]))
+    }
+    
+    // Calculate simple moving average of true ranges
+    const atr = trueRanges.slice(-period).reduce((sum, tr) => sum + tr, 0) / period
+    return atr
   }
 
   /** self explanatory, finds RSI and compares the last two */
@@ -1395,6 +1445,309 @@ class Weekly_Functions {
     nums = Weekly_Functions.pip(num1, num2)
     return (nums[0] - nums[1])
   }
+
+
+  
+
+  static calculateStdDev(prices, period = 20) {
+    if (prices.length < period) return null
+    
+    const mean = prices.reduce((sum, price) => sum + price, 0) / period 
+    const variance = prices.reduce((sum, price) => sum + Math.pow(price - mean, 2), 0) / period
+    return Math.sqrt(variance)
+  }
+
+  /** Machine learning method for weekly timeframe used to determine past movement patterns to support supreslevs */
+  static overall() {
+    // Get price history data
+    const extendedhistory = Weekly_Functions.extendHist
+    const price = Weekly_Functions.price
+    
+    // Get levels from multiple timeframes for more robust analysis
+    const dailyLevels = Daily_Functions.finlevs
+    const weeklyLevels = Weekly_Nexus.finlevs
+    const keyLevels = [...dailyLevels, ...weeklyLevels]
+    
+    // Calculate volatility for dynamic buffer adjustment
+    const volatility = Weekly_Functions.volatility ? Weekly_Functions.volatility() : 0.05
+    
+    // Calculate price range and buffer
+    const priceRange = Math.max(...extendedhistory) - Math.min(...extendedhistory)
+    const buffer = priceRange * Math.max(0.03, Math.min(0.08, volatility))
+    
+    // Define price range for historical analysis
+    const lower = price - buffer
+    const upper = price + buffer
+    const pricerange = [lower, upper]
+    
+    // Find historical instances at similar price levels
+    const studylist = []
+    for (let val = 0; val < extendedhistory.length; val++) {
+      if (extendedhistory[val] <= upper && extendedhistory[val] >= lower) {
+        studylist.push([val, extendedhistory[val]])
+      }
+    }
+    
+    // Check if price is near a key support/resistance level
+    let keyLevelProximity = false
+    for (const level of keyLevels) {
+      const distance = Math.abs(price - level) / price
+      if (distance < 0.003) { // Within 0.3%
+        keyLevelProximity = true
+        break
+      }
+    }
+    
+    // Too little data for reliable analysis
+    if (studylist.length < 5) {
+      return !keyLevelProximity // Allow trades near but not at key levels
+    }
+    
+    // Perform detailed historical analysis
+    const result = Weekly_Functions.analysis(
+      studylist, 
+      extendedhistory, 
+      pricerange
+    )
+    
+    // Return false if near key level AND analysis indicates a rejection zone
+    return result && !keyLevelProximity
+  }
+
+  /** Enhanced analysis method for weekly timeframe */
+  static analysis(cases, extendedhistory, pricerange) {
+    // Initialize rejection zones array
+    Weekly_Functions.rejectionzones = []
+    
+    // Get current price and price history
+    const price = Weekly_Functions.price
+    const histnorm = Weekly_Functions.priceHist
+    
+    // Calculate standard deviation for dynamic thresholds
+    const priceStdDev = Weekly_Functions.calculateStdDev ? 
+      Weekly_Functions.calculateStdDev(extendedhistory.slice(-50)) : 
+      (Math.max(...histnorm) - Math.min(...histnorm)) * 0.025
+    
+    // Calculate Bollinger Bands for volatility reference
+    const bollingerBands = bolls.calculate({ 
+      period: 20, 
+      values: extendedhistory, 
+      stdDev: 2 
+    })
+    
+    // Extract band values
+    const lowerBands = bollingerBands.map(band => band.lower)
+    const upperBands = bollingerBands.map(band => band.upper)
+    const middleBands = bollingerBands.map(band => band.middle)
+    
+    // Calculate smoothed versions for trend detection
+    const smoothedLower = smas.calculate({ period: 10, values: lowerBands })
+    const smoothedUpper = smas.calculate({ period: 10, values: upperBands })
+    const smoothedMiddle = smas.calculate({ period: 10, values: middleBands })
+    
+    // Define rejection threshold
+    const rejectionThreshold = 4
+    
+    // Define volatility based threshold adjustment
+    const volAdjustment = Weekly_Functions.volatility ? 
+      Math.max(0.8, Math.min(1.2, Weekly_Functions.volatility() * 10)) : 
+      1.0
+    
+    // Track rejection zones
+    const rejectionZones = []
+    let rejection = 0
+    
+    // Extract indices from cases for analysis
+    const potentialRejectionPoints = cases.map(c => c[0])
+    
+    // Analyze potential rejection points
+    for (let i = 0; i < potentialRejectionPoints.length; i++) {
+      const idx = potentialRejectionPoints[i]
+      
+      // Skip if too close to start or end of data
+      if (idx < 5 || idx >= extendedhistory.length - 5) continue
+      
+      // Count patterns that suggest rejection
+      let rejectionEvidence = 0
+      
+      // Pattern 1: Local high/low formations
+      let isLocalHigh = true
+      let isLocalLow = true
+      
+      for (let j = 1; j <= 3; j++) {
+        // Check if local high
+        if (extendedhistory[idx] <= extendedhistory[idx - j] || 
+            extendedhistory[idx] <= extendedhistory[idx + j]) {
+          isLocalHigh = false
+        }
+        
+        // Check if local low
+        if (extendedhistory[idx] >= extendedhistory[idx - j] || 
+            extendedhistory[idx] >= extendedhistory[idx + j]) {
+          isLocalLow = false
+        }
+      }
+      
+      if (isLocalHigh || isLocalLow) rejectionEvidence += 2
+      
+      // Pattern 2: Price reversal after reaching this level
+      const preBehavior = extendedhistory[idx] - extendedhistory[idx - 3]
+      const postBehavior = extendedhistory[idx + 3] - extendedhistory[idx]
+      
+      // If direction changed after this point (sign change between pre and post)
+      if (preBehavior * postBehavior < 0 && 
+          Math.abs(postBehavior) > priceStdDev * 0.5) {
+        rejectionEvidence += 1.5
+      }
+      
+      // Pattern 3: Proximity to Bollinger Band
+      if (idx < upperBands.length && idx < lowerBands.length) {
+        const bandProximity = Math.min(
+          Math.abs(extendedhistory[idx] - upperBands[idx]), 
+          Math.abs(extendedhistory[idx] - lowerBands[idx])
+        )
+        
+        if (bandProximity < priceStdDev * 0.5) {
+          rejectionEvidence += 1
+        }
+      }
+      
+      // Pattern 4: Candlestick patterns if available
+      const highsAvailable = typeof highs !== 'undefined' && highs && highs.length > idx
+      const lowsAvailable = typeof lows !== 'undefined' && lows && lows.length > idx
+      
+      if (highsAvailable && lowsAvailable) {
+        const highLowRange = highs[idx] - lows[idx]
+        const bodySize = Math.abs(extendedhistory[idx] - extendedhistory[idx-1])
+        
+        // Detect potential doji, hammer, or shooting star
+        if (highLowRange > bodySize * 2) {
+          rejectionEvidence += 1
+        }
+      }
+      
+      // Pattern 5: Check for confluence with key levels from multiple timeframes
+      const currentPrice = extendedhistory[idx]
+      if (typeof keyLevels !== 'undefined' && keyLevels) {
+        for (const level of keyLevels) {
+          const distancePercent = Math.abs(currentPrice - level) / currentPrice
+          if (distancePercent < 0.005) { // Within 0.5%
+            rejectionEvidence += 1.5
+            break
+          }
+        }
+      }
+      
+      // Adjust evidence by volatility
+      rejectionEvidence *= volAdjustment
+      
+      // If enough evidence found, mark as rejection zone
+      if (rejectionEvidence >= rejectionThreshold) {
+        rejection++
+        rejectionZones.push(extendedhistory[idx])
+        Weekly_Functions.rejectionzones.push(extendedhistory[idx])
+      }
+    }
+    
+    // Check if current price is near an identified rejection zone
+    let nearRejectionZone = false
+    const rejectionProximityThreshold = priceStdDev * 2
+    
+    for (const zone of rejectionZones) {
+      if (Math.abs(price - zone) < rejectionProximityThreshold) {
+        nearRejectionZone = true
+        break
+      }
+    }
+    
+    // Also check distance to newly identified zones that aren't yet in the system
+    for (const zone of Weekly_Functions.rejectionzones) {
+      if (Math.abs(price - zone) < rejectionProximityThreshold) {
+        nearRejectionZone = true
+        break
+      }
+    }
+    
+    // Too many rejection zones or too close to one - not good for trading
+    return !(rejection > 2 || nearRejectionZone)
+  }
+
+  static consolidationtwo () {
+    const history = Weekly_Functions.priceHist
+    const highs = Weekly_Functions.highs
+    const lows = Weekly_Functions.lows
+    
+    // Ensure we have enough data for weekly timeframe
+    const minDataPoints = 12 // Minimum 12 weeks of data
+    if (history.length < minDataPoints || !highs.length || !lows.length) {
+      return false; // Changed to false - don't assume consolidation without enough data
+    }
+    
+    // Normalize all arrays to same length (use recent data)
+    const lookbackPeriod = Math.min(52, history.length) // Look back up to 1 year
+    const recentHistory = history.slice(-lookbackPeriod)
+    const recentHighs = highs.slice(-lookbackPeriod)
+    const recentLows = lows.slice(-lookbackPeriod)
+    
+    // APPROACH 1: Weekly Range Analysis
+    const weeklyRanges = recentHighs.map((high, i) => high - recentLows[i])
+    const avgWeeklyRange = weeklyRanges.reduce((sum, range) => sum + range, 0) / weeklyRanges.length
+    const recentRanges = weeklyRanges.slice(-4) // Last month of weekly ranges
+    const avgRecentRange = recentRanges.reduce((sum, range) => sum + range, 0) / recentRanges.length
+    
+    // Compare recent ranges to historical
+    const rangeRatio = avgRecentRange / avgWeeklyRange
+    const isRangeContracting = rangeRatio < 0.85 // Recent ranges are significantly smaller
+    
+    // APPROACH 2: Price Movement Analysis
+    const priceChanges = []
+    for (let i = 1; i < recentHistory.length; i++) {
+      const weeklyChange = Math.abs(recentHistory[i] - recentHistory[i-1])
+      priceChanges.push(weeklyChange)
+    }
+    
+    const avgHistoricalChange = priceChanges.reduce((sum, change) => sum + change, 0) / priceChanges.length
+    const recentChanges = priceChanges.slice(-4)
+    const avgRecentChange = recentChanges.reduce((sum, change) => sum + change, 0) / recentChanges.length
+    
+    const isLowVolatility = avgRecentChange < (avgHistoricalChange * 0.7)
+    
+    // APPROACH 3: Higher Highs / Lower Lows Analysis
+    let consecutiveCount = 0
+    const lastFourHighs = recentHighs.slice(-4)
+    const lastFourLows = recentLows.slice(-4)
+    
+    for (let i = 1; i < 4; i++) {
+      if (lastFourHighs[i] > lastFourHighs[i-1] && lastFourLows[i] > lastFourLows[i-1]) {
+        consecutiveCount++
+      } else if (lastFourHighs[i] < lastFourHighs[i-1] && lastFourLows[i] < lastFourLows[i-1]) {
+        consecutiveCount++
+      }
+    }
+    
+    const hasStrongTrend = consecutiveCount >= 2
+    
+    // APPROACH 4: Price Channel Width
+    const highestHigh = Math.max(...lastFourHighs)
+    const lowestLow = Math.min(...lastFourLows)
+    const channelWidth = highestHigh - lowestLow
+    const avgPrice = recentHistory.reduce((sum, price) => sum + price, 0) / recentHistory.length
+    const normalizedChannelWidth = channelWidth / avgPrice
+    
+    const isNarrowChannel = normalizedChannelWidth < 0.04 // 4% channel width for weekly
+    
+    // Scoring System
+    let consolidationScore = 0
+    let totalFactors = 4 // Total number of main factors we're checking
+    
+    if (isRangeContracting) consolidationScore++
+    if (isLowVolatility) consolidationScore++
+    if (!hasStrongTrend) consolidationScore++
+    if (isNarrowChannel) consolidationScore++
+    
+    // Calculate probability - require at least 75% of factors to indicate consolidation
+    return (consolidationScore / totalFactors) >= 0.75
+  }
 }
 
 class Daily_Functions {
@@ -1407,6 +1760,9 @@ class Daily_Functions {
   recentHisto = []
   highs = []
   lows = []
+  support = 0
+  resistance = 0
+  finlevs = []
 
   static HistoryAssigner () {
     const instrument = Weekly_Functions.instrument_name()
@@ -1420,6 +1776,84 @@ class Daily_Functions {
     if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
     if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
   }
+
+    /** finds support and resistance levels, very important for code function, would love to improve this */
+    static supreslevs () {
+      const history = Weekly_Functions.priceHist
+      const price = Weekly_Functions.getPrice()
+      
+      // Calculate price range and normalize
+      const ceiling = Math.max(...history)
+      const floor = Math.min(...history)
+      const difference = ceiling - floor
+      const avgPrice = history.reduce((sum, p) => sum + p, 0) / history.length
+      
+      // Normalize price levels for easier clustering
+      const normalizedLevels = history.map(price => ((price - floor) / difference).toFixed(3))
+      
+      // Find repeated price levels that indicate support/resistance
+      const levelFrequency = {}
+      normalizedLevels.forEach(level => {
+        levelFrequency[level] = (levelFrequency[level] || 0) + 1
+      })
+      
+      // Filter levels with sufficient frequency (higher threshold for weekly)
+      const significantLevels = Object.keys(levelFrequency)
+        .filter(level => levelFrequency[level] >= 3)
+        .map(level => parseFloat(level))
+      
+      // Convert normalized levels back to actual prices
+      const finalLevels = significantLevels.map(level => (level * difference) + floor)
+      
+      // Separate levels above and below current price
+      const levelsBelow = finalLevels.filter(level => level < price)
+      const levelsAbove = finalLevels.filter(level => level > price)
+      
+      // Filter levels that are too close to price (within 0.5% for weekly)
+      const minimumDistance = avgPrice * 0.005
+      const significantLevelsBelow = levelsBelow.filter(level => 
+        price - level > minimumDistance)
+      const significantLevelsAbove = levelsAbove.filter(level => 
+        level - price > minimumDistance)
+      
+      // Additional filter for levels that are too close to each other
+      const filteredLevelsBelow = Weekly_Functions.filterCloseValues(significantLevelsBelow, minimumDistance * 2)
+      const filteredLevelsAbove = Weekly_Functions.filterCloseValues(significantLevelsAbove, minimumDistance * 2)
+      
+      // Calculate distances to find closest levels
+      const belowDistances = filteredLevelsBelow.map(level => price - level)
+      const aboveDistances = filteredLevelsAbove.map(level => level - price)
+      
+      // Determine support and resistance
+      let support, resistance
+      
+      // Find support - closest significant level below
+      if (belowDistances.length > 0) {
+        const minBelowDistance = Math.min(...belowDistances)
+        const minBelowIndex = belowDistances.indexOf(minBelowDistance)
+        support = filteredLevelsBelow[minBelowIndex]
+      } else {
+        // Fallback: use dynamic calculation based on ATR
+        const atrValue = Weekly_Functions.calculateATR(history.slice(-15), 14) || difference * 0.03
+        support = price - (atrValue * 1.5)
+      }
+      
+      // Find resistance - closest significant level above
+      if (aboveDistances.length > 0) {
+        const minAboveDistance = Math.min(...aboveDistances)
+        const minAboveIndex = aboveDistances.indexOf(minAboveDistance)
+        resistance = filteredLevelsAbove[minAboveIndex]
+      } else {
+        // Fallback: use dynamic calculation based on ATR
+        const atrValue = Weekly_Functions.calculateATR(history.slice(-15), 14) || difference * 0.03
+        resistance = price + (atrValue * 1.5)
+      }
+      
+      // Set values for use in trading system
+      Daily_Functions.support = support
+      Daily_Functions.resistance = resistance
+      Daily_Functions.finlevs = finalLevels
+    }
 
   static rsi () {
     const history = Daily_Functions.priceHist
@@ -1489,48 +1923,145 @@ class One_Hour_Functions {
 
   static consolidationtwo () {
     const history = One_Hour_Functions.priceHist
-    const highs = One_Hour_Functions.highs
-    const lows = One_Hour_Functions.lows
-    const histmax = Math.max(...history)
-    const histmin = Math.min(...history)
+    const highs = One_Hour_Functions.highs 
+    const lows = One_Hour_Functions.lows 
+    const histmax = Math.max(...highs)
+    const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
-    const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    // Find tr.calculate and replace with normalized version
     
-    // Before any tr.calculate call
-    const trMinLength = Math.min(highs.length, lows.length, history.length)
-    if (trMinLength === 0) return true; // Skip calculation if no data
-    
-    // Normalize arrays - keeping newest values
-    const normHighs = highs.slice(-trMinLength)
-    const normLows = lows.slice(-trMinLength)
-    const normHistory = history.slice(-trMinLength)
-    
-    // Use normalized arrays
-    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
-    const h = []
-    const i = []
-    const j = []
-    for (let value = 0; value < q.length; value++) {
-      h.push(q[value].lower)
-      i.push(q[value].upper)
-      j.push(q[value].middle)
+    // Ensure we have enough data
+    const minDataPoints = 20
+    if (history.length < minDataPoints) {
+      return true; // Default to consolidation if not enough data to determine
     }
-    const smmas = smas.calculate({ period: 14, values: h })
-    const smmass = smas.calculate({ period: 14, values: i })
-    /* keep midpoint just in case */
-    const smmasss = smas.calculate({ period: 14, values: j })
-    const smmaslast = smmas[smmas.length - 1]
-    const smmasslast = smmass[smmass.length - 1]
-    const smadiff = smmasslast - smmaslast
-    const ndiffone = n[n.length - 1] - n[n.length - 2]
-    const ndifftwo = n[n.length - 2] - n[n.length - 3]
-    const benchmark = 0.0125 * histdiff
-    if (smadiff > benchmark) {
-      return false
-    } else {
-      return true
+    
+    // Normalize all arrays to same length (use most recent data)
+    const lookbackPeriod = Math.min(50, history.length)
+    const recentHistory = history.slice(-lookbackPeriod)
+    const recentHighs = highs.slice(-lookbackPeriod)
+    const recentLows = lows.slice(-lookbackPeriod)
+    const recentClose = history.slice(-lookbackPeriod)
+    
+    // APPROACH 1: Bollinger Bands width analysis
+    const bollingerBands = bolls.calculate({ 
+      period: 20, 
+      values: recentHistory, 
+      stdDev: 2
+    })
+    
+    // Calculate normalized Bollinger Band width
+    const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
+    const recentBandWidths = bandWidths.slice(-5)
+    const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
+    
+    // Narrowing bands indicate consolidation
+    const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+    
+    // APPROACH 2: True Range (volatility) analysis
+    const trValues = tr.calculate({ 
+      high: recentHighs, 
+      low: recentLows, 
+      close: recentClose, 
+      period: 14 
+    })
+    
+    // Calculate average true range relative to price
+    const recentTR = trValues.slice(-5)
+    const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
+    const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+    
+    // Decreasing TR indicates consolidation
+    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
+    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+    
+    // APPROACH 3: Price channel/range analysis
+    const priceRange = histmax - histmin
+    const priceRangePercent = priceRange / histmin
+    
+    // Calculate standard deviation of closing prices
+    const sum = recentHistory.reduce((a, b) => a + b, 0)
+    const mean = sum / recentHistory.length
+    const stdDev = Math.sqrt(
+      recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
+    )
+    const relativeStdDev = stdDev / mean
+    
+    // Narrow range indicates consolidation
+    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
+    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+    
+    // APPROACH 4: Linear regression slope and R-squared analysis
+    // Prepare x and y for regression
+    const x = Array.from({ length: recentHistory.length }, (_, i) => i)
+    const y = recentHistory
+    
+    // Calculate linear regression
+    const regResult = new regression.SimpleLinearRegression(x, y)
+    const slope = Math.abs(regResult.slope)
+    const r2 = regResult.rSquared
+    
+    // Flat slope and good fit indicate consolidation
+    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
+    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+    
+    // APPROACH 5: Check for higher highs/lower lows pattern
+    let hasDirectionalMovement = false
+    
+    // Check for consecutive higher highs or lower lows (trend indicators)
+    let consecutiveHigherHighs = 0
+    let consecutiveLowerLows = 0
+    const pattern_window = 5
+    
+    for (let i = 1; i < pattern_window; i++) {
+      if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
+        consecutiveHigherHighs++;
+      }
+      if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
+        consecutiveLowerLows++;
+      }
     }
+    
+    // Strong directional pattern indicates trending, not consolidation
+    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+      hasDirectionalMovement = true;
+    }
+    
+    // Combine all factors to decide if the market is consolidating
+    // Use a scoring system where more indicators agreeing increases confidence
+    
+    let consolidationScore = 0;
+    let totalFactors = 0;
+    
+    // Bollinger factors
+    if (bandWidthShrinking) consolidationScore++;
+    if (isTightBands) consolidationScore++;
+    totalFactors += 2;
+    
+    // TR factors
+    if (trTrend) consolidationScore++;
+    if (isLowVolatility) consolidationScore++;
+    totalFactors += 2;
+    
+    // Range factors
+    if (isNarrowRange) consolidationScore++;
+    if (isLowDeviation) consolidationScore++;
+    totalFactors += 2;
+    
+    // Regression factors
+    if (isFlatSlope) consolidationScore++;
+    if (isPoorFit) consolidationScore++;
+    totalFactors += 2;
+    
+    // Direction factor (negative score if directional)
+    if (!hasDirectionalMovement) consolidationScore++;
+    totalFactors += 1;
+    
+    // Calculate overall probability of consolidation
+    const consolidationProbability = consolidationScore / totalFactors;
+    
+    // Return true if consolidation probability is above 60%
+    return consolidationProbability >= 0.6;
   }
 
   static trend () {
@@ -1607,48 +2138,145 @@ class Thirty_Min_Functions {
 
   static consolidationtwo () {
     const history = Thirty_Min_Functions.priceHist
-    const highs = Thirty_Min_Functions.highs
-    const lows = Thirty_Min_Functions.lows
-    const histmax = Math.max(...history)
-    const histmin = Math.min(...history)
+    const highs = Thirty_Min_Functions.highs 
+    const lows = Thirty_Min_Functions.lows 
+    const histmax = Math.max(...highs)
+    const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
-    const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    // Find tr.calculate and replace with normalized version
     
-    // Before any tr.calculate call
-    const trMinLength = Math.min(highs.length, lows.length, history.length)
-    if (trMinLength === 0) return true; // Skip calculation if no data
-    
-    // Normalize arrays - keeping newest values
-    const normHighs = highs.slice(-trMinLength)
-    const normLows = lows.slice(-trMinLength)
-    const normHistory = history.slice(-trMinLength)
-    
-    // Use normalized arrays
-    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
-    const h = []
-    const i = []
-    const j = []
-    for (let value = 0; value < q.length; value++) {
-      h.push(q[value].lower)
-      i.push(q[value].upper)
-      j.push(q[value].middle)
+    // Ensure we have enough data
+    const minDataPoints = 20
+    if (history.length < minDataPoints) {
+      return true; // Default to consolidation if not enough data to determine
     }
-    const smmas = smas.calculate({ period: 14, values: h })
-    const smmass = smas.calculate({ period: 14, values: i })
-    /* keep midpoint just in case */
-    const smmasss = smas.calculate({ period: 14, values: j })
-    const smmaslast = smmas[smmas.length - 1]
-    const smmasslast = smmass[smmass.length - 1]
-    const smadiff = smmasslast - smmaslast
-    const ndiffone = n[n.length - 1] - n[n.length - 2]
-    const ndifftwo = n[n.length - 2] - n[n.length - 3]
-    const benchmark = 0.0125 * histdiff
-    if (smadiff > benchmark) {
-      return false
-    } else {
-      return true
+    
+    // Normalize all arrays to same length (use most recent data)
+    const lookbackPeriod = Math.min(50, history.length)
+    const recentHistory = history.slice(-lookbackPeriod)
+    const recentHighs = highs.slice(-lookbackPeriod)
+    const recentLows = lows.slice(-lookbackPeriod)
+    const recentClose = history.slice(-lookbackPeriod)
+    
+    // APPROACH 1: Bollinger Bands width analysis
+    const bollingerBands = bolls.calculate({ 
+      period: 20, 
+      values: recentHistory, 
+      stdDev: 2
+    })
+    
+    // Calculate normalized Bollinger Band width
+    const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
+    const recentBandWidths = bandWidths.slice(-5)
+    const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
+    
+    // Narrowing bands indicate consolidation
+    const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+    
+    // APPROACH 2: True Range (volatility) analysis
+    const trValues = tr.calculate({ 
+      high: recentHighs, 
+      low: recentLows, 
+      close: recentClose, 
+      period: 14 
+    })
+    
+    // Calculate average true range relative to price
+    const recentTR = trValues.slice(-5)
+    const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
+    const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+    
+    // Decreasing TR indicates consolidation
+    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
+    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+    
+    // APPROACH 3: Price channel/range analysis
+    const priceRange = histmax - histmin
+    const priceRangePercent = priceRange / histmin
+    
+    // Calculate standard deviation of closing prices
+    const sum = recentHistory.reduce((a, b) => a + b, 0)
+    const mean = sum / recentHistory.length
+    const stdDev = Math.sqrt(
+      recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
+    )
+    const relativeStdDev = stdDev / mean
+    
+    // Narrow range indicates consolidation
+    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
+    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+    
+    // APPROACH 4: Linear regression slope and R-squared analysis
+    // Prepare x and y for regression
+    const x = Array.from({ length: recentHistory.length }, (_, i) => i)
+    const y = recentHistory
+    
+    // Calculate linear regression
+    const regResult = new regression.SimpleLinearRegression(x, y)
+    const slope = Math.abs(regResult.slope)
+    const r2 = regResult.rSquared
+    
+    // Flat slope and good fit indicate consolidation
+    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
+    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+    
+    // APPROACH 5: Check for higher highs/lower lows pattern
+    let hasDirectionalMovement = false
+    
+    // Check for consecutive higher highs or lower lows (trend indicators)
+    let consecutiveHigherHighs = 0
+    let consecutiveLowerLows = 0
+    const pattern_window = 5
+    
+    for (let i = 1; i < pattern_window; i++) {
+      if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
+        consecutiveHigherHighs++;
+      }
+      if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
+        consecutiveLowerLows++;
+      }
     }
+    
+    // Strong directional pattern indicates trending, not consolidation
+    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+      hasDirectionalMovement = true;
+    }
+    
+    // Combine all factors to decide if the market is consolidating
+    // Use a scoring system where more indicators agreeing increases confidence
+    
+    let consolidationScore = 0;
+    let totalFactors = 0;
+    
+    // Bollinger factors
+    if (bandWidthShrinking) consolidationScore++;
+    if (isTightBands) consolidationScore++;
+    totalFactors += 2;
+    
+    // TR factors
+    if (trTrend) consolidationScore++;
+    if (isLowVolatility) consolidationScore++;
+    totalFactors += 2;
+    
+    // Range factors
+    if (isNarrowRange) consolidationScore++;
+    if (isLowDeviation) consolidationScore++;
+    totalFactors += 2;
+    
+    // Regression factors
+    if (isFlatSlope) consolidationScore++;
+    if (isPoorFit) consolidationScore++;
+    totalFactors += 2;
+    
+    // Direction factor (negative score if directional)
+    if (!hasDirectionalMovement) consolidationScore++;
+    totalFactors += 1;
+    
+    // Calculate overall probability of consolidation
+    const consolidationProbability = consolidationScore / totalFactors;
+    
+    // Return true if consolidation probability is above 60%
+    return consolidationProbability >= 0.6;
   }
 
   static trend () {

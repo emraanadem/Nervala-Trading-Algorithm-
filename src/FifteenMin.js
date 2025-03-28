@@ -268,7 +268,6 @@ class Fifteen_Min_Nexus {
     Fifteen_Min_Functions.tpvariation()
     if (!Fifteen_Min_Functions.rejectionzoning()) {
       if (Math.abs(Fifteen_Min_Functions.valdiff(Fifteen_Min_Functions.price, Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price))) > 0.025) {
-        console.log(Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price))
         Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.resistance
         Fifteen_Min_Nexus.pos = true
         Fifteen_Min_Nexus.buy_pos = true
@@ -300,7 +299,6 @@ class Fifteen_Min_Nexus {
     Fifteen_Min_Functions.tpvariation()
     if (!Fifteen_Min_Functions.rejectionzoning()) {
       if (Math.abs(Fifteen_Min_Functions.valdiff(Fifteen_Min_Functions.price, Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price))) > 0.025) {
-        console.log(Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price))
         Fifteen_Min_Nexus.tp = Fifteen_Min_Nexus.support
         Fifteen_Min_Nexus.pos = true
         Fifteen_Min_Nexus.sell_pos = true
@@ -361,27 +359,27 @@ class Fifteen_Min_Nexus {
     }
   }
 
-  /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
-  static controlBiggerPeriod () {
-    try {
-      /* Price Zones */
-      Four_Hour_Functions.ValueAssigner()
-      One_Hour_Functions.ValueAssigner()
-      Four_Hour_Functions.HistoryAssigner()
-      One_Hour_Functions.HistoryAssigner()
-      Four_Hour_Functions.priceZones()
-      One_Hour_Functions.priceZones()
-      let h = new Array()
-      let i = new Array()
-      h = Four_Hour_Functions.finlevs
-      i = One_Hour_Functions.finlevs
-      const totallevs = h.push(i)
-      Fifteen_Min_Nexus.biggersupres = totallevs
-      Fifteen_Min_Nexus.finlevs.concat(totallevs)
-    } catch (error) {
-      console.log(error)
-    }
+ /** checks for support and resistance levels in larger time periods to get a better idea of possible consolidation/reversal points */
+ static controlBiggerPeriod () {
+  try {
+    /* Price Zones */
+    Four_Hour_Functions.ValueAssigner()
+    One_Hour_Functions.ValueAssigner()
+    Four_Hour_Functions.HistoryAssigner()
+    One_Hour_Functions.HistoryAssigner()
+    Four_Hour_Functions.priceZones()
+    One_Hour_Functions.priceZones()
+    let h = new Array()
+    let i = new Array()
+    h = Four_Hour_Functions.finlevs
+    i = One_Hour_Functions.finlevs
+    const totallevs = h.push(i)
+    Fifteen_Min_Nexus.biggersupres = totallevs
+    Fifteen_Min_Nexus.finlevs.concat(totallevs)
+  } catch (error) {
+    console.log(error)
   }
+}
 
   /** main control method, takes control of the entire program and serves as the brain */
   static controlMain () {
@@ -390,7 +388,10 @@ class Fifteen_Min_Nexus {
       Fifteen_Min_Functions.ValueAssigner()
       Five_Min_Functions.HistoryAssigner()
       Four_Hour_Functions.HistoryAssigner()
+      One_Hour_Functions.HistoryAssigner()
       Fifteen_Min_Functions.supreslevs()
+      Four_Hour_Functions.supreslevs()
+      One_Hour_Functions.supreslevs()
       Fifteen_Min_Nexus.controlSmallerPeriod()
       Fifteen_Min_Functions.stoploss()
       Fifteen_Min_Functions.getPrice()
@@ -627,46 +628,143 @@ class Fifteen_Min_Functions {
     const history = Fifteen_Min_Functions.priceHist
     const highs = Fifteen_Min_Functions.highs
     const lows = Fifteen_Min_Functions.lows
-    const histmax = Math.max(...history)
-    const histmin = Math.min(...history)
+    const histmax = Math.max(...highs)
+    const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
-    const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    // Find tr.calculate and replace with normalized version
     
-    // Before any tr.calculate call
-    const trMinLength = Math.min(highs.length, lows.length, history.length)
-    if (trMinLength === 0) return true; // Skip calculation if no data
-    
-    // Normalize arrays - keeping newest values
-    const normHighs = highs.slice(-trMinLength)
-    const normLows = lows.slice(-trMinLength)
-    const normHistory = history.slice(-trMinLength)
-    
-    // Use normalized arrays
-    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
-    const h = new Array()
-    const i = []
-    const j = []
-    for (let value = 0; value < q.length; value++) {
-      h.push(q[value].lower)
-      i.push(q[value].upper)
-      j.push(q[value].middle)
+    // Ensure we have enough data
+    const minDataPoints = 20 // Reduced from 30 to require less data
+    if (history.length < minDataPoints) {
+      return false; // Default to false if not enough data
     }
-    const smmas = smas.calculate({ period: 14, values: h })
-    const smmass = smas.calculate({ period: 14, values: i })
-    /* keep midpoint just in case */
-    const smmasss = smas.calculate({ period: 14, values: j })
-    const smmaslast = smmas[smmas.length - 1]
-    const smmasslast = smmass[smmass.length - 1]
-    const smadiff = smmasslast - smmaslast
-    const ndiffone = n[n.length - 1] - n[n.length - 2]
-    const ndifftwo = n[n.length - 2] - n[n.length - 3]
-    const benchmark = 0.025 * histdiff
-    if (smadiff > benchmark && (n[n.length - 1] > n[n.length - 2] && ndiffone > ndifftwo)) {
-      return false
-    } else {
-      return true
+    
+    // Normalize all arrays to same length (use recent data)
+    const lookbackPeriod = Math.min(40, history.length) // Reduced from 60 for 15min timeframe
+    const recentHistory = history.slice(-lookbackPeriod)
+    const recentHighs = highs.slice(-lookbackPeriod)
+    const recentLows = lows.slice(-lookbackPeriod)
+    const recentClose = history.slice(-lookbackPeriod)
+    
+    // APPROACH 1: Bollinger Bands width analysis
+    const bollingerBands = bolls.calculate({ 
+      period: 14, 
+      values: recentHistory, 
+      stdDev: 2
+    })
+    
+    // Calculate normalized Bollinger Band width
+    const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
+    const recentBandWidths = bandWidths.slice(-5)
+    const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
+    
+    // Narrowing bands indicate consolidation
+    const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+    const isTightBands = avgBandWidth < 0.018 // Increased from 0.015 to be more lenient
+    
+    // APPROACH 2: True Range (volatility) analysis
+    const trValues = tr.calculate({ 
+      high: recentHighs, 
+      low: recentLows, 
+      close: recentClose, 
+      period: 10
+    })
+    
+    // Calculate average true range relative to price
+    const recentTR = trValues.slice(-5)
+    const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
+    const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+    
+    // Decreasing TR indicates consolidation
+    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
+    const isLowVolatility = normalizedATR < 0.0075 // Increased from 0.006 to be more lenient
+    
+    // APPROACH 3: Price channel/range analysis
+    const priceRange = histmax - histmin
+    const priceRangePercent = priceRange / histmin
+    
+    // Calculate standard deviation of closing prices
+    const sum = recentHistory.reduce((a, b) => a + b, 0)
+    const mean = sum / recentHistory.length
+    const stdDev = Math.sqrt(
+      recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
+    )
+    const relativeStdDev = stdDev / mean
+    
+    // Narrow range indicates consolidation
+    const isNarrowRange = priceRangePercent < 0.022 // Increased from 0.015 to be more lenient
+    const isLowDeviation = relativeStdDev < 0.01 // Increased from 0.008 to be more lenient
+    
+    // APPROACH 4: Linear regression slope and R-squared analysis
+    // Prepare x and y for regression
+    const x = Array.from({ length: recentHistory.length }, (_, i) => i)
+    const y = recentHistory
+    
+    // Calculate linear regression
+    const regResult = new regression.SimpleLinearRegression(x, y)
+    const slope = Math.abs(regResult.slope)
+    const r2 = regResult.rSquared
+    
+    // Flat slope and good fit indicate consolidation
+    const isFlatSlope = slope < 0.00012 * mean // Increased from 0.00008 to be more lenient
+    const isPoorFit = r2 < 0.5 // Increased from 0.45 to be more lenient
+    
+    // APPROACH 5: Check for higher highs/lower lows pattern
+    let hasDirectionalMovement = false
+    
+    // Check for consecutive higher highs or lower lows (trend indicators)
+    let consecutiveHigherHighs = 0
+    let consecutiveLowerLows = 0
+    const pattern_window = 4
+    
+    for (let i = 1; i < pattern_window; i++) {
+      if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
+        consecutiveHigherHighs++;
+      }
+      if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
+        consecutiveLowerLows++;
+      }
     }
+    
+    // Strong directional pattern indicates trending, not consolidation
+    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) { // Increased from 2 to be more lenient
+      hasDirectionalMovement = true;
+    }
+    
+    // Combine all factors to decide if the market is consolidating
+    // Use a scoring system where more indicators agreeing increases confidence
+    
+    let consolidationScore = 0;
+    let totalFactors = 0;
+    
+    // Bollinger factors - weigh these more heavily for 15-min timeframe
+    if (bandWidthShrinking) consolidationScore += 1.5; // Increased weight
+    if (isTightBands) consolidationScore += 1.5; // Increased weight
+    totalFactors += 3; // Adjusted total to match new weights
+    
+    // TR factors
+    if (trTrend) consolidationScore++;
+    if (isLowVolatility) consolidationScore++;
+    totalFactors += 2;
+    
+    // Range factors
+    if (isNarrowRange) consolidationScore++;
+    if (isLowDeviation) consolidationScore++;
+    totalFactors += 2;
+    
+    // Regression factors
+    if (isFlatSlope) consolidationScore++;
+    if (isPoorFit) consolidationScore++;
+    totalFactors += 2;
+    
+    // Direction factor (negative score if directional)
+    if (!hasDirectionalMovement) consolidationScore++;
+    totalFactors += 1;
+    
+    // Calculate overall probability of consolidation
+    const consolidationProbability = consolidationScore / totalFactors;
+    
+    // More balanced threshold for 15min timeframe
+    return consolidationProbability >= 0.62; // Decreased from 0.7 to produce more true results
   }
 
   /** TP variation, helps change TP depending on volatility and price movement depending on whether or not the code has surpassed TP1 and
@@ -674,7 +772,12 @@ class Fifteen_Min_Functions {
      */
   static tpvariation () {
     const tp = Fifteen_Min_Nexus.tp
-    const values = Fifteen_Min_Nexus.finlevs.concat(Fifteen_Min_Nexus.biggersupres)
+    
+    // Ensure both arrays exist before trying to concatenate
+    const finlevs = Fifteen_Min_Nexus.finlevs
+    const biggersupres = Fifteen_Min_Nexus.biggersupres
+    const values = finlevs.concat(biggersupres)
+    
     const valdiffgreater = []
     const valdiffless = []
     let closesttp = 0
@@ -683,6 +786,18 @@ class Fifteen_Min_Functions {
     let referenceval = 0
     const num1 = Fifteen_Min_Nexus.price
     const volval = Fifteen_Min_Functions.volatility()
+    
+    // Ensure we have at least some values to work with
+    if (values.length === 0) {
+      // Add fallback values if none exist
+      if (Fifteen_Min_Nexus.buy_pos) {
+        return Fifteen_Min_Functions.price * 1.01; // 1% above current price
+      } else if (Fifteen_Min_Nexus.sell_pos) {
+        return Fifteen_Min_Functions.price * 0.99; // 1% below current price
+      }
+      return Fifteen_Min_Nexus.tp || Fifteen_Min_Functions.price; // Return existing TP or current price
+    }
+    
     if (Fifteen_Min_Nexus.buy_pos) {
       for (let item = 0; item < values.length; item++) {
         if (num1 < values[item]) {
@@ -789,818 +904,235 @@ class Fifteen_Min_Functions {
 
   /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
   static overall () {
-    const extendedhistory = Fifteen_Min_Functions.extendHist
-    Fifteen_Min_Functions.rejectionzones = [0, 0, 0]
-    const price = Fifteen_Min_Functions.price
-    const max = Math.max(...extendedhistory)
-    const min = Math.min(...extendedhistory)
-    const buffer = (max - min) * 0.05
-    const lower = price - buffer
-    const upper = price + buffer
-    const pricerange = [lower, upper]
-    const studylist = []
-    for (let val = 0; val < extendedhistory.length; val++) {
-      if (extendedhistory[val] <= upper && extendedhistory[val] >= lower) {
-        studylist.push([val, extendedhistory[val]])
-      }
-    }
-    const result = Fifteen_Min_Functions.analysis(studylist, extendedhistory, pricerange)
-    return result
-  }
-
-  /** Do past Analysis to see if this is a good trade, based on static overall() method */
-  static analysis (cases, extendedhistory, pricerange) {
-    Fifteen_Min_Functions.rejectionzones = [0, 0, 0]
-    const histnorm = Fifteen_Min_Functions.priceHist
-    const normdiff = (Math.max(...histnorm) - Math.min(...histnorm)) * 0.025
-    const q = bolls.calculate({ period: 10, values: extendedhistory, stdDev: 1 })
-    const h = new Array()
-    const i = []
-    const j = []
-    for (let value = 0; value < q.length; value++) {
-      h.push(q[value].lower)
-      i.push(q[value].upper)
-      j.push(q[value].middle)
-    }
-    const smmas = smas.calculate({ period: 14, values: h })
-    const smmass = smas.calculate({ period: 14, values: i })
-    /* keep midpoint just in case */
-    const smmasss = smas.calculate({ period: 14, values: j })
-    const histdiff = (pricerange[1] - pricerange[0]) / 2
-    const benchmark = 0.025 * histdiff
-    const fractals = []
-    let rejection = 0
-    for (let val = 0; val < cases.length; val++) {
-      fractals.push(cases[val][0])
-    }
-    for (let val = 0; val < fractals.length; val++) {
-      let mincount = 0
-      let maxcount = 0
-      for (let value = 0; value < 3; value++) {
-        if ((fractals[val] < extendedhistory.length - 2) && (fractals[val] > 1)) {
-          if (extendedhistory[fractals[val]] > extendedhistory[fractals[val] - value]) {
-            maxcount++
-          }
-          if (extendedhistory[fractals[val]] > extendedhistory[fractals[val] + value]) {
-            maxcount++
-          }
-          if (extendedhistory[fractals[val]] < extendedhistory[fractals[val] - value]) {
-            mincount++
-          }
-          if (extendedhistory[fractals[val]] < extendedhistory[fractals[val] + value]) {
-            mincount++
-          }
-        }
-      }
-      if (mincount > 4 || maxcount > 4) {
-        rejection++
-        if (fractals.length < 1) {
-          fractals.push(0)
-          Fifteen_Min_Functions.rejectionzones.push(fractals[0])
-        } else {
-          const frac = fractals[val]
-          Fifteen_Min_Functions.rejectionzones.push(extendedhistory[frac])
-        }
-      }
-    }
-    if (Fifteen_Min_Functions.rejectionzones.length < 1) {
-      Fifteen_Min_Functions.rejectionzones.push(Fifteen_Min_Functions.price)
-    }
-    if (rejection > 2) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  /** Smart array that grows as program runs longer for each time period, shows rejection zones and if the program is near them, it'll not allow trading */
-  static rejectionzoning () {
-    Fifteen_Min_Functions.overall()
-    const rejects = Fifteen_Min_Functions.rejectionzones
-    const diffs = []
-    for (const val in rejects) {
-      if (Fifteen_Min_Nexus.pot_buy) {
-        if (Fifteen_Min_Functions.price < val) {
-          diffs.push(val - Fifteen_Min_Functions.price)
-        }
-      }
-      if (Fifteen_Min_Nexus.pot_sell) {
-        if (Fifteen_Min_Functions.price > val) {
-          diffs.push(Fifteen_Min_Functions.price - val)
-        }
-      }
-    }
-
-    if (Math.abs(Math.min(...diffs)) < Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Nexus.tp)) {
-      Fifteen_Min_Nexus.pot_buy = false
-      Fifteen_Min_Nexus.pot_sell = false
-      return true
-    } else {
-      return false
-    }
-  }
-
-  /** return price */
-  static getPrice () {
-    return Fifteen_Min_Functions.price
-  }
-
-  /** return historical price */
-  static priceHistory () {
-    return Fifteen_Min_Functions.priceHist
-  }
-
-  /** find whether trend is going up or down */
-  static trend () {
-    const history = Fifteen_Min_Functions.priceHist
-    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
-    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
-  }
-
-  /** recent history, shortens history array into last 50 digits for different analyses */
-  static recentHist () {
-    const history = Fifteen_Min_Functions.priceHist
-    const historytwo = []
-    for (let x = 0; x < 50; x++) { historytwo.push(history.splice(-1, 1)[0]) }
-    Fifteen_Min_Functions.recentHisto = historytwo.reverse()
-  }
-
-  /** determination of stop loss size */
-  static stoploss () {
-    const highs = Fifteen_Min_Functions.highs
-    const lows = Fifteen_Min_Functions.lows
-    const diff = []
-    let totaldiff = 0
-    let finaldiff = 0
-    for (let variables = 0; variables < 30; variables++) {
-      diff.push(Math.abs(highs[highs.length - 1 - variables] - lows[lows.length - 1 - variables]))
-    }
-    for (let variables = 0; variables < diff.length; variables++) {
-      totaldiff += diff[variables]
-    }
-    if (Fifteen_Min_Functions.volatility() > 0.618) {
-      finaldiff = (totaldiff / 30) * 1.382
-    } else {
-      finaldiff = (totaldiff / 30)
-    }
-    let slceil = 0
-    let slfloor = 0
-    let numbuy = 0
-    let newsl = 0
-    if (Fifteen_Min_Nexus.pot_buy) {
-      const diffprice = Fifteen_Min_Functions.price - finaldiff
-      if (!Number.isFinite(Fifteen_Min_Functions.closesttwo(diffprice)[0])) {
-        slfloor = Fifteen_Min_Functions.price - (finaldiff * 3.618)
-        newsl = slfloor
-      } else {
-        numbuy = Fifteen_Min_Functions.closesttwo(diffprice)[0]
-        if (!Number.isFinite(Fifteen_Min_Functions.closesttwo(numbuy)[0])) {
-          newsl = diffprice - (0.786 * (diffprice - numbuy))
-        } else {
-          slfloor = (Fifteen_Min_Functions.price - ((Fifteen_Min_Functions.price - Fifteen_Min_Functions.closesttwo(numbuy)[0]) * 1.618 * 0.786))
-          newsl = slfloor
-        }
-      }
-      Fifteen_Min_Nexus.sl = newsl
-    } if (Fifteen_Min_Nexus.pot_sell) {
-      const diffprice = finaldiff + Fifteen_Min_Functions.price
-      if (!Number.isFinite(Fifteen_Min_Functions.closesttwo(diffprice)[1])) {
-        slceil = Fifteen_Min_Functions.price + (finaldiff * 3.618)
-        newsl = slceil
-      } else {
-        numbuy = Fifteen_Min_Functions.closesttwo(diffprice)[1]
-        if (!Number.isFinite(Fifteen_Min_Functions.closesttwo(numbuy)[1])) {
-          newsl = diffprice + (0.786 * (numbuy - diffprice))
-        } else {
-          slceil = (Fifteen_Min_Functions.price + ((Math.abs(Fifteen_Min_Functions.price - Fifteen_Min_Functions.closesttwo(numbuy)[1])) * 1.618 * 0.786))
-          newsl = slceil
-        }
-      }
-      Fifteen_Min_Nexus.sl = newsl
-    }
-    return finaldiff
-  }
-
-  /** finds closest support and resistance level to whatever price u put in */
-  static closesttwo (num1) {
-    const values = Fifteen_Min_Nexus.finlevs.concat(Fifteen_Min_Nexus.biggersupres)
-    const valdiffgreater = []
-    const valdiffless = []
-    for (let item = 0; item < values.length; item++) {
-      if (num1 < values[item]) {
-        valdiffgreater.push(Math.abs(num1 - values[item]))
-      }
-      if (num1 > values[item]) {
-        valdiffless.push(Math.abs(num1 - values[item]))
-      }
-    }
-    const closestbelow = Fifteen_Min_Functions.price - Math.min(...valdiffless)
-    const closestabove = Fifteen_Min_Functions.price + Math.min(...valdiffgreater)
-    const closests = [closestbelow, closestabove]
-    return closests
-  }
-
-  /** price zones, meant to determine whether a price zone has been found or not */
-  static priceZones () {
-    Fifteen_Min_Functions.supreslevs()
-    if (Math.abs((Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Functions.price, Fifteen_Min_Nexus.resistance))
-    ) / (Math.abs(Fifteen_Min_Functions.pipCountBuy(Math.max(...Fifteen_Min_Functions.priceHist), Math.min(...Fifteen_Min_Functions.priceHist)))) < 0.1) {
-      return true
-    } else if (Math.abs((Fifteen_Min_Functions.pipCountBuy(Fifteen_Min_Functions.price, Fifteen_Min_Nexus.support))
-    ) / (Math.abs(Fifteen_Min_Functions.pipCountBuy(Math.max(...Fifteen_Min_Functions.priceHist), Math.min(...Fifteen_Min_Functions.priceHist)))) < 0.1) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  /** keylev, meant to determine the closest keylevel to the current price */
-  static keylev () {
-    Fifteen_Min_Functions.getPrice()
-    if (Fifteen_Min_Functions.valdiff(Fifteen_Min_Functions.price, Fifteen_Min_Functions.closest(Fifteen_Min_Functions.price)) < 0.1) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  /** volatility, meant to determine whether or not price movement is too volatile for current parameters */
-  static volatility () {
-    const history = Fifteen_Min_Functions.priceHist
-    const r = rsis.calculate({ period: 14, values: history })
-    const q = r[r.length - 1]
-    let diff = 0
-    if (q > 50) { diff = q - 0 } else if (q <= 50) { diff = 100 - q }
-    const difference = diff / 100
-    const equation = ((Math.abs((100) * Math.sin(difference)))) / (Math.abs(100 * Math.sin(1.05)))
-    return equation
-  }
-
-  /** trailing stop loss factor, uses derived equation to create a sort of "bubble" around price movement to prevent trades being taken out early */
-  static trailingsl () {
-    const factor = Fifteen_Min_Functions.volatility()
-    const history = Fifteen_Min_Functions.priceHist
-    const ceiling = Math.max(...history)
-    const floor = Math.min(...history)
-    const diffy = ceiling - floor
-    const posdiff = Math.abs(Fifteen_Min_Nexus.posprice - Fifteen_Min_Functions.price)
-    const deci = posdiff / diffy
-    const input = deci * 6.18
-    const equation = (1 - factor) * (((input * input) + input) / ((input * input) + input + 1))
-    return equation
-  }
-
-  /**  used to determine price channels and send to announcer so that the announcer can announce whether a price channel has been found, similar to price zones */
-  static priceChannels () {
-    const rvalues = Fifteen_Min_Functions.regression()
-    if ((rvalues[0] * rvalues[0]) > 0.8 && (rvalues[1] * rvalues[1]) > 0.8) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  /** used to determine consolidation via volatility, is added to consolidationtwo that was recently made now */
-  static consolidation () {
-    Fifteen_Min_Functions.recentHist()
-    const max = Math.max(...Fifteen_Min_Functions.recentHisto)
-    const min = Math.min(...Fifteen_Min_Functions.recentHisto)
-    const totmax = Math.max(...Fifteen_Min_Functions.priceHist)
-    const totmin = Math.min(...Fifteen_Min_Functions.priceHist)
-    if (Fifteen_Min_Functions.volatility() > 0.618) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  /** used to determine slope between two points */
-  static slopes () {
-    Fifteen_Min_Functions.recentHist()
-    const recentHistory = Fifteen_Min_Functions.recentHisto
-    const slope = []
-    for (let value = 0; value < recentHistory.length - 1; value++) {
-      slope.push(recentHistory[value + 1] - recentHistory[value])
-    }
-    return slope
-  }
-
-  /* Make stricter, 3+ values or more to be a max or min once real data comes thru */
-  /* UPDATE: stricter values not working that well, but its identifying price channels so ... should I change? I don't know */
-  /** used to determine relative maxes and mins for identification of price channels */
-  static maxes_mins () {
-    Fifteen_Min_Functions.recentHist()
-    const recentHistory = Fifteen_Min_Functions.recentHisto
-    const slope = Fifteen_Min_Functions.slopes()
-    const maxes = []
-    const mins = []
-    for (let value = 3; value < slope.length - 2; value++) {
-      if (slope[value - 1] > 0 && slope[value] < 0) {
-        if (slope[value - 2] > 0 && slope[value + 1] < 0) { maxes.push(recentHistory[value]) } else if (slope[value - 3] > 0 && slope[value + 1] < 0) { maxes.push(recentHistory[value]) }
-      } else if (slope[value - 1] < 0 && slope[value] > 0) {
-        if (slope[value - 2] < 0 && slope[value + 1] > 0) { mins.push(recentHistory[value]) } else if (slope[value - 3] < 0 && slope[value + 1] > 0) { mins.push(recentHistory[value]) }
-      }
-    }
-    Fifteen_Min_Functions.maxes = maxes
-    Fifteen_Min_Functions.mins = mins
-  }
-
-  /** used to determine regression lines (moving averages, for example) */
-  static regression () {
-    Fifteen_Min_Functions.maxes_mins()
-    const x = []
-    const length = Fifteen_Min_Functions.maxes.length
-    for (let value = 0; value < length; value++) { x.push(value) }
-    const y = Fifteen_Min_Functions.maxes
-    const regressions = new regression.SimpleLinearRegression(x, y)
-    const xtwo = []
-    const lengthtwo = Fifteen_Min_Functions.mins.length
-    for (let value = 0; value < lengthtwo; value++) { xtwo.push(value) }
-    const ytwo = Fifteen_Min_Functions.mins
-    const regressionstwo = new regression.SimpleLinearRegression(xtwo, ytwo)
-    const roneone = Object.values(regressions.score(x, y))[0]
-    const ronetwo = Object.values(regressions.score(x, y))[1]
-    const rtwoone = Object.values(regressionstwo.score(xtwo, ytwo))[0]
-    const rtwotwo = Object.values(regressionstwo.score(xtwo, ytwo))[1]
-    return [ronetwo, rtwotwo]
-  }
-
-  /* Add Key Part That the Levels Must Repeat 3x */
-  /* Key part added, test for results */
-  /** finds support and resistance levels, very important for code function, would love to improve this */
-  static supreslevs () {
-    const history = Fifteen_Min_Functions.priceHist
-    const ceiling = Math.max(...history)
-    const floor = Math.min(...history)
-    const difference = ceiling - floor
-    const levels = []
-    const levelss = []
-    let levelsss = []
-    let finalLevs = []
-    let count = 0
-    for (let item = 0; item < history.length; item++) { levels.push((history[item] - floor) / (difference)) }
-    for (let item = 0; item < levels.length; item++) { levels[item] = levels[item].toFixed(3) }
-    for (let item = 0; item < levels.length; item++) {
-      for (let items = 0; items < levels.length; items++) {
-        if (levels[item] == levels[items]) {
-          count++
-        }
-      }
-      if (count > 3) {
-        levelss.push(levels[item])
-      }
-      count = 0
-    }
-    levelsss = [...new Set(levelss)]
-    finalLevs = levelsss
-    const price = Fifteen_Min_Functions.getPrice()
-    const larger = []
-    const smaller = []
-    const largertwo = []
-    const smallertwo = []
-    const smaller_diff = []
-    const larger_diff = []
-    for (let item = 0; item < finalLevs.length; item++) {
-      if (price > ((finalLevs[item] * difference) + floor)) { smaller.push(((finalLevs[item] * difference) + floor)) }
-      if (price < ((finalLevs[item] * difference) + floor)) { larger.push(((finalLevs[item] * difference) + floor)) }
-    }
-    for (let item = 0; item < smaller.length; item++) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(price, smaller[item])) > 0.05) {
-        smallertwo.push(smaller[item])
-      }
-    }
-    for (let item = 0; item < larger.length; item++) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(price, larger[item])) > 0.05) {
-        largertwo.push(larger[item])
-      }
-    }
-    if (smallertwo.length < 1) {
-      smallertwo.push(price - Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
-    }
-    if (largertwo.length < 1) {
-      largertwo.push(price + Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
-    }
-    for (let item = 0; item < smallertwo.length; item++) {
-      smaller_diff.push(Math.abs((smallertwo[item] - price)))
-    }
-    for (let item = 0; item < largertwo.length; item++) {
-      larger_diff.push(Math.abs((largertwo[item] - price)))
-    }
-    const support = price - Math.min(...smaller_diff)
-    const resistance = price + Math.min(...larger_diff)
-    Fifteen_Min_Nexus.support = support
-    Fifteen_Min_Nexus.resistance = resistance
-    for (let item = 0; item < finalLevs.length; item++) {
-      finalLevs[item] = (finalLevs[item] * difference) + floor
-    }
-    Fifteen_Min_Nexus.finlevs = finalLevs
-  }
-
-  /** self explanatory, finds RSI and compares the last two */
-  static rsi () {
-    const history = Fifteen_Min_Functions.priceHist
-    const history2 = []
-    for (let item = 0; item < history.length; item++) { history2.push(history[item]) }
-    history2.splice(-1, 1)
-    const q = rsis.calculate({ period: 14, values: history })
-    const r = rsis.calculate({ period: 14, values: history2 })
-    const qlast = q[q.length - 1]
-    const rlast = r[r.length - 1]
-    if (qlast > rlast) { return true }
-    if (rlast > qlast) { return false }
-  }
-
-  /** self explanatory, finds MACD and compares the last two */
-  static macd () {
-    const history = Fifteen_Min_Functions.priceHist
-    const x = []
-    const q = emas.calculate({ period: 12, values: history })
-    const r = emas.calculate({ period: 26, values: history })
-    const s = macds.calculate({ values: history, fastPeriod: 12, slowPeriod: 26, signalPeriod: 9, SimpleMAOscillator: false, SimpleMASignal: false })
-    for (let i = 0; i < r.length; i++) { x.push(q[i + 14] - r[i]) }
-    const qlast = s[s.length - 1].histogram
-    const rlast = s[s.length - 2].histogram
-    if (qlast > rlast) { return true }
-    if (rlast > qlast) { return false }
-  }
-
-  /** self explanatory, finds ROC and compares the last two */
-  static roc () {
-    const history = Fifteen_Min_Functions.priceHist
-    const history2 = []
-    for (let item = 0; item < history.length; item++) { history2.push(history[item]) }
-    history2.splice(-1, 1)
-    const q = rocs.calculate({ period: 10, values: history })
-    const r = rocs.calculate({ period: 10, values: history2 })
-    const qlast = q[q.length - 1]
-    const rlast = r[r.length - 1]
-    if (qlast > rlast) { return true }
-    if (rlast > qlast) { return false }
-  }
-
-  /** self explanatory, finds EMA and compares the last two */
-  static ema () {
-    const history = Fifteen_Min_Functions.priceHist
-    const q = emas.calculate({ period: 8, values: history })
-    const r = emas.calculate({ period: 14, values: history })
-    const qlast = q[q.length - 1]
-    const rlast = r[r.length - 1]
-    if (qlast > rlast) { return true }
-    if (rlast > qlast) { return false }
-  }
-
-  /** new indicator mix that finds EMAS of RSI and compares the last two values */
-  static obv () {
-    const history = Fifteen_Min_Functions.priceHist
-    const qs = rsis.calculate({ period: 14, values: history })
-    const q = emas.calculate({ period: 8, values: qs })
-    const qlast = q[q.length - 1]
-    const r = emas.calculate({ period: 14, values: qs })
-    const rlast = r[r.length - 1]
-    if (qlast > rlast) { return true }
-    if (rlast > qlast) { return false }
-  }
-
-  /** pip counter */
-  static pip (num1, num2) {
-    if (String(num1).indexOf('.') == 2) {
-      Fifteen_Min_Functions.multiplier = 1000
-    } else if (String(num1).indexOf('.') == 3) {
-      Fifteen_Min_Functions.multiplier = 100
-    } else if (String(num1).indexOf('.') == 4) {
-      Fifteen_Min_Functions.multiplier = 10
-    } else if (String(num1).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 1
-    } else if (String(num1).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 0.1
-    } else if (String(num1).indexOf('.') == 6) {
-      Fifteen_Min_Functions.multiplier = 0.01
-    } else if (String(num1).indexOf('.') == 7) {
-      Fifteen_Min_Functions.multiplier = 0.001
-    } else if (String(num1).indexOf('.') == 8) {
-      Fifteen_Min_Functions.multiplier = 0.0001
-    } else if (String(num1).indexOf('.') == 9) {
-      Fifteen_Min_Functions.multiplier = 0.00001
-    } else if (String(num1).indexOf('.') == 10) {
-      Fifteen_Min_Functions.multiplier = 0.000001
-    } else { Fifteen_Min_Functions.multiplier = 10000 }
-    num1 *= Fifteen_Min_Functions.multiplier
-    num2 *= Fifteen_Min_Functions.multiplier
-    return [num1, num2]
-  }
-
-  /** pip converter */
-  static pipreverse (num, num2) {
-    if (String(num).indexOf('.') == 2) {
-      Fifteen_Min_Functions.multiplier = 0.001
-    } else if (String(num).indexOf('.') == 3) {
-      Fifteen_Min_Functions.multiplier = 0.01
-    } else if (String(num).indexOf('.') == 4) {
-      Fifteen_Min_Functions.multiplier = 0.1
-    } else if (String(num).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 1
-    } else if (String(num).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 10
-    } else if (String(num).indexOf('.') == 6) {
-      Fifteen_Min_Functions.multiplier = 100
-    } else if (String(num).indexOf('.') == 7) {
-      Fifteen_Min_Functions.multiplier = 1000
-    } else if (String(num).indexOf('.') == 8) {
-      Fifteen_Min_Functions.multiplier = 10000
-    } else if (String(num).indexOf('.') == 9) {
-      Fifteen_Min_Functions.multiplier = 100000
-    } else if (String(num).indexOf('.') == 10) {
-      Fifteen_Min_Functions.multiplier = 1000000
-    } else { Fifteen_Min_Functions.multiplier = 0.0001 }
-    num2 *= Fifteen_Min_Functions.multiplier
-    return (num2)
-  }
-
-  static instrument_switcher (instrument) {
-  }
-
-  /* sets value difference as a decimal-percentage of floor to ceiling */
-  /** gets value difference for normalization of data points */
-  static valdiff (num1, num2) {
-    const history = Fifteen_Min_Functions.priceHist
-    const floor = Math.min(...history)
-    const ceil = Math.max(...history)
-    const valdiffer = ceil - floor
-    const diff = Math.abs(num1 - num2)
-    const valuediff = diff / valdiffer
-    return valuediff
-  }
-
-  /** Pip difference calculator */
-  static pipdiffy (price, num1) {
-    if (String(price).indexOf('.') == 2) {
-      Fifteen_Min_Functions.multiplier = 1000
-    } else if (String(price).indexOf('.') == 3) {
-      Fifteen_Min_Functions.multiplier = 100
-    } else if (String(price).indexOf('.') == 4) {
-      Fifteen_Min_Functions.multiplier = 10
-    } else if (String(price).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 1
-    } else if (String(price).indexOf('.') == 5) {
-      Fifteen_Min_Functions.multiplier = 0.1
-    } else if (String(price).indexOf('.') == 6) {
-      Fifteen_Min_Functions.multiplier = 0.01
-    } else if (String(price).indexOf('.') == 7) {
-      Fifteen_Min_Functions.multiplier = 0.001
-    } else if (String(price).indexOf('.') == 8) {
-      Fifteen_Min_Functions.multiplier = 0.0001
-    } else if (String(price).indexOf('.') == 9) {
-      Fifteen_Min_Functions.multiplier = 0.00001
-    } else if (String(price).indexOf('.') == 10) {
-      Fifteen_Min_Functions.multiplier = 0.000001
-    } else {
-      Fifteen_Min_Functions.multiplier = 10000
-    }
-    return num1 * Fifteen_Min_Functions.multiplier
-  }
-
-  /** finds closest support and resistance level to whatever price u put in */
-  static closest (num1) {
-    const values = Fifteen_Min_Nexus.finlevs.concat(Fifteen_Min_Nexus.biggersupres)
-    const valdiffgreater = []
-    const valdiffless = []
-    for (let item = 0; item < values.length; item++) {
-      if (num1 < values[item]) {
-        valdiffgreater.push(Math.abs(num1 - values[item]))
-      }
-      if (num1 > values[item]) {
-        valdiffless.push(Math.abs(num1 - values[item]))
-      }
-    }
-    const closestbelow = Fifteen_Min_Functions.price - Math.min(...valdiffless)
-    const closestabove = Fifteen_Min_Functions.price + Math.min(...valdiffgreater)
-    const closests = [closestbelow, closestabove]
-    return Math.min(...closests)
-  }
-
-  /** Counts pips between two values for buying */
-  static pipCountBuy (num1, num2) {
-    let nums
-    nums = Fifteen_Min_Functions.pip(num1, num2)
-    return (nums[1] - nums[0])
-  }
-
-  /** Counts pips between two values for selling */
-  static pipCountSell (num1, num2) {
-    let nums
-    nums = Fifteen_Min_Functions.pip(num1, num2)
-    return (nums[0] - nums[1])
-  }
-}
-
-class Four_Hour_Functions {
-  multiplier = 0
-  priceHist = []
-  extendHist = []
-  rejectionzones = new Array()
-  extendHigh = []
-  extendLow = []
-  support = 0
-  resistance = 0
-  timeperiods = {}
-  vals = []
-  price = 0
-  maxes = []
-  mins = []
-  recentHisto = []
-  highs = []
-  lows = []
-
-  /** load instrument name from json file */
-  static instrument_name () {
-    Fifteen_Min_Nexus.pair = instrum
-    return instrum
-  }
-
-  /** load historical prices from json file */
-  static HistoryAssigner () {
-    const instrument = Four_Hour_Functions.instrument_name()
-    Four_Hour_Functions.priceHist = dataset.Four_Hour.c
-    Four_Hour_Functions.highs = dataset.Four_Hour.h
-    Four_Hour_Functions.lows = dataset.Four_Hour.l
-    Four_Hour_Functions.extendHist = dataset.Four_Hour_Extend.c
-    Four_Hour_Functions.extendHigh = dataset.Four_Hour_Extend.h
-    Four_Hour_Functions.extendLow = dataset.Four_Hour_Extend.l
-  }
-
-  /** load price from json file */
-  static ValueAssigner () {
-    Four_Hour_Functions.price = liveprice
-  }
-
-  /** second consolidation method, meant to strengthen consolidation identification */
-  static consolidationtwo () {
-    const history = Four_Hour_Functions.priceHist
-    const highs = Four_Hour_Functions.highs
-    const lows = Four_Hour_Functions.lows
-    const histmax = Math.max(...history)
-    const histmin = Math.min(...history)
-    const histdiff = histmax - histmin
-    const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    // Find tr.calculate and replace with normalized version
-    
-    // Before any tr.calculate call
-    const trMinLength = Math.min(highs.length, lows.length, history.length)
-    if (trMinLength === 0) return true; // Skip calculation if no data
-    
-    // Normalize arrays - keeping newest values
-    const normHighs = highs.slice(-trMinLength)
-    const normLows = lows.slice(-trMinLength)
-    const normHistory = history.slice(-trMinLength)
-    
-    // Use normalized arrays
-    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
-    const h = new Array()
-    const i = []
-    const j = []
-    for (let value = 0; value < q.length; value++) {
-      h.push(q[value].lower)
-      i.push(q[value].upper)
-      j.push(q[value].middle)
-    }
-    const smmas = smas.calculate({ period: 14, values: h })
-    const smmass = smas.calculate({ period: 14, values: i })
-    /* keep midpoint just in case */
-    const smmasss = smas.calculate({ period: 14, values: j })
-    const smmaslast = smmas[smmas.length - 1]
-    const smmasslast = smmass[smmass.length - 1]
-    const smadiff = smmasslast - smmaslast
-    const ndiffone = n[n.length - 1] - n[n.length - 2]
-    const ndifftwo = n[n.length - 2] - n[n.length - 3]
-    const benchmark = 0.025 * histdiff
-    if (smadiff > benchmark && (n[n.length - 1] > n[n.length - 2] && ndiffone > ndifftwo)) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  /** fibonacci levels to be added to the program...
-     * update 6/5/22 @ 4:43 PM: Adding identification of retracement origin point
-    */
-  static fib () {
-    const recents = Four_Hour_Functions.recentHisto
-    const dataset = []
-    for (let x = 1; x < 51; x++) {
-      dataset.push([x, recents[x - 1]])
-    }
-    const mod = createModel()
-    mod.fit(dataset, [4])
-    mod.estimate(4, 25)
-    const equation = mod.expressions()['4']
-    const q = nerdamer.diff((equation))
-    const newequation = q.text()
-    const root = roots.getRoots((newequation))
-    const baseprice = 0
-    const currentprice = Four_Hour_Functions.price
-    const diff = Math.abs(baseprice - currentprice)
-    if (currentprice < baseprice) {
-      const fib1 = diff * 0.236 + currentprice
-      const fib2 = diff * 0.382 + currentprice
-      const fib3 = diff * 0.5 + currentprice
-      const fib4 = diff * 0.618 + currentprice
-      const fib5 = diff * 0.786 + currentprice
-      const fib6 = diff * 1.00 + currentprice
-    }
-    if (currentprice > baseprice) {
-      const fib1 = diff * 0.236 + baseprice
-      const fib2 = diff * 0.382 + baseprice
-      const fib3 = diff * 0.5 + baseprice
-      const fib4 = diff * 0.618 + baseprice
-      const fib5 = diff * 0.786 + baseprice
-      const fib6 = diff * 1.00 + baseprice
-    }
-    /* Finish finding roots of derivative, from this point select the root with the highest x value,
-        then register fib levels from the price corresponding to that x value, depending on whether or not its a buy or sell */
-  }
-
-  /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
-  static overall () {
+    // Get extended price history data and current price
     const extendedhistory = Four_Hour_Functions.extendHist
-    Four_Hour_Functions.rejectionzones = [0, 0, 0]
+    const extendedHighs = Four_Hour_Functions.extendHigh 
+    const extendedLows = Four_Hour_Functions.extendLow 
     const price = Four_Hour_Functions.price
+    
+    // Define support/resistance levels from multiple timeframes for more robust rejection zones
+    const onehourLevels = One_Hour_Functions.finlevs
+    const fifteenMinLevels = Fifteen_Min_Nexus.finlevs
+    const fourHourLevels = Four_Hour_Functions.finlevs
+    const keyLevels = [...onehourLevels, ...fifteenMinLevels, ...fourHourLevels]
+    
+    // Calculate volatility to adjust buffer size dynamically
+    const recentPrices = extendedhistory.slice(-50)
+    const volatility = Four_Hour_Functions.volatility ? Four_Hour_Functions.volatility() : 0.05
+    
+    // Adjust buffer based on volatility - more volatile markets need wider buffers
     const max = Math.max(...extendedhistory)
     const min = Math.min(...extendedhistory)
-    const buffer = (max - min) * 0.05
+    const priceRange = max - min
+    const buffer = priceRange * Math.max(0.03, Math.min(0.08, volatility))
+    
+    // Define range around current price to look for similar price levels
     const lower = price - buffer
     const upper = price + buffer
     const pricerange = [lower, upper]
+    
+    // Find historical instances where price was in similar range
     const studylist = []
     for (let val = 0; val < extendedhistory.length; val++) {
       if (extendedhistory[val] <= upper && extendedhistory[val] >= lower) {
+        // Store index and price
         studylist.push([val, extendedhistory[val]])
       }
     }
-    const result = Four_Hour_Functions.analysis(studylist, extendedhistory, pricerange)
-    return result
+    
+    // Detect if price is near a key level from any timeframe
+    const keyLevelProximity = keyLevels.some(level => {
+      const distance = Math.abs(price - level) / price
+      return distance < 0.0015 // 0.15% distance threshold - reduced to be less strict
+    })
+    
+    // If no similar price points found or too few for analysis
+    if (studylist.length < 5) {
+      return !keyLevelProximity // If near key level, avoid trading (false)
+    }
+    
+    // Perform detailed analysis of historical behavior at similar price levels
+    const result = Four_Hour_Functions.analysis(
+      studylist, 
+      extendedhistory, 
+      pricerange, 
+      extendedHighs, 
+      extendedLows, 
+      keyLevels
+    )
+    
+    // Modified to allow more trades: either analysis is positive OR price isn't near key levels with enough data
+    return result || (!keyLevelProximity && studylist.length >= 8)
   }
 
   /** Do past Analysis to see if this is a good trade, based on static overall() method */
-  static analysis (cases, extendedhistory, pricerange) {
-    Four_Hour_Functions.rejectionzones = [0, 0, 0]
+  static analysis (cases, extendedhistory, pricerange, highs, lows, keyLevels) {
+    // Initialize rejection zones array
+    Four_Hour_Functions.rejectionzones = []
+    
+    // Get current price and normal history
+    const price = Four_Hour_Functions.price
     const histnorm = Four_Hour_Functions.priceHist
-    const normdiff = (Math.max(...histnorm) - Math.min(...histnorm)) * 0.025
-    const q = bolls.calculate({ period: 10, values: extendedhistory, stdDev: 1 })
-    const h = new Array()
-    const i = []
-    const j = []
-    for (let value = 0; value < q.length; value++) {
-      h.push(q[value].lower)
-      i.push(q[value].upper)
-      j.push(q[value].middle)
-    }
-    const smmas = smas.calculate({ period: 14, values: h })
-    const smmass = smas.calculate({ period: 14, values: i })
-    /* keep midpoint just in case */
-    const smmasss = smas.calculate({ period: 14, values: j })
-    const histdiff = (pricerange[1] - pricerange[0]) / 2
-    const benchmark = 0.025 * histdiff
-    const fractals = []
+    
+    // Calculate price statistics
+    const priceStdDev = Four_Hour_Functions.calculateStdDev(extendedhistory.slice(-50))
+    const histRange = Math.max(...histnorm) - Math.min(...histnorm)
+    
+    // Significant price movement threshold (scaled by market volatility)
+    const significantMove = histRange * 0.02
+    
+    // Calculate technical indicators
+    const bollingerBands = bolls.calculate({ 
+      period: 20, 
+      values: extendedhistory, 
+      stdDev: 2 
+    })
+    
+    // Extract upper and lower bands
+    const lowerBands = bollingerBands.map(band => band.lower)
+    const upperBands = bollingerBands.map(band => band.upper)
+    const middleBands = bollingerBands.map(band => band.middle)
+    
+    // Calculate smoothed versions for trend detection
+    const smoothedLower = smas.calculate({ period: 10, values: lowerBands })
+    const smoothedUpper = smas.calculate({ period: 10, values: upperBands })
+    const smoothedMiddle = smas.calculate({ period: 10, values: middleBands })
+    
+    // Define rejection threshold based on market volatility - increased to make rejection zones harder to identify
+    const rejectionThreshold = 5.5
+    
+    // Define volatility based threshold adjustment
+    const volAdjustment = Four_Hour_Functions.volatility ? 
+      Math.max(0.8, Math.min(1.2, Four_Hour_Functions.volatility() * 10)) : 
+      1.0
+      
+    // Track identified rejection zones
+    const rejectionZones = []
     let rejection = 0
-    for (let val = 0; val < cases.length; val++) {
-      fractals.push(cases[val][0])
-    }
-    for (let val = 3; val < fractals.length - 3; val++) {
-      let mincount = 0
-      let maxcount = 0
-      for (let value = 1; value < 4; value++) {
-        if (fractals[val] > fractals[val - value]) {
-          maxcount++
+    
+    // Extract indices from cases for analysis
+    const potentialRejectionPoints = cases.map(c => c[0])
+    
+    // Analyze each potential rejection point
+    for (let i = 0; i < potentialRejectionPoints.length; i++) {
+      const idx = potentialRejectionPoints[i]
+      
+      // Skip if too close to start or end of data
+      if (idx < 5 || idx >= extendedhistory.length - 5) continue
+      
+      // Count patterns that suggest rejection
+      let rejectionEvidence = 0
+      
+      // Pattern 1: Local high/low formations
+      let isLocalHigh = true
+      let isLocalLow = true
+      
+      for (let j = 1; j <= 3; j++) {
+        // Check if local high
+        if (extendedhistory[idx] <= extendedhistory[idx - j] || 
+            extendedhistory[idx] <= extendedhistory[idx + j]) {
+          isLocalHigh = false
         }
-        if (fractals[val] > fractals[val + value]) {
-          maxcount++
-        }
-        if (fractals[val] < fractals[val - value]) {
-          mincount++
-        }
-        if (fractals[val] < fractals[val + value]) {
-          mincount++
+        
+        // Check if local low
+        if (extendedhistory[idx] >= extendedhistory[idx - j] || 
+            extendedhistory[idx] >= extendedhistory[idx + j]) {
+          isLocalLow = false
         }
       }
-      if (mincount + maxcount > 4) {
+      
+      if (isLocalHigh || isLocalLow) rejectionEvidence += 2
+      
+      // Pattern 2: Price reversal after reaching this level
+      const preBehavior = extendedhistory[idx] - extendedhistory[idx - 3]
+      const postBehavior = extendedhistory[idx + 3] - extendedhistory[idx]
+      
+      // If direction changed after this point (sign change between pre and post)
+      if (preBehavior * postBehavior < 0 && 
+          Math.abs(postBehavior) > significantMove) {
+        rejectionEvidence += 1.5
+      }
+      
+      // Pattern 3: Proximity to Bollinger Band
+      const bandProximity = Math.min(
+        Math.abs(extendedhistory[idx] - upperBands[idx]), 
+        Math.abs(extendedhistory[idx] - lowerBands[idx])
+      )
+      
+      if (bandProximity < priceStdDev * 0.5) {
+        rejectionEvidence += 1
+      }
+      
+      // Pattern 4: Volume spike analysis if available (stub for future implementation)
+      // if (volume data available) { check for volume spike }
+      
+      // Pattern 5: Candlestick patterns if available
+      if (highs && lows) {
+        const highLowRange = highs[idx] - lows[idx]
+        const bodySize = Math.abs(extendedhistory[idx] - extendedhistory[idx-1])
+        
+        // Detect potential doji, hammer, or shooting star
+        if (highLowRange > bodySize * 2) {
+          rejectionEvidence += 1
+        }
+      }
+      
+      // Pattern 6: Check for confluence with key levels from multiple timeframes
+      const currentPrice = extendedhistory[idx]
+      for (const level of keyLevels) {
+        const distancePercent = Math.abs(currentPrice - level) / currentPrice
+        if (distancePercent < 0.005) { // Within 0.5%
+          rejectionEvidence += 1.5
+          break
+        }
+      }
+      
+      // Adjust evidence by volatility
+      rejectionEvidence *= volAdjustment
+      
+      // If enough evidence found, mark as rejection zone
+      if (rejectionEvidence >= rejectionThreshold) {
         rejection++
-        if (fractals.length < 1) {
-          fractals.push(0)
-          Four_Hour_Functions.rejectionzones.push(fractals[0])
-        } else {
-          const frac = fractals[val]
-          Four_Hour_Functions.rejectionzones.push(extendedhistory[frac])
-        }
+        rejectionZones.push(extendedhistory[idx])
+        Four_Hour_Functions.rejectionzones.push(extendedhistory[idx])
       }
     }
-    if (Four_Hour_Functions.rejectionzones.length < 1) {
-      Four_Hour_Functions.rejectionzones.push(Four_Hour_Functions.price)
+    
+    // Check if current price is near an identified rejection zone
+    let nearRejectionZone = false
+    const rejectionProximityThreshold = priceStdDev * 2
+    
+    for (const zone of rejectionZones) {
+      if (Math.abs(price - zone) < rejectionProximityThreshold) {
+        nearRejectionZone = true
+        break
+      }
     }
-    if (rejection > 2) {
-      return false
-    } else {
-      return true
+    
+    // Also check distance to newly identified zones that aren't yet in the system
+    for (const zone of Four_Hour_Functions.rejectionzones) {
+      if (Math.abs(price - zone) < rejectionProximityThreshold) {
+        nearRejectionZone = true
+        break
+      }
     }
+    
+    // Allow more rejection zones before prohibiting trades
+    return !(rejection > 3 || nearRejectionZone)
+  }
+  
+  /**
+   * Calculate standard deviation of a numeric array
+   * @param {number[]} values - Array of price values
+   * @return {number} Standard deviation
+   */
+  static calculateStdDev(values) {
+    const n = values.length
+    if (n < 2) return 0
+    
+    const mean = values.reduce((sum, val) => sum + val, 0) / n
+    const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n
+    return Math.sqrt(variance)
   }
 
   /** Smart array that grows as program runs longer for each time period, shows rejection zones and if the program is near them, it'll not allow trading */
@@ -1679,8 +1211,8 @@ class Four_Hour_Functions {
 
   /** keylev, meant to determine the closest keylevel to the current price */
   static keylev () {
-    Four_Hour_Functions.getPrice()
-    if (Four_Hour_Functions.valdiff(Four_Hour_Functions.price, Four_Hour_Functions.closest(Four_Hour_Functions.price)) < 0.1) {
+    Fifteen_Min_Functions.getPrice()
+    if (Fifteen_Min_Functions.valdiff(Fifteen_Min_Functions.price, Four_Hour_Functions.closest(Fifteen_Min_Functions.price)) < 0.1) {
       return true
     } else {
       return false
@@ -1725,16 +1257,156 @@ class Four_Hour_Functions {
 
   /** used to determine consolidation via volatility, is added to consolidationtwo that was recently made now */
   static consolidation () {
-    Four_Hour_Functions.recentHist()
-    const max = Math.max(...Four_Hour_Functions.recentHisto)
-    const min = Math.min(...Four_Hour_Functions.recentHisto)
-    const totmax = Math.max(...Four_Hour_Functions.priceHist)
-    const totmin = Math.min(...Four_Hour_Functions.priceHist)
-    if (Four_Hour_Functions.volatility() > 0.618) {
-      return false
-    } else {
-      return true
+    // Get price data
+    const history = Four_Hour_Functions.priceHist
+    const histLen = history.length
+    
+    // Need enough data for analysis
+    if (histLen < 30) return false
+    
+    // SECTION 1: PRICE STRUCTURE ANALYSIS
+    // Sample recent prices (more weight on recent activity)
+    const recentPrices = history.slice(-25)
+    const olderPrices = history.slice(-50, -25)
+    
+    // Calculate price statistics
+    const maxRecent = Math.max(...recentPrices)
+    const minRecent = Math.min(...recentPrices)
+    const maxOlder = Math.max(...olderPrices)
+    const minOlder = Math.min(...olderPrices)
+    const avgPrice = recentPrices.reduce((sum, price) => sum + price, 0) / recentPrices.length
+    
+    // Calculate normalized price ranges as percentages
+    const recentRange = (maxRecent - minRecent) / avgPrice
+    const olderRange = (maxOlder - minOlder) / avgPrice
+    
+    // Calculate percentage changes between consecutive prices
+    const changes = []
+    for (let i = 1; i < recentPrices.length; i++) {
+      changes.push((recentPrices[i] - recentPrices[i-1]) / recentPrices[i-1])
     }
+    
+    // SECTION 2: CYCLE DETECTION - novel approach
+    // Find dominant cycle length using auto-correlation
+    let maxCorrelation = 0
+    let dominantCycle = 0
+    
+    // Search for cycle lengths between 3 and 12 periods
+    for (let lag = 3; lag <= 12; lag++) {
+      let correlation = 0
+      let validPairs = 0
+      
+      for (let i = 0; i < recentPrices.length - lag; i++) {
+        correlation += (recentPrices[i] - avgPrice) * (recentPrices[i + lag] - avgPrice)
+        validPairs++
+      }
+      
+      if (validPairs > 0) {
+        correlation /= validPairs
+        
+        // Normalize correlation
+        if (correlation > maxCorrelation) {
+          maxCorrelation = correlation
+          dominantCycle = lag
+        }
+      }
+    }
+    
+    // Convert correlation to a 0-1 scale where 1 is perfect cyclic behavior
+    const normCorrelation = maxCorrelation > 0 ? 
+      Math.min(1, maxCorrelation / (0.5 * Math.pow(maxRecent - minRecent, 2))) : 0
+    
+    // SECTION 3: DIRECTIONAL ANALYSIS
+    // Detect if price is showing directional tendencies or random walk
+    let consecutiveUp = 0
+    let consecutiveDown = 0
+    let maxConsecutive = 0
+    let prevDirection = null
+    
+    for (const change of changes) {
+      const currentDirection = change >= 0
+      
+      if (prevDirection === true && currentDirection === true) {
+        consecutiveUp++
+        maxConsecutive = Math.max(maxConsecutive, consecutiveUp)
+      } else if (prevDirection === false && currentDirection === false) {
+        consecutiveDown++
+        maxConsecutive = Math.max(maxConsecutive, consecutiveDown)
+      } else {
+        consecutiveUp = currentDirection ? 1 : 0
+        consecutiveDown = currentDirection ? 0 : 1
+      }
+      
+      prevDirection = currentDirection
+    }
+    
+    // SECTION 4: ADAPTIVE THRESHOLD BASED ON VOLATILITY
+    // Calculate ATR (Average True Range)-like volatility measure
+    let sumTrueRange = 0
+    for (let i = 1; i < recentPrices.length; i++) {
+      const trueRange = Math.abs(recentPrices[i] - recentPrices[i-1])
+      sumTrueRange += trueRange
+    }
+    const atr = sumTrueRange / (recentPrices.length - 1)
+    const normalizedAtr = atr / avgPrice
+    
+    // CRITICAL CONDITION: Disqualify if market shows clear trending behavior
+    if (maxConsecutive >= 5) {
+      return false // Trending market with 5+ consecutive moves in same direction
+    }
+    
+    // CRITICAL CONDITION: Disqualify if recent volatility is significantly higher than historical
+    const volatilityExpanding = normalizedAtr > 0.0025 && recentRange > olderRange * 1.3
+    if (volatilityExpanding) {
+      return false // Expanding volatility suggests breakout or trend formation
+    }
+    
+    // SECTION 5: PRICE SPIKES ANALYSIS
+    // Detect outliers in price changes (spikes) that would disqualify consolidation
+    const stdDevChanges = Math.sqrt(
+      changes.reduce((sum, change) => sum + change * change, 0) / changes.length
+    )
+    
+    let spikeCount = 0
+    for (const change of changes) {
+      if (Math.abs(change) > stdDevChanges * 2.5) {
+        spikeCount++
+      }
+    }
+    
+    // Too many spikes suggest volatility, not consolidation
+    if (spikeCount > 2) {
+      return false
+    }
+    
+    // SECTION 6: DECISION FRAMEWORK
+    // Combined criteria with strict thresholds
+    
+    // Core consolidation conditions
+    const narrowRange = recentRange < 0.012 // Very strict: 1.2% range maximum
+    const stableRange = Math.abs(recentRange - olderRange) / olderRange < 0.3 // Range stability
+    const lowVolatility = normalizedAtr < 0.002 // Strict volatility threshold
+    const goodCycleStrength = normCorrelation > 0.4 // Strong cyclic behavior
+    
+    // Count how many conditions are met
+    let conditionsMet = 0
+    if (narrowRange) conditionsMet++
+    if (stableRange) conditionsMet++
+    if (lowVolatility) conditionsMet++ 
+    if (goodCycleStrength) conditionsMet++
+    
+    // Additional context-specific conditions
+    const consistentStructure = maxConsecutive <= 3 // No more than 3 consecutive moves same direction
+    const limitedSpikes = spikeCount <= 1 // At most 1 price spike
+    
+    if (consistentStructure) conditionsMet++
+    if (limitedSpikes) conditionsMet++
+    
+    // Set an adaptive threshold based on overall volatility
+    const requiredConditions = normalizedAtr < 0.0015 ? 4 : 5
+    
+    // Final decision with high bar for consolidation
+    return conditionsMet >= requiredConditions;
   }
 
   /** used to determine slope between two points */
@@ -1792,76 +1464,154 @@ class Four_Hour_Functions {
   /* Key part added, test for results */
   /** finds support and resistance levels, very important for code function, would love to improve this */
   static supreslevs () {
-    const history = Four_Hour_Functions.priceHist
-    const ceiling = Math.max(...history)
-    const floor = Math.min(...history)
-    const difference = ceiling - floor
+    // Get price history data
+    const history = Fifteen_Min_Functions.priceHist
+    const highs = Fifteen_Min_Functions.highs 
+    const lows = Fifteen_Min_Functions.lows 
+    const price = Fifteen_Min_Functions.getPrice()
+    
+    // Ensure we have valid data
+    if (!highs || !lows || !history || highs.length === 0 || lows.length === 0 || history.length === 0) {
+      // Return fallback level
+      Fifteen_Min_Functions.support = price * 0.995
+      Fifteen_Min_Functions.resistance = price * 1.005
+      return [price * 0.995, price * 1.005]
+    }
+    
+    // Identify potential levels using various methods
     const levels = []
-    const levelss = []
-    let levelsss = []
-    let finalLevs = []
-    let count = 0
-    for (let item = 0; item < history.length; item++) { levels.push((history[item] - floor) / (difference)) }
-    for (let item = 0; item < levels.length; item++) { levels[item] = levels[item].toFixed(3) }
-    for (let item = 0; item < levels.length; item++) {
-      for (let items = 0; items < levels.length; items++) {
-        if (levels[item] == levels[items]) {
-          count++
+    
+    // Method 1: Find historical price clusters using histogram approach
+    const histogramBins = 100
+    const ceiling = Math.max(...highs)
+    const floor = Math.min(...lows)
+    const binSize = (ceiling - floor) / histogramBins
+    const histogram = new Array(histogramBins).fill(0)
+    
+    // Fill histogram with price occurrences
+    for (let i = 0; i < history.length; i++) {
+      const binIndex = Math.min(Math.floor((history[i] - floor) / binSize), histogramBins - 1)
+      histogram[binIndex]++
+    }
+    
+    // Find histogram peaks (high-frequency price zones)
+    const threshold = Math.max(3, Math.floor(history.length / 50)) // Adjust threshold based on data size
+    for (let i = 0; i < histogramBins; i++) {
+      if (histogram[i] >= threshold) {
+        levels.push(floor + (i + 0.5) * binSize)
+      }
+    }
+    
+    // Method 2: Identify swing highs and lows (price pivots)
+    const windowSize = Math.min(10, Math.floor(history.length / 10))
+    for (let i = windowSize; i < history.length - windowSize; i++) {
+      // Check for swing high (local peak)
+      let isSwingHigh = true
+      for (let j = i - windowSize; j < i; j++) {
+        if (highs[j] >= highs[i]) {
+          isSwingHigh = false
+          break
         }
       }
-      if (count > 3) {
-        levelss.push(levels[item])
+      for (let j = i + 1; j <= i + windowSize; j++) {
+        if (j < highs.length && highs[j] >= highs[i]) {
+          isSwingHigh = false
+          break
+        }
       }
-      count = 0
-    }
-    levelsss = [...new Set(levelss)]
-    finalLevs = levelsss
-    const price = Four_Hour_Functions.getPrice()
-    const larger = []
-    const smaller = []
-    const largertwo = []
-    const smallertwo = []
-    const smaller_diff = []
-    const larger_diff = []
-    for (let item = 0; item < finalLevs.length; item++) {
-      if (price > ((finalLevs[item] * difference) + floor)) { smaller.push(((finalLevs[item] * difference) + floor)) }
-      if (price < ((finalLevs[item] * difference) + floor)) { larger.push(((finalLevs[item] * difference) + floor)) }
-    }
-    for (let item = 0; item < smaller.length; item++) {
-      if (Math.abs(Four_Hour_Functions.valdiff(price, smaller[item])) > 0.05) {
-        smallertwo.push(smaller[item])
+      if (isSwingHigh) {
+        levels.push(highs[i])
+      }
+      
+      // Check for swing low (local valley)
+      let isSwingLow = true
+      for (let j = i - windowSize; j < i; j++) {
+        if (lows[j] <= lows[i]) {
+          isSwingLow = false
+          break
+        }
+      }
+      for (let j = i + 1; j <= i + windowSize; j++) {
+        if (j < lows.length && lows[j] <= lows[i]) {
+          isSwingLow = false
+          break
+        }
+      }
+      if (isSwingLow) {
+        levels.push(lows[i])
       }
     }
-    for (let item = 0; item < larger.length; item++) {
-      if (Math.abs(Four_Hour_Functions.valdiff(price, larger[item])) > 0.05) {
-        largertwo.push(larger[item])
+    
+    // Cluster similar levels to avoid redundancy
+    const clusterThreshold = binSize * 1.5 // Adjust based on instrument volatility
+    const clusteredLevels = []
+    
+    // Sort levels for clustering
+    levels.sort((a, b) => a - b)
+    
+    if (levels.length > 0) {
+      let currentCluster = [levels[0]]
+      for (let i = 1; i < levels.length; i++) {
+        if (levels[i] - levels[i-1] < clusterThreshold) {
+          // Add to current cluster
+          currentCluster.push(levels[i])
+        } else {
+          // Calculate cluster average and add to result
+          const sum = currentCluster.reduce((acc, val) => acc + val, 0)
+          clusteredLevels.push(sum / currentCluster.length)
+          // Start new cluster
+          currentCluster = [levels[i]]
+        }
+      }
+      // Add final cluster
+      if (currentCluster.length > 0) {
+        const sum = currentCluster.reduce((acc, val) => acc + val, 0)
+        clusteredLevels.push(sum / currentCluster.length)
       }
     }
-    if (smallertwo.length < 1) {
-      smallertwo.push(price - Four_Hour_Functions.pipreverse(price, Four_Hour_Functions.pipdiffy(price, Four_Hour_Functions.stoploss())))
+    
+    // Filter levels by distance from current price
+    const finalLevs = clusteredLevels
+    const larger = []  // Levels above current price
+    const smaller = [] // Levels below current price
+    
+    for (let level of finalLevs) {
+      if (level < price) {
+        smaller.push(level)
+      } else if (level > price) {
+        larger.push(level)
+      }
     }
-    if (largertwo.length < 1) {
-      largertwo.push(price + Four_Hour_Functions.pipreverse(price, Four_Hour_Functions.pipdiffy(price, Four_Hour_Functions.stoploss())))
+    
+    // Ensure we have at least one support and resistance level
+    if (smaller.length < 1) {
+      smaller.push(price - Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
     }
-    for (let item = 0; item < smallertwo.length; item++) {
-      smaller_diff.push(Math.abs((smallertwo[item] - price)))
+    if (larger.length < 1) {
+      larger.push(price + Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
     }
-    for (let item = 0; item < largertwo.length; item++) {
-      larger_diff.push(Math.abs((largertwo[item] - price)))
-    }
-    const support = price - Math.min(...smaller_diff)
-    const resistance = price + Math.min(...larger_diff)
-    Four_Hour_Functions.support = support
-    Four_Hour_Functions.resistance = resistance
-    for (let item = 0; item < finalLevs.length; item++) {
-      finalLevs[item] = (finalLevs[item] * difference) + floor
-    }
-    Four_Hour_Functions.finlevs = finalLevs
+    
+    // Find closest support and resistance
+    const smaller_diff = smaller.map(level => Math.abs(level - price))
+    const larger_diff = larger.map(level => Math.abs(level - price))
+    
+    const supportIndex = smaller_diff.indexOf(Math.min(...smaller_diff))
+    const resistanceIndex = larger_diff.indexOf(Math.min(...larger_diff))
+    
+    const support = smaller[supportIndex]
+    const resistance = larger[resistanceIndex]
+    
+    // Store calculated levels
+    Fifteen_Min_Functions.support = support
+    Fifteen_Min_Functions.resistance = resistance
+    Fifteen_Min_Nexus.finlevs = finalLevs
+    
+    return finalLevs
   }
 
   /** self explanatory, finds RSI and compares the last two */
   static rsi () {
-    const history = Four_Hour_Functions.priceHist
+    const history = Fifteen_Min_Functions.priceHist
     const history2 = []
     for (let item = 0; item < history.length; item++) { history2.push(history[item]) }
     history2.splice(-1, 1)
@@ -2069,12 +1819,18 @@ class One_Hour_Functions {
   resistance = 0
   highs = []
   lows = []
+  extendHist = []
+  extendHigh = []
+  extendLow = []
 
   static HistoryAssigner () {
     const instrument = Fifteen_Min_Functions.instrument_name()
     One_Hour_Functions.priceHist = dataset.One_Hour.c
     One_Hour_Functions.highs = dataset.One_Hour.h
     One_Hour_Functions.lows = dataset.One_Hour.l
+    One_Hour_Functions.extendHist = dataset.One_Hour_Extend.c
+    One_Hour_Functions.extendHigh = dataset.One_Hour_Extend.h
+    One_Hour_Functions.extendLow = dataset.One_Hour_Extend.l
   }
 
   static ValueAssigner () {
@@ -2105,72 +1861,149 @@ class One_Hour_Functions {
 
   /* Add Key Part That the Levels Must Repeat 3x */
   static supreslevs () {
+    // Get price history data
     const history = One_Hour_Functions.priceHist
-    const ceiling = Math.max(...history)
-    const floor = Math.min(...history)
-    const difference = ceiling - floor
+    const highs = One_Hour_Functions.highs 
+    const lows = One_Hour_Functions.lows 
+    const price = One_Hour_Functions.getPrice()
+    
+    // Identify potential levels using various methods
     const levels = []
-    const levelss = []
-    let levelsss = []
-    let finalLevs = []
-    let count = 0
-    for (let item = 0; item < history.length; item++) { levels.push((history[item] - floor) / (difference)) }
-    for (let item = 0; item < levels.length; item++) { levels[item] = levels[item].toFixed(3) }
-    for (let item = 0; item < levels.length; item++) {
-      for (let items = 0; items < levels.length; items++) {
-        if (levels[item] == levels[items]) {
-          count++
+    
+    // Method 1: Find historical price clusters using histogram approach
+    const histogramBins = 100
+    const ceiling = Math.max(...highs)
+    const floor = Math.min(...lows)
+    const binSize = (ceiling - floor) / histogramBins
+    const histogram = new Array(histogramBins).fill(0)
+    
+    // Fill histogram with price occurrences
+    for (let i = 0; i < history.length; i++) {
+      const binIndex = Math.min(Math.floor((history[i] - floor) / binSize), histogramBins - 1)
+      histogram[binIndex]++
+    }
+    
+    // Find histogram peaks (high-frequency price zones)
+    const threshold = Math.max(3, Math.floor(history.length / 50)) // Adjust threshold based on data size
+    for (let i = 0; i < histogramBins; i++) {
+      if (histogram[i] >= threshold) {
+        levels.push(floor + (i + 0.5) * binSize)
+      }
+    }
+    
+    // Method 2: Identify swing highs and lows (price pivots)
+    const windowSize = Math.min(10, Math.floor(history.length / 10))
+    for (let i = windowSize; i < history.length - windowSize; i++) {
+      // Check for swing high (local peak)
+      let isSwingHigh = true
+      for (let j = i - windowSize; j < i; j++) {
+        if (highs[j] >= highs[i]) {
+          isSwingHigh = false
+          break
         }
       }
-      if (count > 3) {
-        levelss.push(levels[item])
+      for (let j = i + 1; j <= i + windowSize; j++) {
+        if (j < highs.length && highs[j] >= highs[i]) {
+          isSwingHigh = false
+          break
+        }
       }
-      count = 0
-    }
-    levelsss = [...new Set(levelss)]
-    finalLevs = levelsss
-    One_Hour_Functions.getPrice()
-    const price = One_Hour_Functions.price
-    const larger = []
-    const smaller = []
-    const largertwo = []
-    const smallertwo = []
-    const smaller_diff = []
-    const larger_diff = []
-    for (let item = 0; item < finalLevs.length; item++) {
-      if (price > ((finalLevs[item] * difference) + floor)) { smaller.push(((finalLevs[item] * difference) + floor)) }
-      if (price < ((finalLevs[item] * difference) + floor)) { larger.push(((finalLevs[item] * difference) + floor)) }
-    }
-    for (let item = 0; item < smaller.length; item++) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(price, smaller[item])) > 0.05) {
-        smallertwo.push(smaller[item])
+      if (isSwingHigh) {
+        levels.push(highs[i])
+      }
+      
+      // Check for swing low (local valley)
+      let isSwingLow = true
+      for (let j = i - windowSize; j < i; j++) {
+        if (lows[j] <= lows[i]) {
+          isSwingLow = false
+          break
+        }
+      }
+      for (let j = i + 1; j <= i + windowSize; j++) {
+        if (j < lows.length && lows[j] <= lows[i]) {
+          isSwingLow = false
+          break
+        }
+      }
+      if (isSwingLow) {
+        levels.push(lows[i])
       }
     }
-    for (let item = 0; item < larger.length; item++) {
-      if (Math.abs(Fifteen_Min_Functions.valdiff(price, larger[item])) > 0.05) {
-        largertwo.push(larger[item])
+    
+    // Cluster similar levels to avoid redundancy
+    const clusterThreshold = binSize * 1.5 // Adjust based on instrument volatility
+    const clusteredLevels = []
+    
+    // Sort levels for clustering
+    levels.sort((a, b) => a - b)
+    
+    if (levels.length > 0) {
+      let currentCluster = [levels[0]]
+      for (let i = 1; i < levels.length; i++) {
+        if (levels[i] - levels[i-1] < clusterThreshold) {
+          // Add to current cluster
+          currentCluster.push(levels[i])
+        } else {
+          // Calculate cluster average and add to result
+          const sum = currentCluster.reduce((acc, val) => acc + val, 0)
+          clusteredLevels.push(sum / currentCluster.length)
+          // Start new cluster
+          currentCluster = [levels[i]]
+        }
+      }
+      // Add final cluster
+      if (currentCluster.length > 0) {
+        const sum = currentCluster.reduce((acc, val) => acc + val, 0)
+        clusteredLevels.push(sum / currentCluster.length)
       }
     }
-    if (smallertwo.length < 1) {
-      smallertwo.push(price - Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
+    
+    // Filter levels by distance from current price
+    const finalLevs = clusteredLevels
+    const larger = []  // Levels above current price
+    const smaller = [] // Levels below current price
+    
+    for (let level of finalLevs) {
+      if (level < price) {
+        smaller.push(level)
+      } else if (level > price) {
+        larger.push(level)
+      }
     }
-    if (largertwo.length < 1) {
-      largertwo.push(price + Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
+    
+    // Ensure we have at least one support and resistance level
+    if (smaller.length < 1) {
+      smaller.push(price - Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
     }
-    for (let item = 0; item < smallertwo.length; item++) {
-      smaller_diff.push(Math.abs((smallertwo[item] - price)))
+    if (larger.length < 1) {
+      larger.push(price + Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
     }
-    for (let item = 0; item < largertwo.length; item++) {
-      larger_diff.push(Math.abs((largertwo[item] - price)))
-    }
-    const support = price - Math.min(...smaller_diff)
-    const resistance = price + Math.min(...larger_diff)
+    
+    // Find closest support and resistance
+    const smaller_diff = smaller.map(level => Math.abs(level - price))
+    const larger_diff = larger.map(level => Math.abs(level - price))
+    
+    const supportIndex = smaller_diff.indexOf(Math.min(...smaller_diff))
+    const resistanceIndex = larger_diff.indexOf(Math.min(...larger_diff))
+    
+    const support = smaller[supportIndex]
+    const resistance = larger[resistanceIndex]
+    
+    // Store calculated levels
     One_Hour_Functions.support = support
     One_Hour_Functions.resistance = resistance
-    for (let item = 0; item < finalLevs.length; item++) {
-      finalLevs[item] = (finalLevs[item] * difference) + floor
-    }
     One_Hour_Functions.finlevs = finalLevs
+    
+    return finalLevs
+  }
+
+  static pip (num1, num2) {
+    if (String(num1).indexOf('.') == 2) {
+      One_Hour_Functions.multiplier = 1000
+    }
+    // Calculate pip difference based on currency pair
+    return Math.abs(num1 - num2) * One_Hour_Functions.multiplier
   }
 
   static pip (num1, num2) {
@@ -2210,6 +2043,681 @@ class One_Hour_Functions {
   }
 }
 
+class Four_Hour_Functions {
+  multiplier = 0
+  priceHist = []
+  extendHist = []
+  rejectionzones = new Array()
+  timeperiods = {}
+  extendHigh = []
+  extendLow = []
+  resistance = 0
+  support = 0
+  vals = []
+  price = 0
+  maxes = []
+  finlevs = []
+  mins = []
+  recentHisto = []
+  highs = []
+  lows = []
+
+  /** load instrument name from json file */
+  static instrument_name () {
+    return Fifteen_Min_Functions.instrument_name()
+  }
+
+  /** load historical prices from json file */
+  static HistoryAssigner () {
+    const instrument = Four_Hour_Functions.instrument_name()
+    Four_Hour_Functions.priceHist = dataset.Four_Hour.c
+    Four_Hour_Functions.highs = dataset.Four_Hour.h
+    Four_Hour_Functions.lows = dataset.Four_Hour.l
+    if (dataset.Four_Hour_Extend) {
+      Four_Hour_Functions.extendHist = dataset.Four_Hour_Extend.c
+      Four_Hour_Functions.extendHigh = dataset.Four_Hour_Extend.h
+      Four_Hour_Functions.extendLow = dataset.Four_Hour_Extend.l
+    }
+  }
+
+  /** load price from json file */
+  static ValueAssigner () {
+    Four_Hour_Functions.price = liveprice
+  }
+
+  /**  Machine learning method used to determine past movement patterns at different prices, can help with stop loss and take profit definition */
+  static overall () {
+    // Get extended price history data and current price
+    const extendedhistory = Four_Hour_Functions.extendHist
+    const extendedHighs = Four_Hour_Functions.extendHigh 
+    const extendedLows = Four_Hour_Functions.extendLow 
+    const price = Four_Hour_Functions.price
+    
+    // Define support/resistance levels from multiple timeframes for more robust rejection zones
+    const onehourLevels = One_Hour_Functions.finlevs
+    const fifteenMinLevels = Fifteen_Min_Nexus.finlevs
+    const fourHourLevels = Four_Hour_Functions.finlevs
+    const keyLevels = [...onehourLevels, ...fifteenMinLevels, ...fourHourLevels]
+    
+    // Calculate volatility to adjust buffer size dynamically
+    const recentPrices = extendedhistory.slice(-50)
+    const volatility = Four_Hour_Functions.volatility ? Four_Hour_Functions.volatility() : 0.05
+    
+    // Adjust buffer based on volatility - more volatile markets need wider buffers
+    const max = Math.max(...extendedhistory)
+    const min = Math.min(...extendedhistory)
+    const priceRange = max - min
+    const buffer = priceRange * Math.max(0.03, Math.min(0.08, volatility))
+    
+    // Define range around current price to look for similar price levels
+    const lower = price - buffer
+    const upper = price + buffer
+    const pricerange = [lower, upper]
+    
+    // Find historical instances where price was in similar range
+    const studylist = []
+    for (let val = 0; val < extendedhistory.length; val++) {
+      if (extendedhistory[val] <= upper && extendedhistory[val] >= lower) {
+        // Store index and price
+        studylist.push([val, extendedhistory[val]])
+      }
+    }
+    
+    // Detect if price is near a key level from any timeframe
+    const keyLevelProximity = keyLevels.some(level => {
+      const distance = Math.abs(price - level) / price
+      return distance < 0.0015 // 0.15% distance threshold - reduced to be less strict
+    })
+    
+    // If no similar price points found or too few for analysis
+    if (studylist.length < 5) {
+      return !keyLevelProximity // If near key level, avoid trading (false)
+    }
+    
+    // Perform detailed analysis of historical behavior at similar price levels
+    const result = Four_Hour_Functions.analysis(
+      studylist, 
+      extendedhistory, 
+      pricerange, 
+      extendedHighs, 
+      extendedLows, 
+      keyLevels
+    )
+    
+    // Modified to allow more trades: either analysis is positive OR price isn't near key levels with enough data
+    return result || (!keyLevelProximity && studylist.length >= 8)
+  }
+
+  /** Do past Analysis to see if this is a good trade, based on static overall() method */
+  static analysis (cases, extendedhistory, pricerange, highs, lows, keyLevels) {
+    // Initialize rejection zones array
+    Four_Hour_Functions.rejectionzones = []
+    
+    // Get current price and normal history
+    const price = Four_Hour_Functions.price
+    const histnorm = Four_Hour_Functions.priceHist
+    
+    // Calculate price statistics
+    const priceStdDev = Four_Hour_Functions.calculateStdDev(extendedhistory.slice(-50))
+    const histRange = Math.max(...histnorm) - Math.min(...histnorm)
+    
+    // Significant price movement threshold (scaled by market volatility)
+    const significantMove = histRange * 0.02
+    
+    // Calculate technical indicators
+    const bollingerBands = bolls.calculate({ 
+      period: 20, 
+      values: extendedhistory, 
+      stdDev: 2 
+    })
+    
+    // Extract upper and lower bands
+    const lowerBands = bollingerBands.map(band => band.lower)
+    const upperBands = bollingerBands.map(band => band.upper)
+    const middleBands = bollingerBands.map(band => band.middle)
+    
+    // Calculate smoothed versions for trend detection
+    const smoothedLower = smas.calculate({ period: 10, values: lowerBands })
+    const smoothedUpper = smas.calculate({ period: 10, values: upperBands })
+    const smoothedMiddle = smas.calculate({ period: 10, values: middleBands })
+    
+    // Define rejection threshold based on market volatility - increased to make rejection zones harder to identify
+    const rejectionThreshold = 5.5
+    
+    // Define volatility based threshold adjustment
+    const volAdjustment = Four_Hour_Functions.volatility ? 
+      Math.max(0.8, Math.min(1.2, Four_Hour_Functions.volatility() * 10)) : 
+      1.0
+      
+    // Track identified rejection zones
+    const rejectionZones = []
+    let rejection = 0
+    
+    // Extract indices from cases for analysis
+    const potentialRejectionPoints = cases.map(c => c[0])
+    
+    // Analyze each potential rejection point
+    for (let i = 0; i < potentialRejectionPoints.length; i++) {
+      const idx = potentialRejectionPoints[i]
+      
+      // Skip if too close to start or end of data
+      if (idx < 5 || idx >= extendedhistory.length - 5) continue
+      
+      // Count patterns that suggest rejection
+      let rejectionEvidence = 0
+      
+      // Pattern 1: Local high/low formations
+      let isLocalHigh = true
+      let isLocalLow = true
+      
+      for (let j = 1; j <= 3; j++) {
+        // Check if local high
+        if (extendedhistory[idx] <= extendedhistory[idx - j] || 
+            extendedhistory[idx] <= extendedhistory[idx + j]) {
+          isLocalHigh = false
+        }
+        
+        // Check if local low
+        if (extendedhistory[idx] >= extendedhistory[idx - j] || 
+            extendedhistory[idx] >= extendedhistory[idx + j]) {
+          isLocalLow = false
+        }
+      }
+      
+      if (isLocalHigh || isLocalLow) rejectionEvidence += 2
+      
+      // Pattern 2: Price reversal after reaching this level
+      const preBehavior = extendedhistory[idx] - extendedhistory[idx - 3]
+      const postBehavior = extendedhistory[idx + 3] - extendedhistory[idx]
+      
+      // If direction changed after this point (sign change between pre and post)
+      if (preBehavior * postBehavior < 0 && 
+          Math.abs(postBehavior) > significantMove) {
+        rejectionEvidence += 1.5
+      }
+      
+      // Pattern 3: Proximity to Bollinger Band
+      const bandProximity = Math.min(
+        Math.abs(extendedhistory[idx] - upperBands[idx]), 
+        Math.abs(extendedhistory[idx] - lowerBands[idx])
+      )
+      
+      if (bandProximity < priceStdDev * 0.5) {
+        rejectionEvidence += 1
+      }
+      
+      // Pattern 4: Volume spike analysis if available (stub for future implementation)
+      // if (volume data available) { check for volume spike }
+      
+      // Pattern 5: Candlestick patterns if available
+      if (highs && lows) {
+        const highLowRange = highs[idx] - lows[idx]
+        const bodySize = Math.abs(extendedhistory[idx] - extendedhistory[idx-1])
+        
+        // Detect potential doji, hammer, or shooting star
+        if (highLowRange > bodySize * 2) {
+          rejectionEvidence += 1
+        }
+      }
+      
+      // Pattern 6: Check for confluence with key levels from multiple timeframes
+      const currentPrice = extendedhistory[idx]
+      for (const level of keyLevels) {
+        const distancePercent = Math.abs(currentPrice - level) / currentPrice
+        if (distancePercent < 0.005) { // Within 0.5%
+          rejectionEvidence += 1.5
+          break
+        }
+      }
+      
+      // Adjust evidence by volatility
+      rejectionEvidence *= volAdjustment
+      
+      // If enough evidence found, mark as rejection zone
+      if (rejectionEvidence >= rejectionThreshold) {
+        rejection++
+        rejectionZones.push(extendedhistory[idx])
+        Four_Hour_Functions.rejectionzones.push(extendedhistory[idx])
+      }
+    }
+    
+    // Check if current price is near an identified rejection zone
+    let nearRejectionZone = false
+    const rejectionProximityThreshold = priceStdDev * 2
+    
+    for (const zone of rejectionZones) {
+      if (Math.abs(price - zone) < rejectionProximityThreshold) {
+        nearRejectionZone = true
+        break
+      }
+    }
+    
+    // Also check distance to newly identified zones that aren't yet in the system
+    for (const zone of Four_Hour_Functions.rejectionzones) {
+      if (Math.abs(price - zone) < rejectionProximityThreshold) {
+        nearRejectionZone = true
+        break
+      }
+    }
+    
+    // Allow more rejection zones before prohibiting trades
+    return !(rejection > 3 || nearRejectionZone)
+  }
+
+  static consolidationtwo() {
+    const history = Four_Hour_Functions.priceHist
+    const highs = Four_Hour_Functions.highs
+    const lows = Four_Hour_Functions.lows
+    const histmax = Math.max(...highs)
+    const histmin = Math.min(...lows)
+    const histdiff = histmax - histmin
+    
+    // Ensure we have enough data
+    const minDataPoints = 30 // More data needed for meaningful four-hour analysis
+    if (history.length < minDataPoints) {
+      return false; // Default to false if not enough data
+    }
+    
+    // Normalize all arrays to same length (use recent data)
+    const lookbackPeriod = Math.min(60, history.length) // Longer lookback for four-hour timeframe
+    const recentHistory = history.slice(-lookbackPeriod)
+    const recentHighs = highs.slice(-lookbackPeriod)
+    const recentLows = lows.slice(-lookbackPeriod)
+    const recentClose = history.slice(-lookbackPeriod)
+    
+    // APPROACH 1: Bollinger Bands width analysis
+    const bollingerBands = bolls.calculate({ 
+      period: 20, // Longer period for four-hour chart
+      values: recentHistory, 
+      stdDev: 2
+    })
+    
+    // Calculate normalized Bollinger Band width
+    const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
+    const recentBandWidths = bandWidths.slice(-6) // Longer period for four-hour
+    const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
+    
+    // Narrowing bands indicate consolidation
+    const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+    const isTightBands = avgBandWidth < 0.027 // Higher threshold for four-hour charts
+    
+    // APPROACH 2: True Range (volatility) analysis
+    const trValues = tr.calculate({ 
+      high: recentHighs, 
+      low: recentLows, 
+      close: recentClose, 
+      period: 14 // Longer period for four-hour
+    })
+    
+    // Calculate average true range relative to price
+    const recentTR = trValues.slice(-6) // Using more bars for four-hour
+    const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
+    const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+    
+    // Decreasing TR indicates consolidation
+    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
+    const isLowVolatility = normalizedATR < 0.011 // Higher threshold for four-hour timeframe
+    
+    // APPROACH 3: Price channel/range analysis
+    const priceRange = histmax - histmin
+    const priceRangePercent = priceRange / histmin
+    
+    // Calculate standard deviation of closing prices
+    const sum = recentHistory.reduce((a, b) => a + b, 0)
+    const mean = sum / recentHistory.length
+    const stdDev = Math.sqrt(
+      recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
+    )
+    const relativeStdDev = stdDev / mean
+    
+    // Narrow range indicates consolidation
+    const isNarrowRange = priceRangePercent < 0.035 // Higher threshold for four-hour timeframe
+    const isLowDeviation = relativeStdDev < 0.015 // Higher threshold for four-hour timeframe
+    
+    // APPROACH 4: Linear regression slope and R-squared analysis
+    // Prepare x and y for regression
+    const x = Array.from({ length: recentHistory.length }, (_, i) => i)
+    const y = recentHistory
+    
+    // Calculate linear regression
+    const regResult = new regression.SimpleLinearRegression(x, y)
+    const slope = Math.abs(regResult.slope)
+    const r2 = regResult.rSquared
+    
+    // Flat slope and good fit indicate consolidation
+    const isFlatSlope = slope < 0.00008 * mean // Lower threshold - four-hour moves should be flatter for consolidation
+    const isPoorFit = r2 < 0.45 // Stricter for four-hour - less noise expected
+    
+    // APPROACH 5: Check for higher highs/lower lows pattern
+    let hasDirectionalMovement = false
+    
+    // Check for consecutive higher highs or lower lows (trend indicators)
+    let consecutiveHigherHighs = 0
+    let consecutiveLowerLows = 0
+    const pattern_window = 5 // Longer window for four-hour
+    
+    for (let i = 1; i < pattern_window; i++) {
+      if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
+        consecutiveHigherHighs++;
+      }
+      if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
+        consecutiveLowerLows++;
+      }
+    }
+    
+    // Strong directional pattern indicates trending, not consolidation
+    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) { // Same as 15min, but with longer window
+      hasDirectionalMovement = true;
+    }
+    
+    // Combine all factors to decide if the market is consolidating
+    // Use a scoring system where more indicators agreeing increases confidence
+    
+    let consolidationScore = 0;
+    let totalFactors = 0;
+    
+    // Bollinger factors - for four-hour, these are very important
+    if (bandWidthShrinking) consolidationScore += 1.5;
+    if (isTightBands) consolidationScore += 1.5;
+    totalFactors += 3;
+    
+    // TR factors
+    if (trTrend) consolidationScore += 1.25; // Slightly more weight for four-hour
+    if (isLowVolatility) consolidationScore += 1.25;
+    totalFactors += 2.5;
+    
+    // Range factors
+    if (isNarrowRange) consolidationScore += 1;
+    if (isLowDeviation) consolidationScore += 1;
+    totalFactors += 2;
+    
+    // Regression factors - more important for four-hour
+    if (isFlatSlope) consolidationScore += 1.25;
+    if (isPoorFit) consolidationScore += 0.75; // Less important in four-hour
+    totalFactors += 2;
+    
+    // Direction factor (negative score if directional)
+    if (!hasDirectionalMovement) consolidationScore += 1;
+    totalFactors += 1;
+    
+    // Calculate overall probability of consolidation
+    const consolidationProbability = consolidationScore / totalFactors;
+    
+    // Threshold for four-hour timeframe
+    return consolidationProbability >= 0.65; // Slightly higher threshold for four-hour - require more confidence
+  }
+
+  static getPrice () {
+    return Four_Hour_Functions.price
+  }
+
+  static priceHistory () {
+    return Four_Hour_Functions.priceHist
+  }
+
+  static trend () {
+    const history = Four_Hour_Functions.priceHist
+    if (history[history.length - 1] > history[history.length - 2] && history[history.length - 2] >= history[history.length - 3]) { return true }
+    if (history[history.length - 1] < history[history.length - 2] && history[history.length - 2] <= history[history.length - 3]) { return false }
+  }
+
+  static recentHist () {
+    const history = Four_Hour_Functions.priceHist
+    const historytwo = []
+    for (let x = 0; x < 30; x++) { historytwo.push(history.splice(-1, 1)[0]) }
+    Four_Hour_Functions.recentHisto = historytwo.reverse()
+  }
+
+  static priceZones () {
+    const biggersupres = Four_Hour_Functions.supreslevs()
+    return biggersupres
+  }
+
+  static supreslevs () {
+    // Get price history data
+    const history = Four_Hour_Functions.priceHist
+    const highs = Four_Hour_Functions.highs 
+    const lows = Four_Hour_Functions.lows 
+    const price = Four_Hour_Functions.getPrice()
+    
+    // Identify potential levels using various methods
+    const levels = []
+    
+    // Method 1: Find historical price clusters using histogram approach
+    const histogramBins = 100
+    const ceiling = Math.max(...highs)
+    const floor = Math.min(...lows)
+    const binSize = (ceiling - floor) / histogramBins
+    const histogram = new Array(histogramBins).fill(0)
+    
+    // Fill histogram with price occurrences
+    for (let i = 0; i < history.length; i++) {
+      const binIndex = Math.min(Math.floor((history[i] - floor) / binSize), histogramBins - 1)
+      histogram[binIndex]++
+    }
+    
+    // Find histogram peaks (high-frequency price zones)
+    const threshold = Math.max(3, Math.floor(history.length / 50)) // Adjust threshold based on data size
+    for (let i = 0; i < histogramBins; i++) {
+      if (histogram[i] >= threshold) {
+        levels.push(floor + (i + 0.5) * binSize)
+      }
+    }
+    
+    // Method 2: Identify swing highs and lows (price pivots)
+    const windowSize = Math.min(10, Math.floor(history.length / 10))
+    for (let i = windowSize; i < history.length - windowSize; i++) {
+      // Check for swing high (local peak)
+      let isSwingHigh = true
+      for (let j = i - windowSize; j < i; j++) {
+        if (highs[j] >= highs[i]) {
+          isSwingHigh = false
+          break
+        }
+      }
+      for (let j = i + 1; j <= i + windowSize; j++) {
+        if (j < highs.length && highs[j] >= highs[i]) {
+          isSwingHigh = false
+          break
+        }
+      }
+      if (isSwingHigh) {
+        levels.push(highs[i])
+      }
+      
+      // Check for swing low (local valley)
+      let isSwingLow = true
+      for (let j = i - windowSize; j < i; j++) {
+        if (lows[j] <= lows[i]) {
+          isSwingLow = false
+          break
+        }
+      }
+      for (let j = i + 1; j <= i + windowSize; j++) {
+        if (j < lows.length && lows[j] <= lows[i]) {
+          isSwingLow = false
+          break
+        }
+      }
+      if (isSwingLow) {
+        levels.push(lows[i])
+      }
+    }
+    
+    // Cluster similar levels to avoid redundancy
+    const clusterThreshold = binSize * 1.5 // Adjust based on instrument volatility
+    const clusteredLevels = []
+    
+    // Sort levels for clustering
+    levels.sort((a, b) => a - b)
+    
+    if (levels.length > 0) {
+      let currentCluster = [levels[0]]
+      for (let i = 1; i < levels.length; i++) {
+        if (levels[i] - levels[i-1] < clusterThreshold) {
+          // Add to current cluster
+          currentCluster.push(levels[i])
+        } else {
+          // Calculate cluster average and add to result
+          const sum = currentCluster.reduce((acc, val) => acc + val, 0)
+          clusteredLevels.push(sum / currentCluster.length)
+          // Start new cluster
+          currentCluster = [levels[i]]
+        }
+      }
+      // Add final cluster
+      if (currentCluster.length > 0) {
+        const sum = currentCluster.reduce((acc, val) => acc + val, 0)
+        clusteredLevels.push(sum / currentCluster.length)
+      }
+    }
+    
+    // Filter levels by distance from current price
+    const finalLevs = clusteredLevels
+    const larger = []  // Levels above current price
+    const smaller = [] // Levels below current price
+    
+    for (let level of finalLevs) {
+      if (level < price) {
+        smaller.push(level)
+      } else if (level > price) {
+        larger.push(level)
+      }
+    }
+    
+    // Ensure we have at least one support and resistance level
+    if (smaller.length < 1) {
+      smaller.push(price - Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
+    }
+    if (larger.length < 1) {
+      larger.push(price + Fifteen_Min_Functions.pipreverse(price, Fifteen_Min_Functions.pipdiffy(price, Fifteen_Min_Functions.stoploss())))
+    }
+    
+    // Find closest support and resistance
+    const smaller_diff = smaller.map(level => Math.abs(level - price))
+    const larger_diff = larger.map(level => Math.abs(level - price))
+    
+    const supportIndex = smaller_diff.indexOf(Math.min(...smaller_diff))
+    const resistanceIndex = larger_diff.indexOf(Math.min(...larger_diff))
+    
+    const support = smaller[supportIndex]
+    const resistance = larger[resistanceIndex]
+    
+    // Store calculated levels
+    Four_Hour_Functions.support = support
+    Four_Hour_Functions.resistance = resistance
+    Four_Hour_Functions.finlevs = finalLevs
+    
+    return finalLevs
+  }
+
+  /** finds closest support and resistance level to whatever price u put in */
+  static closest (num1) {
+    const values = Fifteen_Min_Nexus.finlevs.concat(Four_Hour_Functions.finlevs)
+    const valdiffgreater = []
+    const valdiffless = []
+    for (let item = 0; item < values.length; item++) {
+      if (num1 < values[item]) {
+        valdiffgreater.push(Math.abs(num1 - values[item]))
+      }
+      if (num1 > values[item]) {
+        valdiffless.push(Math.abs(num1 - values[item]))
+      }
+    }
+    const closestbelow = Four_Hour_Functions.price - Math.min(...valdiffless)
+    const closestabove = Four_Hour_Functions.price + Math.min(...valdiffgreater)
+    const closests = [closestbelow, closestabove]
+    return Math.min(...closests)
+  }
+
+  static pip (num1, num2) {
+    if (String(num1).indexOf('.') == 2) {
+      Four_Hour_Functions.multiplier = 1000
+    } else if (String(num1).indexOf('.') == 10) {
+      Four_Hour_Functions.multiplier = 0.000001
+    } else {
+      Four_Hour_Functions.multiplier = 10000
+    }
+    return Math.abs(num1 - num2) * Four_Hour_Functions.multiplier
+  }
+
+  static pipCountBuy (num1, num2) {
+    return Four_Hour_Functions.pip(num2, num1)
+  }
+
+  static pipCountSell (num1, num2) {
+    return Four_Hour_Functions.pip(num1, num2)
+  }
+  
+  /** Smart array that grows as program runs longer for each time period, shows rejection zones and if the program is near them, it'll not allow trading */
+  static rejectionzoning () {
+    try {
+      // Initialize rejection zones if not already done
+      if (!Four_Hour_Functions.rejectionzones) {
+        Four_Hour_Functions.rejectionzones = []
+      }
+      
+      // Call overall to ensure rejection zones are calculated
+      try {
+        Four_Hour_Functions.overall()
+      } catch (err) {
+        console.log("Warning: Failed to calculate overall in rejectionzoning", err.message)
+        return false
+      }
+      
+      const rejects = Four_Hour_Functions.rejectionzones
+      
+      // If no rejection zones, return false (no rejection)
+      if (!rejects || rejects.length === 0) {
+        return false
+      }
+      
+      const diffs = []
+      for (const val in rejects) {
+        if (Fifteen_Min_Nexus.pot_buy) {
+          if (Four_Hour_Functions.price < val) {
+            diffs.push(val - Four_Hour_Functions.price)
+          }
+        }
+        if (Fifteen_Min_Nexus.pot_sell) {
+          if (Four_Hour_Functions.price > val) {
+            diffs.push(Four_Hour_Functions.price - val)
+          }
+        }
+      }
+      
+      // If no diffs were calculated or they're empty, return false
+      if (!diffs || diffs.length === 0) {
+        return false
+      }
+      
+      // Check if price is too close to a rejection zone
+      if (Math.abs(Math.min(...diffs)) < Math.abs(Four_Hour_Functions.price - Fifteen_Min_Nexus.tp)) {
+        Fifteen_Min_Nexus.pot_buy = false
+        Fifteen_Min_Nexus.pot_sell = false
+        return true
+      } else {
+        return false
+      }
+    } catch (err) {
+      console.log("Error in Four_Hour_Functions.rejectionzoning:", err.message)
+      return false
+    }
+  }
+
+  static calculateStdDev(values) {
+    if (!values || values.length === 0) return 0;
+    
+    const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+    const squareDiffs = values.map(value => {
+      const diff = value - avg;
+      return diff * diff;
+    });
+    const avgSquareDiff = squareDiffs.reduce((sum, val) => sum + val, 0) / squareDiffs.length;
+    return Math.sqrt(avgSquareDiff);
+  }
+}
+
 class Five_Min_Functions {
   multiplier = 0
   priceHist = []
@@ -2228,50 +2736,148 @@ class Five_Min_Functions {
     Five_Min_Functions.lows = dataset.Five_Min.l
   }
 
+  /** second consolidation method, meant to strengthen consolidation identification */
   static consolidationtwo () {
     const history = Five_Min_Functions.priceHist
     const highs = Five_Min_Functions.highs
     const lows = Five_Min_Functions.lows
-    const histmax = Math.max(...history)
-    const histmin = Math.min(...history)
+    const histmax = Math.max(...highs)
+    const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
-    const q = bolls.calculate({ period: 10, values: history, stdDev: 1 })
-    // Find tr.calculate and replace with normalized version
     
-    // Before any tr.calculate call
-    const trMinLength = Math.min(highs.length, lows.length, history.length)
-    if (trMinLength === 0) return true; // Skip calculation if no data
-    
-    // Normalize arrays - keeping newest values
-    const normHighs = highs.slice(-trMinLength)
-    const normLows = lows.slice(-trMinLength)
-    const normHistory = history.slice(-trMinLength)
-    
-    // Use normalized arrays
-    const n = tr.calculate({ high: normHighs, low: normLows, close: normHistory, period: 8 })
-    const h = new Array()
-    const i = []
-    const j = []
-    for (let value = 0; value < q.length; value++) {
-      h.push(q[value].lower)
-      i.push(q[value].upper)
-      j.push(q[value].middle)
+    // Ensure we have enough data
+    const minDataPoints = 15 // Even fewer data points needed for 5min timeframe
+    if (history.length < minDataPoints) {
+      return false; // Default to false if not enough data
     }
-    const smmas = smas.calculate({ period: 14, values: h })
-    const smmass = smas.calculate({ period: 14, values: i })
-    /* keep midpoint just in case */
-    const smmasss = smas.calculate({ period: 14, values: j })
-    const smmaslast = smmas[smmas.length - 1]
-    const smmasslast = smmass[smmass.length - 1]
-    const smadiff = smmasslast - smmaslast
-    const ndiffone = n[n.length - 1] - n[n.length - 2]
-    const ndifftwo = n[n.length - 2] - n[n.length - 3]
-    const benchmark = 0.0125 * histdiff
-    if (smadiff > benchmark) {
-      return false
-    } else {
-      return true
+    
+    // Normalize all arrays to same length (use recent data)
+    const lookbackPeriod = Math.min(30, history.length) // Shorter lookback for 5min
+    const recentHistory = history.slice(-lookbackPeriod)
+    const recentHighs = highs.slice(-lookbackPeriod)
+    const recentLows = lows.slice(-lookbackPeriod)
+    const recentClose = history.slice(-lookbackPeriod)
+    
+    // APPROACH 1: Bollinger Bands width analysis
+    const bollingerBands = bolls.calculate({ 
+      period: 12, // Shorter period for 5min timeframe
+      values: recentHistory, 
+      stdDev: 2
+    })
+    
+    // Calculate normalized Bollinger Band width
+    const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
+    const recentBandWidths = bandWidths.slice(-4) // Shorter period
+    const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
+    
+    // Narrowing bands indicate consolidation
+    const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+    const isTightBands = avgBandWidth < 0.02 // Slightly higher for noisier 5min
+    
+    // APPROACH 2: True Range (volatility) analysis
+    const trValues = tr.calculate({ 
+      high: recentHighs, 
+      low: recentLows, 
+      close: recentClose, 
+      period: 8 // Shorter period for 5min
+    })
+    
+    // Calculate average true range relative to price
+    const recentTR = trValues.slice(-4) // Shorter window
+    const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
+    const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+    
+    // Decreasing TR indicates consolidation
+    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
+    const isLowVolatility = normalizedATR < 0.008 // Higher for noisier 5min
+    
+    // APPROACH 3: Price channel/range analysis
+    const priceRange = histmax - histmin
+    const priceRangePercent = priceRange / histmin
+    
+    // Calculate standard deviation of closing prices
+    const sum = recentHistory.reduce((a, b) => a + b, 0)
+    const mean = sum / recentHistory.length
+    const stdDev = Math.sqrt(
+      recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
+    )
+    const relativeStdDev = stdDev / mean
+    
+    // Narrow range indicates consolidation
+    const isNarrowRange = priceRangePercent < 0.025 // Higher for noisier 5min
+    const isLowDeviation = relativeStdDev < 0.011 // Higher for noisier 5min
+    
+    // APPROACH 4: Linear regression slope and R-squared analysis
+    // Prepare x and y for regression
+    const x = Array.from({ length: recentHistory.length }, (_, i) => i)
+    const y = recentHistory
+    
+    // Calculate linear regression
+    const regResult = new regression.SimpleLinearRegression(x, y)
+    const slope = Math.abs(regResult.slope)
+    const r2 = regResult.rSquared
+    
+    // Flat slope and good fit indicate consolidation
+    const isFlatSlope = slope < 0.00015 * mean // Higher for 5min
+    const isPoorFit = r2 < 0.55 // Higher for 5min - more noise
+    
+    // APPROACH 5: Check for higher highs/lower lows pattern
+    let hasDirectionalMovement = false
+    
+    // Check for consecutive higher highs or lower lows (trend indicators)
+    let consecutiveHigherHighs = 0
+    let consecutiveLowerLows = 0
+    const pattern_window = 3 // Shorter window for 5min
+    
+    for (let i = 1; i < pattern_window; i++) {
+      if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
+        consecutiveHigherHighs++;
+      }
+      if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
+        consecutiveLowerLows++;
+      }
     }
+    
+    // Strong directional pattern indicates trending, not consolidation
+    if (consecutiveHigherHighs >= 2 || consecutiveLowerLows >= 2) {
+      hasDirectionalMovement = true;
+    }
+    
+    // Combine all factors to decide if the market is consolidating
+    // Use a scoring system where more indicators agreeing increases confidence
+    
+    let consolidationScore = 0;
+    let totalFactors = 0;
+    
+    // Bollinger factors - weigh these more heavily for 5-min timeframe
+    if (bandWidthShrinking) consolidationScore += 1.5;
+    if (isTightBands) consolidationScore += 1.5;
+    totalFactors += 3;
+    
+    // TR factors
+    if (trTrend) consolidationScore++;
+    if (isLowVolatility) consolidationScore++;
+    totalFactors += 2;
+    
+    // Range factors
+    if (isNarrowRange) consolidationScore++;
+    if (isLowDeviation) consolidationScore++;
+    totalFactors += 2;
+    
+    // Regression factors
+    if (isFlatSlope) consolidationScore++;
+    if (isPoorFit) consolidationScore++;
+    totalFactors += 2;
+    
+    // Direction factor (negative score if directional)
+    if (!hasDirectionalMovement) consolidationScore++;
+    totalFactors += 1;
+    
+    // Calculate overall probability of consolidation
+    const consolidationProbability = consolidationScore / totalFactors;
+    
+    // More balanced threshold for 5min timeframe - slightly higher than 15min
+    return consolidationProbability >= 0.60; // Even more lenient for 5min
   }
 
   static trend () {

@@ -23,6 +23,7 @@ async function getCandleData (baseUrl, options, timescaleLabel) {
       
       const data = await res.json()
       const candleData = {}
+      console.log('Data:', data.candles[0]);
       candleData[`${timescaleLabel[1]}`] = {}
       candleData[`${timescaleLabel[1]}`].o = data.candles.slice(Math.max(data.candles.length - 4000, 0), data.candles.length).map((x) => parseFloat(x.mid.o))
       candleData[`${timescaleLabel[1]}`].h = data.candles.slice(Math.max(data.candles.length - 4000, 0), data.candles.length).map((x) => parseFloat(x.mid.h))
