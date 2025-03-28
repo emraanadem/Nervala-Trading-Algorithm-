@@ -371,28 +371,29 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
         openTrades.forEach(trade => {
           // Entry price line
           try {
-            candlestickSeriesRef.current.createPriceLine({
-              price: trade.entry,
-              color: trade.direction === 'buy' ? '#10b981' : '#ef4444',
-              lineWidth: 2,
-              lineStyle: 1, // Solid
-              axisLabelVisible: false, // Hide axis label to prevent clutter
-              title: `Entry ${formatPrice(trade.entry, pair)}`,
-              id: trade.id + '_entry' // Use a simpler ID format
-            });
+            // Entry price line - Removed to eliminate green horizontal line when direction is 'buy'
+            // candlestickSeriesRef.current.createPriceLine({
+            //   price: trade.entry,
+            //   color: trade.direction === 'buy' ? '#10b981' : '#ef4444',
+            //   lineWidth: 2,
+            //   lineStyle: 1, // Solid
+            //   axisLabelVisible: false, // Hide axis label to prevent clutter
+            //   title: `Entry ${formatPrice(trade.entry, pair)}`,
+            //   id: trade.id + '_entry' // Use a simpler ID format
+            // });
             
             // No longer showing stop loss line
             
-            // Take Profit price line
-            candlestickSeriesRef.current.createPriceLine({
-              price: trade.takeProfit,
-              color: '#10b981', // Green
-              lineWidth: 2,
-              lineStyle: 3, // Dotted
-              axisLabelVisible: false, // Hide axis label to prevent clutter
-              title: `TP ${formatPrice(trade.takeProfit, pair)}`,
-              id: trade.id + '_tp'
-            });
+            // Take Profit price line - Removed to eliminate green horizontal line
+            // candlestickSeriesRef.current.createPriceLine({
+            //   price: trade.takeProfit,
+            //   color: '#10b981', // Green
+            //   lineWidth: 2,
+            //   lineStyle: 3, // Dotted
+            //   axisLabelVisible: false, // Hide axis label to prevent clutter
+            //   title: `TP ${formatPrice(trade.takeProfit, pair)}`,
+            //   id: trade.id + '_tp'
+            // });
           } catch (err) {
             console.error("Error adding trade price lines:", err);
           }
@@ -459,8 +460,9 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
               style: 1,
             },
             horzLines: {
-              color: 'rgba(42, 46, 57, 0.4)',
+              color: 'transparent',
               style: 1,
+              visible: false,
             },
           },
           rightPriceScale: {
@@ -507,10 +509,10 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
               labelVisible: true,
             },
             horzLine: {
-              color: 'rgba(224, 227, 235, 0.4)',
+              color: 'transparent',
               width: 1,
               style: 1,
-              visible: true,
+              visible: false,
               labelVisible: true,
             },
           },
@@ -996,28 +998,29 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
             openTrades.forEach(trade => {
               // Entry price line
               try {
-                candlestickSeriesRef.current.createPriceLine({
-                  price: trade.entry,
-                  color: trade.direction === 'buy' ? '#10b981' : '#ef4444',
-                  lineWidth: 2,
-                  lineStyle: 1, // Solid
-                  axisLabelVisible: false, // Hide axis label to prevent clutter
-                  title: `Entry ${formatPrice(trade.entry, pair)}`,
-                  id: trade.id + '_entry' // Use a simpler ID format
-                });
+                // Entry price line - Removed to eliminate green horizontal line when direction is 'buy'
+                // candlestickSeriesRef.current.createPriceLine({
+                //   price: trade.entry,
+                //   color: trade.direction === 'buy' ? '#10b981' : '#ef4444',
+                //   lineWidth: 2,
+                //   lineStyle: 1, // Solid
+                //   axisLabelVisible: false, // Hide axis label to prevent clutter
+                //   title: `Entry ${formatPrice(trade.entry, pair)}`,
+                //   id: trade.id + '_entry' // Use a simpler ID format
+                // });
                 
                 // No longer showing stop loss line
                 
-                // Take Profit price line
-                candlestickSeriesRef.current.createPriceLine({
-                  price: trade.takeProfit,
-                  color: '#10b981', // Green
-                  lineWidth: 2,
-                  lineStyle: 3, // Dotted
-                  axisLabelVisible: false, // Hide axis label to prevent clutter
-                  title: `TP ${formatPrice(trade.takeProfit, pair)}`,
-                  id: trade.id + '_tp'
-                });
+                // Take Profit price line - Removed to eliminate green horizontal line
+                // candlestickSeriesRef.current.createPriceLine({
+                //   price: trade.takeProfit,
+                //   color: '#10b981', // Green
+                //   lineWidth: 2,
+                //   lineStyle: 3, // Dotted
+                //   axisLabelVisible: false, // Hide axis label to prevent clutter
+                //   title: `TP ${formatPrice(trade.takeProfit, pair)}`,
+                //   id: trade.id + '_tp'
+                // });
               } catch (err) {
                 console.error("Error adding trade price lines:", err);
               }
