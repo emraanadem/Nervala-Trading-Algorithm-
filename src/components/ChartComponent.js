@@ -73,6 +73,27 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
     }
   }, []);
 
+  // Function to update the chart with current price and its relation to trade targets
+  const updateCurrentPriceIndicator = useCallback((price) => {
+    if (!chartRef.current || !candlestickSeriesRef.current) return;
+    
+    if (priceLabelRef.current) {
+      try {
+        priceLabelRef.current.applyOptions({
+          price,
+          title: `Live: ${formatPrice(price, pair)}`,
+          axisLabelVisible: true, // Always show the live price on axis
+        });
+      } catch (err) {
+        console.error("Error updating price line:", err);
+      }
+    }
+    
+    // We've removed the trade progress indicator UI, so we don't need to calculate
+    // progress percentages toward targets anymore. Just let the price lines show visually
+    // where the entry, SL and TP levels are on the chart.
+  }, [pair]);
+
   // Define fetchCandleData before handleRetry to avoid circular reference
   const fetchCandleData = useCallback(() => {
     // Skip if already fetching
@@ -143,17 +164,8 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
             }
             setCurrentPrice(numericPrice);
             
-            // Update price line if it exists
-            if (priceLabelRef.current) {
-              try {
-                priceLabelRef.current.applyOptions({
-                  price: numericPrice,
-                  title: `Live: ${formatPrice(numericPrice, pair)}`,
-                });
-              } catch (err) {
-                console.error("Error updating price line:", err);
-              }
-            }
+            // Update price line and trade progress indicators
+            updateCurrentPriceIndicator(numericPrice);
           }
         }
         
@@ -330,6 +342,61 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
         }
       } else if (candlestickSeriesRef.current) {
         candlestickSeriesRef.current.setMarkers(markers);
+      }
+
+      // Add price lines for open trades to visualize entry/exit levels
+      if (candlestickSeriesRef.current) {
+        // First, try to remove any existing trade price lines
+        try {
+          // Use a try-catch block since the priceLines method might not exist
+          // Instead of trying to get all price lines, just attempt to remove the ones we know about
+          // by their IDs (which we'll track in state)
+          const openTrades = relevantTrades.filter(trade => trade.status === 'open');
+          openTrades.forEach(trade => {
+            try {
+              // Try to remove existing lines for this trade ID if they exist
+              candlestickSeriesRef.current.removePriceLine(trade.id + '_entry');
+              candlestickSeriesRef.current.removePriceLine(trade.id + '_sl');
+              candlestickSeriesRef.current.removePriceLine(trade.id + '_tp');
+            } catch (err) {
+              // Ignore errors from removing non-existent lines
+            }
+          });
+        } catch (err) {
+          console.error("Error removing existing price lines:", err);
+        }
+        
+        // Add new price lines for open trades
+        const openTrades = relevantTrades.filter(trade => trade.status === 'open');
+        openTrades.forEach(trade => {
+          // Entry price line
+          try {
+            candlestickSeriesRef.current.createPriceLine({
+              price: trade.entry,
+              color: trade.direction === 'buy' ? '#10b981' : '#ef4444',
+              lineWidth: 2,
+              lineStyle: 1, // Solid
+              axisLabelVisible: false, // Hide axis label to prevent clutter
+              title: `Entry ${formatPrice(trade.entry, pair)}`,
+              id: trade.id + '_entry' // Use a simpler ID format
+            });
+            
+            // No longer showing stop loss line
+            
+            // Take Profit price line
+            candlestickSeriesRef.current.createPriceLine({
+              price: trade.takeProfit,
+              color: '#10b981', // Green
+              lineWidth: 2,
+              lineStyle: 3, // Dotted
+              axisLabelVisible: false, // Hide axis label to prevent clutter
+              title: `TP ${formatPrice(trade.takeProfit, pair)}`,
+              id: trade.id + '_tp'
+            });
+          } catch (err) {
+            console.error("Error adding trade price lines:", err);
+          }
+        });
       }
     } catch (err) {
       console.error("Error updating trade markers:", err);
@@ -901,6 +968,61 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
           } else if (candlestickSeriesRef.current) {
             candlestickSeriesRef.current.setMarkers(markers);
           }
+          
+          // Add price lines for open trades to visualize entry/exit levels
+          if (candlestickSeriesRef.current) {
+            // First, try to remove any existing trade price lines
+            try {
+              // Use a try-catch block since the priceLines method might not exist
+              // Instead of trying to get all price lines, just attempt to remove the ones we know about
+              // by their IDs (which we'll track in state)
+              const openTrades = relevantTrades.filter(trade => trade.status === 'open');
+              openTrades.forEach(trade => {
+                try {
+                  // Try to remove existing lines for this trade ID if they exist
+                  candlestickSeriesRef.current.removePriceLine(trade.id + '_entry');
+                  candlestickSeriesRef.current.removePriceLine(trade.id + '_sl');
+                  candlestickSeriesRef.current.removePriceLine(trade.id + '_tp');
+                } catch (err) {
+                  // Ignore errors from removing non-existent lines
+                }
+              });
+            } catch (err) {
+              console.error("Error removing existing price lines:", err);
+            }
+            
+            // Add new price lines for open trades
+            const openTrades = relevantTrades.filter(trade => trade.status === 'open');
+            openTrades.forEach(trade => {
+              // Entry price line
+              try {
+                candlestickSeriesRef.current.createPriceLine({
+                  price: trade.entry,
+                  color: trade.direction === 'buy' ? '#10b981' : '#ef4444',
+                  lineWidth: 2,
+                  lineStyle: 1, // Solid
+                  axisLabelVisible: false, // Hide axis label to prevent clutter
+                  title: `Entry ${formatPrice(trade.entry, pair)}`,
+                  id: trade.id + '_entry' // Use a simpler ID format
+                });
+                
+                // No longer showing stop loss line
+                
+                // Take Profit price line
+                candlestickSeriesRef.current.createPriceLine({
+                  price: trade.takeProfit,
+                  color: '#10b981', // Green
+                  lineWidth: 2,
+                  lineStyle: 3, // Dotted
+                  axisLabelVisible: false, // Hide axis label to prevent clutter
+                  title: `TP ${formatPrice(trade.takeProfit, pair)}`,
+                  id: trade.id + '_tp'
+                });
+              } catch (err) {
+                console.error("Error adding trade price lines:", err);
+              }
+            });
+          }
         } catch (err) {
           console.error("Error setting markers:", err);
         }
@@ -958,6 +1080,8 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
           )}
         </div>
       )}
+      
+      {/* Trade progress indicator - removed as it's redundant with chart price lines */}
       
       {/* Trades panel */}
       <div 

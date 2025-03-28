@@ -83,7 +83,15 @@ export default function Home() {
   const handleReloadChart = () => {
     if (chartRef.current) {
       console.log("Triggering chart reload from parent component");
-      chartRef.current.reloadChart();
+      try {
+        if (typeof chartRef.current.reloadChart === 'function') {
+          chartRef.current.reloadChart();
+        } else {
+          console.error("reloadChart is not a function. Chart ref contains:", chartRef.current);
+        }
+      } catch (err) {
+        console.error("Error calling reloadChart:", err);
+      }
     } else {
       console.warn("Chart reference not available");
     }
