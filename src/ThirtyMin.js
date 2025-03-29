@@ -3221,6 +3221,46 @@ export function testthirtymin (data, price, instrument) {
   liveprice = price
   dataset = data
   Thirty_Min_Nexus.controlMain()
+  
+  // If we have a potential buy signal
+  if (Thirty_Min_Nexus.pot_buy && !Thirty_Min_Nexus.buy_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    Thirty_Min_Functions.supreslevs()
+    Thirty_Min_Functions.getPrice()
+    Thirty_Min_Functions.stoploss()
+    Thirty_Min_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Thirty_Min_Nexus.sl.toFixed(5);
+    const formattedTP = Thirty_Min_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[ThirtyMin] BUY SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('BUY', instrument, formattedSL, formattedTP, 0.02, 'ThirtyMin algorithm signal', 'ThirtyMin');
+  }
+  
+  // If we have a potential sell signal
+  if (Thirty_Min_Nexus.pot_sell && !Thirty_Min_Nexus.sell_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    Thirty_Min_Functions.supreslevs()
+    Thirty_Min_Functions.getPrice()
+    Thirty_Min_Functions.stoploss()
+    Thirty_Min_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Thirty_Min_Nexus.sl.toFixed(5);
+    const formattedTP = Thirty_Min_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[ThirtyMin] SELL SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('SELL', instrument, formattedSL, formattedTP, 0.02, 'ThirtyMin algorithm signal', 'ThirtyMin');
+  }
 }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */

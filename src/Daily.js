@@ -2677,6 +2677,46 @@ export function testdaily (data, price, instrument) {
   liveprice = price
   dataset = data
   Daily_Nexus.controlMain()
+  
+  // If we have a potential buy signal
+  if (Daily_Nexus.pot_buy && !Daily_Nexus.buy_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    Daily_Functions.supreslevs()
+    Daily_Functions.getPrice()
+    Daily_Functions.stoploss()
+    Daily_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Daily_Nexus.sl.toFixed(5);
+    const formattedTP = Daily_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[Daily] BUY SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('BUY', instrument, formattedSL, formattedTP, 0.05, 'Daily algorithm signal', 'Daily');
+  }
+  
+  // If we have a potential sell signal
+  if (Daily_Nexus.pot_sell && !Daily_Nexus.sell_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    Daily_Functions.supreslevs()
+    Daily_Functions.getPrice()
+    Daily_Functions.stoploss()
+    Daily_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Daily_Nexus.sl.toFixed(5);
+    const formattedTP = Daily_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[Daily] SELL SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('SELL', instrument, formattedSL, formattedTP, 0.05, 'Daily algorithm signal', 'Daily');
+  }
 }
 
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down

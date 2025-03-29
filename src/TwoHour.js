@@ -4049,18 +4049,44 @@ export function testtwohour (data, price, instrument) {
   liveprice = price
   dataset = data
   Two_Hour_Nexus.controlMain()
+  
+  // If we have a potential buy signal
+  if (Two_Hour_Nexus.pot_buy && !Two_Hour_Nexus.buy_pos) {
+    // Call buy() to setup the predetermined stop loss and take profit values
+    Two_Hour_Functions.supreslevs()
+    Two_Hour_Functions.getPrice()
+    Two_Hour_Functions.stoploss()
+    Two_Hour_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Two_Hour_Nexus.sl.toFixed(5);
+    const formattedTP = Two_Hour_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[TwoHour] BUY SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('BUY', instrument, formattedSL, formattedTP, 0.03, 'Two_Hour algorithm signal', 'Two_Hour');
+  }
+  
+  // If we have a potential sell signal
+  if (Two_Hour_Nexus.pot_sell && !Two_Hour_Nexus.sell_pos) {
+    // Call sell() to setup the predetermined stop loss and take profit values
+    Two_Hour_Functions.supreslevs()
+    Two_Hour_Functions.getPrice()
+    Two_Hour_Functions.stoploss()
+    Two_Hour_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Two_Hour_Nexus.sl.toFixed(5);
+    const formattedTP = Two_Hour_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[TwoHour] SELL SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('SELL', instrument, formattedSL, formattedTP, 0.04, 'Two_Hour algorithm signal', 'Two_Hour')
+  }
 }
-/* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
-depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
-/* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */
-/* Update: 6/04/22: Only thing left is to see how fibonnaci can be added to the program, as fibonacci
-                            may not be needed due to support and resistance levels already being used */
-
-/* Update: 6/07/22: Aside from fib, make sure to change the supreslevs filler support and resistance levels to a variable pip value of the average of
-                            the last 15 candles */
-/* UPDATE: THIS HAS BEEN COMPLETED. */
-
-/* Bro this app is gonna take off I promise. Get that grind on bro you got this. */
-
-/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
- have been included with this distribution. */

@@ -2341,18 +2341,44 @@ export function testweekly (data, price, instrument) {
   liveprice = price
   dataset = data
   Weekly_Nexus.controlMain()
+  
+  // If we have a potential buy signal
+  if (Weekly_Nexus.pot_buy && !Weekly_Nexus.buy_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    Weekly_Functions.supreslevs()
+    Weekly_Functions.getPrice()
+    Weekly_Functions.stoploss()
+    Weekly_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Weekly_Nexus.sl.toFixed(5);
+    const formattedTP = Weekly_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[Weekly] BUY SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('BUY', instrument, formattedSL, formattedTP, 0.06, 'Weekly algorithm signal', 'Weekly');
+  }
+  
+  // If we have a potential sell signal
+  if (Weekly_Nexus.pot_sell && !Weekly_Nexus.sell_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    Weekly_Functions.supreslevs()
+    Weekly_Functions.getPrice()
+    Weekly_Functions.stoploss()
+    Weekly_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Weekly_Nexus.sl.toFixed(5);
+    const formattedTP = Weekly_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[Weekly] SELL SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('SELL', instrument, formattedSL, formattedTP, 0.06, 'Weekly algorithm signal', 'Weekly');
+  }
 }
-/* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
-depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
-/* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */
-/* Update: 6/04/22: Only thing left is to see how fibonnaci can be added to the program, as fibonacci
-                            may not be needed due to support and resistance levels already being used */
-
-/* Update: 6/07/22: Aside from fib, make sure to change the supreslevs filler support and resistance levels to a variable pip value of the average of
-                            the last 15 candles */
-/* UPDATE: THIS HAS BEEN COMPLETED. */
-
-/* Bro this app is gonna take off I promise. Get that grind on bro you got this. */
-
-/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
- have been included with this distribution. */

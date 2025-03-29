@@ -3286,6 +3286,46 @@ export function testfourhour (data, price, instrument) {
   liveprice = price
   dataset = data
   Four_Hour_Nexus.controlMain()
+  
+  // If we have a potential buy signal
+  if (Four_Hour_Nexus.pot_buy && !Four_Hour_Nexus.buy_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    Four_Hour_Functions.supreslevs()
+    Four_Hour_Functions.getPrice()
+    Four_Hour_Functions.stoploss()
+    Four_Hour_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Four_Hour_Nexus.sl.toFixed(5);
+    const formattedTP = Four_Hour_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[FourHour] BUY SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('BUY', instrument, formattedSL, formattedTP, 0.04, 'Four_Hour algorithm signal', 'Four_Hour');
+  }
+  
+  // If we have a potential sell signal
+  if (Four_Hour_Nexus.pot_sell && !Four_Hour_Nexus.sell_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    Four_Hour_Functions.supreslevs()
+    Four_Hour_Functions.getPrice()
+    Four_Hour_Functions.stoploss()
+    Four_Hour_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = Four_Hour_Nexus.sl.toFixed(5);
+    const formattedTP = Four_Hour_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[FourHour] SELL SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('SELL', instrument, formattedSL, formattedTP, 0.04, 'Four_Hour algorithm signal', 'Four_Hour');
+  }
 }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */

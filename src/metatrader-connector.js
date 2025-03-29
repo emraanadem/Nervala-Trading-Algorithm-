@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { addTrade, updateTrade } from './utils/index.js';
 
 // Configuration
 const COMMANDS_FILE = 'mt5_commands.txt';
@@ -219,9 +220,28 @@ class MetaTraderConnector {
 // Export as ES Module
 export const connector = new MetaTraderConnector();
 
-export async function sendSignal(action, symbol, sl, tp, volume, reason) {
+export async function sendSignal(action, symbol, sl, tp, volume, reason, timeframe = "") {
   try {
     const mtConnector = new MetaTraderConnector();
+    
+    // Map the timeframe format used in the algorithm to the web app format
+    const timeframeMap = {
+      'FifteenMin': '15m',
+      'Fifteen_Min': '15m',
+      'ThirtyMin': '30m',
+      'Thirty_Min': '30m',
+      'OneHour': '1h',
+      'One_Hour': '1h',
+      'TwoHour': '2h',
+      'Two_Hour': '2h',
+      'FourHour': '4h',
+      'Four_Hour': '4h',
+      'Daily': 'D',
+      'Weekly': 'W'
+    };
+    
+    // Normalize the timeframe value
+    const normalizedTimeframe = timeframeMap[timeframe] || timeframe;
     
     try {
       await mtConnector.connect();
@@ -232,6 +252,65 @@ export async function sendSignal(action, symbol, sl, tp, volume, reason) {
       // Log the trading signal that would have been sent
       console.log(`WOULD SEND: ${action} | ${symbol} | SL:${sl} | TP:${tp} | Volume:${volume} | ${reason || ''}`);
       
+      // Store the trade in our trade store when it's a new trade
+      if (action === 'BUY' || action === 'SELL') {
+        // In the test functions, symbol is the instrument name and price is passed separately
+        // When we get to this function, price isn't available, so we'll use the midpoint between SL and TP
+        // This is just an approximation for storage purposes
+        const slPrice = parseFloat(sl);
+        const tpPrice = parseFloat(tp);
+        
+        // Estimate the entry price based on the stop loss and take profit
+        // This is a reasonable approximation when the actual price isn't available
+        let entryPrice;
+        if (action === 'BUY') {
+          // For a buy, entry would be closer to the stop loss (below entry)
+          entryPrice = slPrice + (tpPrice - slPrice) / 3;
+        } else { // SELL
+          // For a sell, entry would be closer to the stop loss (above entry)
+          entryPrice = slPrice - (slPrice - tpPrice) / 3;
+        }
+        
+        // Calculate risk-reward ratio
+        let riskPips, rewardPips;
+        if (action === 'BUY') {
+          riskPips = Math.abs(entryPrice - slPrice);
+          rewardPips = Math.abs(tpPrice - entryPrice);
+        } else { // SELL
+          riskPips = Math.abs(slPrice - entryPrice);
+          rewardPips = Math.abs(entryPrice - tpPrice);
+        }
+        const riskReward = (rewardPips / riskPips).toFixed(2);
+        
+        // Create and store the trade
+        const trade = {
+          pair: symbol,
+          timeframe: normalizedTimeframe,
+          direction: action.toLowerCase(),
+          entry: entryPrice,
+          takeProfit: tpPrice,
+          stopLoss: slPrice,
+          riskReward: riskReward,
+          status: 'open',
+          timestamp: new Date().toISOString()
+        };
+        
+        // Add to store
+        addTrade(trade);
+        console.log(`Stored new ${action} trade for ${symbol} in timeframe ${normalizedTimeframe}`);
+      }
+      // Update existing trade when it's closed
+      else if (action === 'CLOSE_BUY' || action === 'CLOSE_SELL') {
+        // Assuming 'reason' contains the trade ID here
+        if (reason) {
+          updateTrade(reason, {
+            status: 'closed',
+            closeTime: new Date().toISOString()
+          });
+          console.log(`Updated trade ${reason} status to closed`);
+        }
+      }
+      
       // Return a fake success response to allow the trading strategy to continue
       return "SIMULATED_RESPONSE";
     }
@@ -239,12 +318,67 @@ export async function sendSignal(action, symbol, sl, tp, volume, reason) {
     let result;
     if (action === 'BUY') {
       result = await mtConnector.buy(symbol, volume, sl, tp);
-    } else if (action === 'SELL') {
+      
+      // Same logic as above to estimate entry price
+      const slPrice = parseFloat(sl);
+      const tpPrice = parseFloat(tp);
+      const entryPrice = slPrice + (tpPrice - slPrice) / 3;
+      
+      // Store trade in our store
+      addTrade({
+        pair: symbol,
+        timeframe: normalizedTimeframe,
+        direction: 'buy',
+        entry: entryPrice,
+        takeProfit: tpPrice,
+        stopLoss: slPrice,
+        riskReward: ((tpPrice - entryPrice) / (entryPrice - slPrice)).toFixed(2),
+        status: 'open',
+        timestamp: new Date().toISOString()
+      });
+    } 
+    else if (action === 'SELL') {
       result = await mtConnector.sell(symbol, volume, sl, tp);
-    } else if (action === 'CLOSE_BUY' || action === 'CLOSE_SELL') {
+      
+      // Same logic as above to estimate entry price
+      const slPrice = parseFloat(sl);
+      const tpPrice = parseFloat(tp);
+      const entryPrice = slPrice - (slPrice - tpPrice) / 3;
+      
+      // Store trade in our store
+      addTrade({
+        pair: symbol,
+        timeframe: normalizedTimeframe,
+        direction: 'sell',
+        entry: entryPrice,
+        takeProfit: tpPrice,
+        stopLoss: slPrice,
+        riskReward: ((entryPrice - tpPrice) / (slPrice - entryPrice)).toFixed(2),
+        status: 'open',
+        timestamp: new Date().toISOString()
+      });
+    } 
+    else if (action === 'CLOSE_BUY' || action === 'CLOSE_SELL') {
       result = await mtConnector.closePosition(reason); // Using reason as ticket ID
-    } else if (action === 'MODIFY') {
+      
+      // Update trade status in our store
+      if (reason) {
+        updateTrade(reason, {
+          status: 'closed',
+          closeTime: new Date().toISOString()
+        });
+      }
+    } 
+    else if (action === 'MODIFY') {
       result = await mtConnector.modifyPosition(reason, sl, tp); // Using reason as ticket ID
+      
+      // Update trade data in our store
+      if (reason) {
+        updateTrade(reason, {
+          stopLoss: parseFloat(sl),
+          takeProfit: parseFloat(tp)
+        });
+      }
     }
     
     mtConnector.disconnect();

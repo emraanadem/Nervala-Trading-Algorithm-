@@ -3681,6 +3681,46 @@ export function testonehour (data, price, instrument) {
   liveprice = price
   dataset = data
   One_Hour_Nexus.controlMain()
+  
+  // If we have a potential buy signal
+  if (One_Hour_Nexus.pot_buy && !One_Hour_Nexus.buy_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    One_Hour_Functions.supreslevs()
+    One_Hour_Functions.getPrice()
+    One_Hour_Functions.stoploss()
+    One_Hour_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = One_Hour_Nexus.sl.toFixed(5);
+    const formattedTP = One_Hour_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[OneHour] BUY SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('BUY', instrument, formattedSL, formattedTP, 0.03, 'OneHour algorithm signal', 'OneHour');
+  }
+  
+  // If we have a potential sell signal
+  if (One_Hour_Nexus.pot_sell && !One_Hour_Nexus.sell_pos) {
+    // Call functions to setup the predetermined stop loss and take profit values
+    One_Hour_Functions.supreslevs()
+    One_Hour_Functions.getPrice()
+    One_Hour_Functions.stoploss()
+    One_Hour_Functions.tpvariation()
+    
+    // Format as strings with proper precision
+    const formattedSL = One_Hour_Nexus.sl.toFixed(5);
+    const formattedTP = One_Hour_Nexus.tp.toFixed(5);
+    const formattedPrice = price.toFixed(5);
+    
+    // Log the signal
+    console.log(`[OneHour] SELL SIGNAL for ${instrument} at ${formattedPrice}, SL: ${formattedSL}, TP: ${formattedTP}`);
+    
+    // Send the trade signal to MT5 and the trade store
+    sendSignal('SELL', instrument, formattedSL, formattedTP, 0.03, 'OneHour algorithm signal', 'OneHour');
+  }
 }
 /* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
 depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
