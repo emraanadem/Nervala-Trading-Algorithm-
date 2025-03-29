@@ -1,15 +1,15 @@
-import { fork } from 'child_process';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import instrumentsForex from './data/instrumentsForex.json' assert { type: "json" };
-import instrumentsStocks from './data/instrumentsStocks.json' assert { type: "json" };
-import proxies from './data/proxylist.json' assert { type: "json" };
-import accounts from './data/accounts.json' assert { type: "json" };
-import proxyauth from './data/proxyauth.json' assert { type: "json" };
+const { fork } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
-// Get current file's directory
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Load JSON files
+const instrumentsForex = require('./data/instrumentsForex.json');
+const instrumentsStocks = require('./data/instrumentsStocks.json');
+const proxies = require('./data/proxylist.json');
+const accounts = require('./data/accounts.json');
+const proxyauth = require('./data/proxyauth.json');
+
+// __dirname is already defined in CommonJS
 
 // Define the instruments to monitor continuously
 const instruments = [

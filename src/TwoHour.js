@@ -1,12 +1,15 @@
-import * as fs from 'fs'
-import * as regression from 'ml-regression-simple-linear'
-import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as bolls, SMA as smas, ATR as tr } from 'technicalindicators'
-import { createModel } from 'polynomial-regression'
-import * as nerdamer from 'nerdamer/all.min.js'
-import * as roots from 'kld-polynomial'
-import { sendSignal } from './metatrader-connector.js'
+const fs = require('fs');
+const regression = require('ml-regression-simple-linear');
+const { EMA: emas, RSI: rsis, MACD: macds, ROC: rocs, BollingerBands: bolls, SMA: smas, ATR: tr } = require('technicalindicators');
+const { createModel } = require('polynomial-regression');
+const nerdamer = require('nerdamer/all.min.js');
+const roots = require('kld-polynomial');
+const { sendSignal } = require('./metatrader-connector.js');
 
-let instrum = ''
+// At the top of the file after imports
+let instrum = '';
+var dataset = {};
+var liveprice = 0;
 
 class Two_Hour_Nexus {
   pos = false
@@ -4041,22 +4044,20 @@ class Fifteen_Min_Functions {
   }
 }
 
-var dataset = {}
-var liveprice = 0
-
-export function testtwohour (data, price, instrument) {
-  instrum = instrument
-  liveprice = price
-  dataset = data
-  Two_Hour_Nexus.controlMain()
+function testtwohour (data, price, instrument) {
+  instrum = instrument;
+  liveprice = price;
+  // Assign to the global dataset variable
+  dataset = data;
+  Two_Hour_Nexus.controlMain();
   
   // If we have a potential buy signal
   if (Two_Hour_Nexus.pot_buy && !Two_Hour_Nexus.buy_pos) {
-    // Call buy() to setup the predetermined stop loss and take profit values
-    Two_Hour_Functions.supreslevs()
-    Two_Hour_Functions.getPrice()
-    Two_Hour_Functions.stoploss()
-    Two_Hour_Functions.tpvariation()
+    // Call functions to setup the predetermined stop loss and take profit values
+    Two_Hour_Functions.supreslevs();
+    Two_Hour_Functions.getPrice();
+    Two_Hour_Functions.stoploss();
+    Two_Hour_Functions.tpvariation();
     
     // Format as strings with proper precision
     const formattedSL = Two_Hour_Nexus.sl.toFixed(5);
@@ -4072,11 +4073,11 @@ export function testtwohour (data, price, instrument) {
   
   // If we have a potential sell signal
   if (Two_Hour_Nexus.pot_sell && !Two_Hour_Nexus.sell_pos) {
-    // Call sell() to setup the predetermined stop loss and take profit values
-    Two_Hour_Functions.supreslevs()
-    Two_Hour_Functions.getPrice()
-    Two_Hour_Functions.stoploss()
-    Two_Hour_Functions.tpvariation()
+    // Call functions to setup the predetermined stop loss and take profit values
+    Two_Hour_Functions.supreslevs();
+    Two_Hour_Functions.getPrice();
+    Two_Hour_Functions.stoploss();
+    Two_Hour_Functions.tpvariation();
     
     // Format as strings with proper precision
     const formattedSL = Two_Hour_Nexus.sl.toFixed(5);
@@ -4090,3 +4091,7 @@ export function testtwohour (data, price, instrument) {
     sendSignal('SELL', instrument, formattedSL, formattedTP, 0.04, 'Two_Hour algorithm signal', 'Two_Hour')
   }
 }
+
+module.exports = {
+  testtwohour
+};

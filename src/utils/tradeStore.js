@@ -120,10 +120,76 @@ export function getFilteredTrades(filters = {}) {
   return result;
 }
 
+// Add this new function after initStore
+export function createSampleTrades() {
+  // Load latest data
+  initStore();
+  
+  // Example trade data
+  const sampleTrades = [
+    {
+      id: Date.now() + 1,
+      pair: 'EUR_USD',
+      timeframe: '15m',
+      direction: 'buy',
+      entry: 1.08765,
+      stopLoss: 1.08665,
+      takeProfit: 1.08965,
+      riskReward: '1:2',
+      status: 'open',
+      timestamp: new Date().toISOString()
+    },
+    {
+      id: Date.now() + 2,
+      pair: 'GBP_USD',
+      timeframe: '1h',
+      direction: 'sell',
+      entry: 1.27543,
+      stopLoss: 1.27643,
+      takeProfit: 1.27343,
+      riskReward: '1:2',
+      status: 'open',
+      timestamp: new Date().toISOString()
+    },
+    {
+      id: Date.now() + 3,
+      pair: 'USD_JPY',
+      timeframe: '4h',
+      direction: 'buy',
+      entry: 151.234,
+      stopLoss: 150.934,
+      takeProfit: 151.834,
+      riskReward: '1:2',
+      status: 'win',
+      timestamp: new Date(Date.now() - 3600000).toISOString()
+    },
+    {
+      id: Date.now() + 4,
+      pair: 'AUD_USD',
+      timeframe: 'Daily',
+      direction: 'sell',
+      entry: 0.65432,
+      stopLoss: 0.65532,
+      takeProfit: 0.65232,
+      riskReward: '1:2',
+      status: 'loss',
+      timestamp: new Date(Date.now() - 7200000).toISOString()
+    }
+  ];
+  
+  // Add sample trades to the store
+  sampleTrades.forEach(trade => {
+    addTrade(trade);
+  });
+  
+  return sampleTrades;
+}
+
 // Export the store methods
 export default {
   addTrade,
   updateTrade,
   getAllTrades,
-  getFilteredTrades
+  getFilteredTrades,
+  createSampleTrades
 }; 

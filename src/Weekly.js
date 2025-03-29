@@ -1,12 +1,15 @@
-import * as fs from 'fs'
-import * as regression from 'ml-regression-simple-linear'
-import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as bolls, SMA as smas, ATR as tr } from 'technicalindicators'
-import { createModel } from 'polynomial-regression'
-import * as nerdamer from 'nerdamer/all.min.js'
-import * as roots from 'kld-polynomial'
-import { sendSignal } from './metatrader-connector.js'
+const fs = require('fs');
+const regression = require('ml-regression-simple-linear');
+const { EMA: emas, RSI: rsis, MACD: macds, ROC: rocs, BollingerBands: bolls, SMA: smas, ATR: tr } = require('technicalindicators');
+const { createModel } = require('polynomial-regression');
+const nerdamer = require('nerdamer/all.min.js');
+const roots = require('kld-polynomial');
+const { sendSignal } = require('./metatrader-connector.js');
 
-let instrum = ''
+// At the top of the file after imports
+let instrum = '';
+var dataset = {};
+var liveprice = 0;
 
 class Weekly_Nexus {
   pos = false
@@ -2333,22 +2336,20 @@ class Thirty_Min_Functions {
   }
 }
 
-var dataset = {}
-var liveprice = 0
-
-export function testweekly (data, price, instrument) {
-  instrum = instrument
-  liveprice = price
-  dataset = data
-  Weekly_Nexus.controlMain()
+function testweekly (data, price, instrument) {
+  instrum = instrument;
+  liveprice = price;
+  // Assign to the global dataset variable
+  dataset = data;
+  Weekly_Nexus.controlMain();
   
   // If we have a potential buy signal
   if (Weekly_Nexus.pot_buy && !Weekly_Nexus.buy_pos) {
     // Call functions to setup the predetermined stop loss and take profit values
-    Weekly_Functions.supreslevs()
-    Weekly_Functions.getPrice()
-    Weekly_Functions.stoploss()
-    Weekly_Functions.tpvariation()
+    Weekly_Functions.supreslevs();
+    Weekly_Functions.getPrice();
+    Weekly_Functions.stoploss();
+    Weekly_Functions.tpvariation();
     
     // Format as strings with proper precision
     const formattedSL = Weekly_Nexus.sl.toFixed(5);
@@ -2365,10 +2366,10 @@ export function testweekly (data, price, instrument) {
   // If we have a potential sell signal
   if (Weekly_Nexus.pot_sell && !Weekly_Nexus.sell_pos) {
     // Call functions to setup the predetermined stop loss and take profit values
-    Weekly_Functions.supreslevs()
-    Weekly_Functions.getPrice()
-    Weekly_Functions.stoploss()
-    Weekly_Functions.tpvariation()
+    Weekly_Functions.supreslevs();
+    Weekly_Functions.getPrice();
+    Weekly_Functions.stoploss();
+    Weekly_Functions.tpvariation();
     
     // Format as strings with proper precision
     const formattedSL = Weekly_Nexus.sl.toFixed(5);
@@ -2382,3 +2383,7 @@ export function testweekly (data, price, instrument) {
     sendSignal('SELL', instrument, formattedSL, formattedTP, 0.06, 'Weekly algorithm signal', 'Weekly');
   }
 }
+
+module.exports = {
+  testweekly
+};

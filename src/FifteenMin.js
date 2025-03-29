@@ -1,12 +1,15 @@
-import * as fs from 'fs'
-import * as regression from 'ml-regression-simple-linear'
-import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as bolls, SMA as smas, ATR as tr } from 'technicalindicators'
-import { createModel } from 'polynomial-regression'
-import * as nerdamer from 'nerdamer/all.min.js'
-import * as roots from 'kld-polynomial'
-import { sendSignal } from './metatrader-connector.js'
+const fs = require('fs');
+const regression = require('ml-regression-simple-linear');
+const { EMA: emas, RSI: rsis, MACD: macds, ROC: rocs, BollingerBands: bolls, SMA: smas, ATR: tr } = require('technicalindicators');
+const { createModel } = require('polynomial-regression');
+const nerdamer = require('nerdamer/all.min.js');
+const roots = require('kld-polynomial');
+const { sendSignal } = require('./metatrader-connector.js');
 
-let instrum = ''
+// At the top of the file after imports
+let instrum = '';
+var dataset = {};
+var liveprice = 0;
 
 class Fifteen_Min_Nexus {
   pos = false
@@ -2933,22 +2936,21 @@ class Five_Min_Functions {
     if (rlast > qlast) { return false }
   }
 }
-var dataset = {}
-var liveprice = 0
 
-export function testfifteen (data, price, instrument) {
-  instrum = instrument
-  liveprice = price
-  dataset = data
-  Fifteen_Min_Nexus.controlMain()
+function testfifteen(data, price, instrument) {
+  instrum = instrument;
+  liveprice = price;
+  // Assign to the global dataset variable
+  dataset = data;
+  Fifteen_Min_Nexus.controlMain();
   
   // If we have a potential buy signal
   if (Fifteen_Min_Nexus.pot_buy && !Fifteen_Min_Nexus.buy_pos) {
     // Call functions to setup the predetermined stop loss and take profit values
-    Fifteen_Min_Functions.supreslevs()
-    Fifteen_Min_Functions.getPrice()
-    Fifteen_Min_Functions.stoploss()
-    Fifteen_Min_Functions.tpvariation()
+    Fifteen_Min_Functions.supreslevs();
+    Fifteen_Min_Functions.getPrice();
+    Fifteen_Min_Functions.stoploss();
+    Fifteen_Min_Functions.tpvariation();
     
     // Format as strings with proper precision
     const formattedSL = Fifteen_Min_Nexus.sl.toFixed(5);
@@ -2965,10 +2967,10 @@ export function testfifteen (data, price, instrument) {
   // If we have a potential sell signal
   if (Fifteen_Min_Nexus.pot_sell && !Fifteen_Min_Nexus.sell_pos) {
     // Call functions to setup the predetermined stop loss and take profit values
-    Fifteen_Min_Functions.supreslevs()
-    Fifteen_Min_Functions.getPrice()
-    Fifteen_Min_Functions.stoploss()
-    Fifteen_Min_Functions.tpvariation()
+    Fifteen_Min_Functions.supreslevs();
+    Fifteen_Min_Functions.getPrice();
+    Fifteen_Min_Functions.stoploss();
+    Fifteen_Min_Functions.tpvariation();
     
     // Format as strings with proper precision
     const formattedSL = Fifteen_Min_Nexus.sl.toFixed(5);
@@ -2982,17 +2984,7 @@ export function testfifteen (data, price, instrument) {
     sendSignal('SELL', instrument, formattedSL, formattedTP, 0.01, 'Fifteen_Min algorithm signal', 'Fifteen_Min');
   }
 }
-/* Edit Trailing Stop Loss so that there is a sort of "bubble" or "cloud" that follows the price around and gives it some space to rebound up or down
-depending on the type of trade, so that it doesn't result in trades that exit super early due to opposite price action */
-/* Fix all issues and complete working of the project so you can sell it, get updates from Erm n Pat */
-/* Update: 6/04/22: Only thing left is to see how fibonnaci can be added to the program, as fibonacci
-                            may not be needed due to support and resistance levels already being used */
 
-/* Update: 6/07/22: Aside from fib, make sure to change the supreslevs filler support and resistance levels to a variable pip value of the average of
-                            the last 15 candles */
-/* UPDATE: THIS HAS BEEN COMPLETED. */
-
-/* Bro this app is gonna take off I promise. Get that grind on bro you got this. */
-
-/* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
- have been included with this distribution. */
+module.exports = {
+  testfifteen
+};

@@ -1,4 +1,53 @@
 {
-  "trades": [],
-  "lastUpdated": "2025-03-28T23:59:25.643Z"
+  "trades": [
+    {
+      "id": 1743243430723,
+      "pair": "EUR_USD",
+      "timeframe": "15m",
+      "direction": "buy",
+      "entry": 1.08765,
+      "stopLoss": 1.08665,
+      "takeProfit": 1.08965,
+      "riskReward": "1:2",
+      "status": "open",
+      "timestamp": "2025-03-29T10:17:10.722Z"
+    },
+    {
+      "id": 1743243430724,
+      "pair": "GBP_USD",
+      "timeframe": "1h",
+      "direction": "sell",
+      "entry": 1.27543,
+      "stopLoss": 1.27643,
+      "takeProfit": 1.27343,
+      "riskReward": "1:2",
+      "status": "open",
+      "timestamp": "2025-03-29T10:17:10.722Z"
+    },
+    {
+      "id": 1743243430725,
+      "pair": "USD_JPY",
+      "timeframe": "4h",
+      "direction": "buy",
+      "entry": 151.234,
+      "stopLoss": 150.934,
+      "takeProfit": 151.834,
+      "riskReward": "1:2",
+      "status": "win",
+      "timestamp": "2025-03-29T09:17:10.722Z"
+    },
+    {
+      "id": 1743243430726,
+      "pair": "AUD_USD",
+      "timeframe": "Daily",
+      "direction": "sell",
+      "entry": 0.65432,
+      "stopLoss": 0.65532,
+      "takeProfit": 0.65232,
+      "riskReward": "1:2",
+      "status": "loss",
+      "timestamp": "2025-03-29T08:17:10.722Z"
+    }
+  ],
+  "lastUpdated": "2025-03-29T10:17:10.724Z"
 }

@@ -1,6 +1,7 @@
 import Layout from '../components/Layout';
 import '../styles/globals.css';
 import { useEffect } from 'react';
+import { NotificationProvider } from '../contexts/NotificationContext';
 
 function MyApp({ Component, pageProps }) {
   // Start the trading algorithm when the app loads
@@ -30,9 +31,11 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <NotificationProvider>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </NotificationProvider>
   );
 }
 

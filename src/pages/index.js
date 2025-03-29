@@ -4,8 +4,10 @@ import dynamic from 'next/dynamic';
 import TimeframeSelector from '../components/TimeframeSelector';
 import TradesList from '../components/TradesList';
 import PairSearch from '../components/PairSearch';
+import TradesDropdown from '../components/TradesDropdown';
 import { useRouter } from 'next/router';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Bell } from 'lucide-react';
+import { useNotifications } from '../contexts/NotificationContext';
 
 // Dynamically import the chart component to avoid SSR issues
 const ChartComponent = dynamic(() => import('../components/ChartComponent'), {
@@ -28,6 +30,7 @@ export default function Home() {
   const [trades, setTrades] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const chartRef = useRef(null);
+  const { notifications, addNotification } = useNotifications();
   
   // Create a debounced version of router.push
   const debouncedUpdateUrl = useCallback(
@@ -97,6 +100,30 @@ export default function Home() {
     }
   };
 
+  const createSampleTrades = async () => {
+    try {
+      const response = await fetch('/api/trades/sample', {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to create sample trades: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Created sample trades:', data);
+      
+      // No need to reload, trades will be fetched by the notification system
+    } catch (error) {
+      console.error('Error creating sample trades:', error);
+    }
+  };
+
+  // Create a test notification when bell is clicked
+  const handleNotificationClick = () => {
+    addNotification('Test notification', 'info', 3000);
+  };
+
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen bg-gray-900">
       <div className="text-white text-xl">Loading...</div>
@@ -128,7 +155,27 @@ export default function Home() {
             <RefreshCw size={16} />
           </button>
         </div>
-        <PairSearch selectedPair={selectedPair} onSelectPair={setSelectedPair} />
+        
+        <div className="flex items-center space-x-4">
+          {/* Trades Dropdown */}
+          <TradesDropdown />
+          
+          {/* Notifications Button */}
+          <div className="relative">
+            <button 
+              className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-gray-800 relative"
+              onClick={handleNotificationClick}
+            >
+              <Bell className="h-5 w-5" />
+              {notifications.length > 0 && (
+                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
+              )}
+            </button>
+          </div>
+          
+          {/* Search */}
+          <PairSearch selectedPair={selectedPair} onSelectPair={setSelectedPair} />
+        </div>
       </header>
 
       <main className="flex flex-1 overflow-hidden">
@@ -139,6 +186,14 @@ export default function Home() {
           />
           <div className="flex-1 overflow-y-auto">
             <TradesList trades={trades} selectedPair={selectedPair} />
+          </div>
+          <div className="absolute bottom-4 left-4 z-10">
+            <button
+              onClick={createSampleTrades}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Create Sample Trades
+            </button>
           </div>
         </aside>
         <section className="flex-1">

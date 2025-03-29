@@ -1,4 +1,4 @@
-import { checkForSignals as checkForex } from './src/datacenter-forex.js';
+const { checkForSignals: checkForex } = require('./src/datacenter-forex.js');
 
 // Listen for messages from the parent process
 process.on('message', async (data) => {

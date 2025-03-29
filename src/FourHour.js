@@ -1,12 +1,15 @@
-import * as fs from 'fs'
-import * as regression from 'ml-regression-simple-linear'
-import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as bolls, SMA as smas, ATR as tr } from 'technicalindicators'
-import { createModel } from 'polynomial-regression'
-import * as nerdamer from 'nerdamer/all.min.js'
-import * as roots from 'kld-polynomial'
-import { sendSignal } from './metatrader-connector.js'
+const fs = require('fs');
+const regression = require('ml-regression-simple-linear');
+const { EMA: emas, RSI: rsis, MACD: macds, ROC: rocs, BollingerBands: bolls, SMA: smas, ATR: tr } = require('technicalindicators');
+const { createModel } = require('polynomial-regression');
+const nerdamer = require('nerdamer/all.min.js');
+const roots = require('kld-polynomial');
+const { sendSignal } = require('./metatrader-connector.js');
 
-let instrum = ''
+// At the top of the file after imports
+let instrum = '';
+var dataset = {};
+var liveprice = 0;
 
 class Four_Hour_Nexus {
   pos = false
@@ -3278,22 +3281,20 @@ class Fifteen_Min_Functions {
   }
 }
 
-var dataset = {}
-var liveprice = 0
-
-export function testfourhour (data, price, instrument) {
-  instrum = instrument
-  liveprice = price
-  dataset = data
-  Four_Hour_Nexus.controlMain()
+function testfourhour (data, price, instrument) {
+  instrum = instrument;
+  liveprice = price;
+  // Assign to the global dataset variable
+  dataset = data;
+  Four_Hour_Nexus.controlMain();
   
   // If we have a potential buy signal
   if (Four_Hour_Nexus.pot_buy && !Four_Hour_Nexus.buy_pos) {
     // Call functions to setup the predetermined stop loss and take profit values
-    Four_Hour_Functions.supreslevs()
-    Four_Hour_Functions.getPrice()
-    Four_Hour_Functions.stoploss()
-    Four_Hour_Functions.tpvariation()
+    Four_Hour_Functions.supreslevs();
+    Four_Hour_Functions.getPrice();
+    Four_Hour_Functions.stoploss();
+    Four_Hour_Functions.tpvariation();
     
     // Format as strings with proper precision
     const formattedSL = Four_Hour_Nexus.sl.toFixed(5);
@@ -3310,10 +3311,10 @@ export function testfourhour (data, price, instrument) {
   // If we have a potential sell signal
   if (Four_Hour_Nexus.pot_sell && !Four_Hour_Nexus.sell_pos) {
     // Call functions to setup the predetermined stop loss and take profit values
-    Four_Hour_Functions.supreslevs()
-    Four_Hour_Functions.getPrice()
-    Four_Hour_Functions.stoploss()
-    Four_Hour_Functions.tpvariation()
+    Four_Hour_Functions.supreslevs();
+    Four_Hour_Functions.getPrice();
+    Four_Hour_Functions.stoploss();
+    Four_Hour_Functions.tpvariation();
     
     // Format as strings with proper precision
     const formattedSL = Four_Hour_Nexus.sl.toFixed(5);
@@ -3341,3 +3342,7 @@ depending on the type of trade, so that it doesn't result in trades that exit su
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
  have been included with this distribution. */
+
+module.exports = {
+  testfourhour
+};

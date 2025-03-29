@@ -1,9 +1,5 @@
-import { fork } from 'child_process';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { fork } = require('child_process');
+const path = require('path');
 
 // Handle messages from the parent process
 process.on('message', (data) => {
@@ -13,7 +9,7 @@ process.on('message', (data) => {
   console.log(`Wrapper handling instrument: ${instrument}`);
   
   // Create the actual worker
-  const workerPath = path.join(__dirname, 'worker-forex.js');
+  const workerPath = path.join(process.cwd(), 'worker-forex.js');
   const worker = fork(workerPath);
   
   // Forward the data to the worker

@@ -1,4 +1,4 @@
-# Nervala
+# Nervala Trading Platform
 
 Nervala is a trading algorithm visualization platform built with Next.js. It provides a modern UI for monitoring trading signals and analyzing market data across different timeframes and currency pairs.
 
@@ -10,6 +10,22 @@ Nervala is a trading algorithm visualization platform built with Next.js. It pro
 - Real-time trade signals display
 - Global keyboard shortcut for quick currency pair search
 - Dark theme UI for reduced eye strain during trading
+- Real-time algorithmic trading signals
+- Multi-timeframe analysis
+- Trade visualization and management
+- Real-time notifications for new trading signals
+
+## Notification System
+
+The platform includes a comprehensive notification system that alerts you whenever a new trading signal is generated:
+
+1. **Browser Notifications** - Get desktop notifications when new trades are generated
+2. **In-App Toast Alerts** - See toast notifications in the bottom right corner of the app
+3. **Notification Center** - Access all your notifications from the bell icon in the header
+
+### Notification Sounds
+
+The system plays a sound alert when new trading signals are generated. You can adjust volume or disable sounds in the settings panel.
 
 ## Getting Started
 
@@ -45,7 +61,12 @@ npm run dev
 yarn dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Or run with real data:
+```bash
+npm run dev:real
+```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Production Deployment
 
@@ -58,6 +79,10 @@ npm start
 yarn build
 yarn start
 ```
+
+## Trade Store
+
+All trading signals are stored in a local JSON file (`trade-data.json`). This provides persistence between application restarts.
 
 ## Algorithm Integration
 

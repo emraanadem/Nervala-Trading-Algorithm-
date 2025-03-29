@@ -366,6 +366,37 @@ export default function AdminDashboard() {
             )}
           </>
         )}
+        
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-white mb-4">Testing Tools</h2>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={async () => {
+                try {
+                  const response = await fetch('/api/trades/sample', {
+                    method: 'POST',
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error(`Failed to create sample trades: ${response.status}`);
+                  }
+                  
+                  const data = await response.json();
+                  alert(data.message);
+                  
+                  // Refresh the page to see new trades
+                  window.location.reload();
+                } catch (error) {
+                  console.error('Error creating sample trades:', error);
+                  alert(`Error: ${error.message}`);
+                }
+              }}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
+            >
+              Create Sample Trades
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
