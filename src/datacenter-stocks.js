@@ -1,13 +1,13 @@
-const { ProxyAgent } = require('undici'); // native fetch uses undici as underlying HTTP handler, need the agent from it
-const moment = require('moment');
+import { ProxyAgent } from 'undici' // native fetch uses undici as underlying HTTP handler, need the agent from it
+import moment from 'moment';
 
-const { testfifteen } = require('./FifteenMin.js');
-const { testthirtymin } = require('./ThirtyMin.js');
-const { testonehour } = require('./OneHour.js');
-const { testtwohour } = require('./TwoHour.js');
-const { testfourhour } = require('./FourHour.js');
-const { testdaily } = require('./Daily.js');
-const { testweekly } = require('./Weekly.js');
+import { testfifteen } from './FifteenMin.js'
+import { testthirtymin } from './ThirtyMin.js'
+import { testonehour } from './OneHour.js'
+import { testtwohour } from './TwoHour.js'
+import { testfourhour } from './FourHour.js'
+import { testdaily } from './Daily.js'
+import { testweekly } from './Weekly.js'
 
 async function getCandleData (baseUrl, options, timescaleLabel) {
   const params = `${timescaleLabel[0]}${moment().subtract(timescaleLabel[2], 'days').format().split('T')[0]}/${moment().format().split('T')[0]}?adjusted=true&sort=asc&limit=2500&apiKey=_jyyfwbAshFTAtdM3jaZIu9JnKLv7npG`
@@ -98,7 +98,7 @@ function equalizeCandleSetLengths (candleData) {
   return candleData
 }
 
-async function checkForSignals (instrument, proxy = null, proxyauths = null, loop = false) {
+export async function checkForSignals (instrument, proxy = null, proxyauths = null, loop = false) {
   const baseUrl = `https://api.polygon.io/v2/aggs/ticker/${instrument}/range/`
   let options = {}
 
@@ -128,10 +128,6 @@ async function checkForSignals (instrument, proxy = null, proxyauths = null, loo
     testweekly(candleData, price, instrument)
   } while (loop)
 }
-
-module.exports = {
-  checkForSignals
-};
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
  have been included with this distribution. */
