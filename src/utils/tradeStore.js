@@ -1,6 +1,6 @@
 // tradeStore.js - Central store for algorithm-generated trades
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
 // Path to store trades
 const TRADE_FILE = path.join(process.cwd(), 'trade-data.json');
@@ -37,7 +37,7 @@ function saveStore() {
 }
 
 // Add a new trade to the store
-export function addTrade(trade) {
+function addTrade(trade) {
   // Load latest data
   initStore();
   
@@ -66,7 +66,7 @@ export function addTrade(trade) {
 }
 
 // Update a trade in the store
-export function updateTrade(id, updates) {
+function updateTrade(id, updates) {
   // Load latest data
   initStore();
   
@@ -88,14 +88,14 @@ export function updateTrade(id, updates) {
 }
 
 // Get all trades
-export function getAllTrades() {
+function getAllTrades() {
   // Load latest data
   initStore();
   return tradeStore.trades;
 }
 
 // Get filtered trades
-export function getFilteredTrades(filters = {}) {
+function getFilteredTrades(filters = {}) {
   // Load latest data
   initStore();
   
@@ -121,7 +121,7 @@ export function getFilteredTrades(filters = {}) {
 }
 
 // Add this new function after initStore
-export function createSampleTrades() {
+function createSampleTrades() {
   // Load latest data
   initStore();
   
@@ -185,8 +185,8 @@ export function createSampleTrades() {
   return sampleTrades;
 }
 
-// Export the store methods
-export default {
+// Export all functions
+module.exports = {
   addTrade,
   updateTrade,
   getAllTrades,

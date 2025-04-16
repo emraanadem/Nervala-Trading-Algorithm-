@@ -1,6 +1,7 @@
-// Re-export all trade store functions
-export * from './tradeStore.js';
+const tradeStore = require('./tradeStore.js');
 
-// Export the default export as well
-import tradeStore from './tradeStore.js';
-export default tradeStore; 
+// Export all trade store functions and the default export
+module.exports = {
+  ...tradeStore,
+  default: tradeStore
+}; 

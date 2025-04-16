@@ -1,10 +1,10 @@
-import * as fs from 'fs'
-import * as regression from 'ml-regression-simple-linear'
-import { EMA as emas, RSI as rsis, MACD as macds, ROC as rocs, BollingerBands as bolls, SMA as smas, ATR as tr } from 'technicalindicators'
-import { createModel } from 'polynomial-regression'
-import * as nerdamer from 'nerdamer/all.min.js'
-import * as roots from 'kld-polynomial'
-import { sendSignal } from './metatrader-connector.js'
+const fs = require('fs');
+const regression = require('ml-regression-simple-linear');
+const { EMA: emas, RSI: rsis, MACD: macds, ROC: rocs, BollingerBands: bolls, SMA: smas, ATR: tr } = require('technicalindicators');
+const { createModel } = require('polynomial-regression');
+const nerdamer = require('nerdamer/all.min.js');
+const roots = require('kld-polynomial');
+const { sendSignal } = require('./metatrader-connector.js');
 
 // At the top of the file after imports
 let instrum = '';

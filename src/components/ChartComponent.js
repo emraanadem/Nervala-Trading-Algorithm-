@@ -29,6 +29,7 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
   const isRetryingRef = useRef(false);
   const containerReadyRef = useRef(false);
   const tradesContainerRef = useRef(null);
+  const wsRef = useRef(null);
 
   // Define state variables next
   const [isLoading, setIsLoading] = useState(true);
@@ -472,12 +473,11 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
               top: 0.1,
               bottom: 0.1,
             },
-            // Ensure more price labels on the y-axis
-            minimumHeight: 20, // Even smaller value = more labels
+            minimumHeight: 20,
             textColor: '#d1d4dc',
             fontSize: 11,
             alignLabels: true,
-            mode: 0, // 0 = Normal is better for standard price display
+            mode: 0,
             autoScale: true,
             entireTextOnly: false,
             ticksVisible: true,
@@ -489,7 +489,6 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
             secondsVisible: false,
             tickMarkFormatter: (time, tickMarkType, locale) => {
               const date = new Date(time * 1000);
-              // Format based on timeframe
               if (timeframe === '1d' || timeframe === 'Daily' || timeframe === 'Weekly') {
                 return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
               } else {
@@ -516,136 +515,29 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
               labelVisible: true,
             },
           },
-          // Handle watermark
           watermark: {
             visible: false,
           },
         });
         
-        // Function to determine appropriate price precision based on pair and current price level
-        const determinePricePrecision = (pair, currentPrice) => {
-          if (pair.includes('JPY')) return 3;
-          
-          // For pairs with very small price movements (like some crypto pairs)
-          if (currentPrice < 0.01) return 8;
-          
-          // Default for forex pairs like EUR_USD
-          return 5;
-        };
-        
-        // Get appropriate precision for this pair
-        const precision = determinePricePrecision(pair, currentPrice || 1.0);
-        
-        const series = chart.addCandlestickSeries({
-          upColor: '#10b981', 
+        // Save references
+        chartRef.current = chart;
+        candlestickSeriesRef.current = chart.addCandlestickSeries({
+          upColor: '#10b981',
           downColor: '#ef4444',
           borderVisible: false,
           wickUpColor: '#10b981',
           wickDownColor: '#ef4444',
-          priceFormat: {
-            type: 'price',
-            precision: precision,
-            minMove: Math.pow(10, -precision), // Dynamically set minimum price movement
-          },
-          // Additional formatting for price labels
-          lastValueVisible: true,
-          priceLineVisible: true,
-          priceLineWidth: 1,
-          priceLineColor: 'rgba(255, 255, 255, 0.5)',
-          priceLineStyle: LineStyle.Dotted,
         });
-        
-        // After creating the chart, make sure the rightPriceScale is properly configured
-        chart.applyOptions({
-          rightPriceScale: {
-            autoScale: true,
-            mode: 0,
-            invertScale: false,
-            alignLabels: true,
-            borderVisible: true,
-            scaleMargins: {
-              top: 0.1, 
-              bottom: 0.1,
-            },
-            ticksVisible: true,
-            // Adjust the number of price labels
-            minimumHeight: 20,
-          }
-        });
-        
-        // Force price format update
-        series.applyOptions({
-          priceFormat: {
-            type: 'price',
-            precision: precision,
-            minMove: Math.pow(10, -precision),
-          }
-        });
-        
-        // Add volume histogram with proper configuration
-        try {
-          const volumeSeries = chart.addHistogramSeries({
-            priceScaleId: '', // Use default scale
-            scaleMargins: {
-              top: 0.85, // Position volume at the bottom
-              bottom: 0,
-            },
-            priceFormat: {
-              type: 'volume',
-            },
-            color: 'rgba(76, 175, 80, 0.5)',
-          });
-          
-          volumeSeriesRef.current = volumeSeries;
-        } catch (err) {
-          console.error("Failed to add volume series:", err);
-          // Continue without volume series
-        }
-        
-        // Save references
-        chartRef.current = chart;
-        candlestickSeriesRef.current = series;
-        
-        // Add marker series for trade entry/exit points
-        try {
-          const markerSeries = chart.addLineSeries({
-            lineVisible: false,
-            lastValueVisible: false,
-            priceLineVisible: false,
-            baseLineVisible: false,
-            crosshairMarkerVisible: false,
-            priceFormat: {
-              type: 'price',
-              precision: precision,
-              minMove: Math.pow(10, -precision),
-            }
-          });
-          markerSeriesRef.current = markerSeries;
-          
-          // If we already have trades, immediately add markers
-          if (trades && trades.length > 0) {
-            updateTradeMarkers(trades);
-          } else if (externalTrades && Array.isArray(externalTrades)) {
-            // Or use external trades if available
-            const relevantTrades = externalTrades.filter(trade => 
-              trade.pair === pair && (trade.timeframe === timeframe || !timeframe)
-            );
-            updateTradeMarkers(relevantTrades);
-          }
-        } catch (err) {
-          console.error("Failed to add marker series:", err);
-          // Continue without marker series, will fall back to candlestick series for markers
-        }
         
         // Add price line
-        const priceLine = series.createPriceLine({
+        priceLabelRef.current = candlestickSeriesRef.current.createPriceLine({
           price: 0,
           color: '#2196F3',
           lineWidth: 1,
           axisLabelVisible: true,
           title: 'Live',
         });
-        priceLabelRef.current = priceLine;
         
         // Set up resize handler
         const handleResize = () => {
@@ -672,54 +564,21 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
           window.addEventListener('resize', handleResize);
         }
         
-        // Load data
+        // Load initial data
         fetchCandleData()
-          .then((data) => {
+          .then(() => {
             console.log("Initial data loaded successfully");
-            
-            // If we have volume data, set up volume series
-            if (data && data.candles && data.candles.length > 0 && data.candles[0].volume && volumeSeriesRef.current) {
-              try {
-                const volumeData = data.candles.map(candle => ({
-                  time: candle.time,
-                  value: candle.volume || 0,
-                  color: candle.c >= candle.o 
-                    ? 'rgba(16, 185, 129, 0.5)'  // green for up
-                    : 'rgba(239, 68, 68, 0.5)'   // red for down
-                }));
-                
-                volumeSeriesRef.current.setData(volumeData);
-              } catch (err) {
-                console.error("Error setting volume data:", err);
-              }
-            }
-            
-            // Apply trade markers after chart data is loaded
-            setTimeout(() => {
-              if (externalTrades && Array.isArray(externalTrades) && externalTrades.length > 0) {
-                console.log("Applying external trade markers after chart initialization");
-                updateTradeMarkers(externalTrades);
-              } else {
-                // Try to fetch and apply trade data
-                fetchTrades()
-                  .then(fetchedTrades => {
-                    if (fetchedTrades && fetchedTrades.length > 0) {
-                      console.log("Applying fetched trade markers after chart initialization");
-                      updateTradeMarkers(fetchedTrades);
-                    }
-                  })
-                  .catch(err => {
-                    console.error("Error fetching trades for markers:", err);
-                  });
-              }
-            }, 500);
+            setIsLoading(false);
           })
           .catch(err => {
             console.error("Failed to load initial data:", err);
+            setError(`Failed to load data: ${err.message}`);
+            setIsLoading(false);
           })
           .finally(() => {
             isRetryingRef.current = false;
           });
+          
       } catch (err) {
         console.error("Error in chart creation:", err);
         setError(`Chart creation failed: ${err.message}`);
@@ -727,7 +586,7 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
         isRetryingRef.current = false;
       }
     }, 300);
-  }, [pair, timeframe, cleanupChart, cleanupTimersAndIntervals, fetchCandleData, currentPrice]);
+  }, [pair, timeframe, cleanupChart, cleanupTimersAndIntervals, fetchCandleData]);
 
   // Initialize chart only once
   useEffect(() => {
@@ -842,26 +701,16 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
         }
       }
       
-      const success = handleRetry();
+      handleRetry();
       
-      if (success) {
-        fetchCandleData()
-          .then(() => {
-            console.log("Initial data loaded successfully");
-          })
-          .catch(err => {
-            console.error("Failed to load initial data:", err);
+      // Set up data refresh interval
+      updateIntervalRef.current = setInterval(() => {
+        if (isMountedRef.current && !isFetchingRef.current) {
+          fetchCandleData().catch(err => {
+            console.error("Error in interval fetch:", err);
           });
-        
-        // Set up data refresh interval
-        updateIntervalRef.current = setInterval(() => {
-          if (isMountedRef.current && !isFetchingRef.current) {
-            fetchCandleData().catch(err => {
-              console.error("Error in interval fetch:", err);
-            });
-          }
-        }, 30000);
-      }
+        }
+      }, 30000);
     }, 300);
     
     return () => {
@@ -1037,6 +886,84 @@ export default forwardRef(({ pair, timeframe, externalTrades }, ref) => {
     
     return () => clearTimeout(timerId);
   }, [externalTrades, pair, timeframe]);
+
+  // WebSocket connection for live price updates
+  useEffect(() => {
+    const connectWebSocket = () => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        console.log('WebSocket already connected');
+        return;
+      }
+
+      const ws = new WebSocket(`ws://${window.location.hostname}:3001`);
+      
+      ws.onopen = () => {
+        console.log('WebSocket connected');
+        // Subscribe to price updates for the current pair
+        ws.send(JSON.stringify({
+          type: 'subscribe',
+          pair: pair
+        }));
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'price' && data.pair === pair) {
+            const numericPrice = Number(data.price);
+            if (!isNaN(numericPrice)) {
+              // Update price direction
+              if (currentPrice !== null) {
+                setPriceChangePositive(numericPrice >= currentPrice);
+              }
+              setCurrentPrice(numericPrice);
+              setLastUpdateTime(new Date());
+              
+              // Update price line on chart
+              if (chartRef.current && candlestickSeriesRef.current) {
+                updateCurrentPriceIndicator(numericPrice);
+                
+                // Update the last candle if it exists
+                const lastCandle = candlestickSeriesRef.current.data();
+                if (lastCandle && lastCandle.length > 0) {
+                  const updatedCandle = {
+                    ...lastCandle[lastCandle.length - 1],
+                    close: numericPrice,
+                    high: Math.max(lastCandle[lastCandle.length - 1].high, numericPrice),
+                    low: Math.min(lastCandle[lastCandle.length - 1].low, numericPrice)
+                  };
+                  candlestickSeriesRef.current.update(updatedCandle);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Error processing WebSocket message:', err);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      ws.onclose = () => {
+        console.log('WebSocket disconnected, attempting to reconnect...');
+        wsRef.current = null;
+        setTimeout(connectWebSocket, 5000);
+      };
+
+      wsRef.current = ws;
+    };
+
+    connectWebSocket();
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, [pair]); // Only depend on pair changes, not currentPrice
 
   // Return component JSX
   return (

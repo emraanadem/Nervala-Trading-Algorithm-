@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { addTrade, updateTrade } from './utils/index.js';
+const fs = require('fs');
+const path = require('path');
+const { addTrade, updateTrade } = require('./utils/index.js');
 
 // Configuration
 const COMMANDS_FILE = 'mt5_commands.txt';
@@ -217,10 +217,11 @@ class MetaTraderConnector {
   }
 }
 
-// Export as ES Module
-export const connector = new MetaTraderConnector();
+// Create a single instance of the connector
+const connector = new MetaTraderConnector();
 
-export async function sendSignal(action, symbol, sl, tp, volume, reason, timeframe = "") {
+// Convert to regular async functions
+async function sendSignal(action, symbol, sl, tp, volume, reason, timeframe = "") {
   try {
     const mtConnector = new MetaTraderConnector();
     
@@ -390,8 +391,7 @@ export async function sendSignal(action, symbol, sl, tp, volume, reason, timefra
   }
 }
 
-// Test function is exported but not auto-executed
-export async function testConnection() {
+async function testConnection() {
   try {
     console.log('Testing MT5 connection...');
     const mtConnector = new MetaTraderConnector();
@@ -417,4 +417,11 @@ export async function testConnection() {
     console.error('Test error:', error);
     return false;
   }
-} 
+}
+
+// Export everything at the end
+module.exports = {
+  sendSignal,
+  testConnection,
+  MetaTraderConnector
+}; 

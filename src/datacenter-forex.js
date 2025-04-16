@@ -1,12 +1,12 @@
-import { ProxyAgent } from 'undici' // native fetch uses undici as underlying HTTP handler, need the agent from it
+const { ProxyAgent } = require('undici') // native fetch uses undici as underlying HTTP handler, need the agent from it
 
-import { testfifteen } from './FifteenMin.js'
-import { testthirtymin } from './ThirtyMin.js'
-import { testonehour } from './OneHour.js'
-import { testtwohour } from './TwoHour.js'
-import { testfourhour } from './FourHour.js'
-import { testdaily } from './Daily.js'
-import { testweekly } from './Weekly.js'
+const { testfifteen } = require('./FifteenMin.js')
+const { testthirtymin } = require('./ThirtyMin.js')
+const { testonehour } = require('./OneHour.js')
+const { testtwohour } = require('./TwoHour.js')
+const { testfourhour } = require('./FourHour.js')
+const { testdaily } = require('./Daily.js')
+const { testweekly } = require('./Weekly.js')
 
 async function getCandleData (baseUrl, options, timescaleLabel) {
   while (true) {
@@ -23,7 +23,6 @@ async function getCandleData (baseUrl, options, timescaleLabel) {
       
       const data = await res.json()
       const candleData = {}
-      console.log('Data:', data.candles[0]);
       candleData[`${timescaleLabel[1]}`] = {}
       candleData[`${timescaleLabel[1]}`].o = data.candles.slice(Math.max(data.candles.length - 4000, 0), data.candles.length).map((x) => parseFloat(x.mid.o))
       candleData[`${timescaleLabel[1]}`].h = data.candles.slice(Math.max(data.candles.length - 4000, 0), data.candles.length).map((x) => parseFloat(x.mid.h))
@@ -108,102 +107,104 @@ async function getPrice (baseUrl, options) {
   }
 }
 
-export async function checkForSignals (instrument, accountInfo, proxy = null, proxyauths = null, loop = true) {
-  const baseUrl = `https://api-fxpractice.oanda.com/v3/accounts/${accountInfo[0]}/instruments/${instrument}/candles?`
-  let options = {
-    headers: {
-      Authorization: `Bearer ${accountInfo[1]}`
+module.exports = {
+  checkForSignals: async function (instrument, accountInfo, proxy = null, proxyauths = null, loop = true) {
+    const baseUrl = `https://api-fxpractice.oanda.com/v3/accounts/${accountInfo[0]}/instruments/${instrument}/candles?`
+    let options = {
+      headers: {
+        Authorization: `Bearer ${accountInfo[1]}`
+      }
     }
-  }
-  if (proxy) {
-    const proxyAgent = new ProxyAgent({
-      uri: `http://${proxy[1]}:${proxy[2]}`,
-      token: `Basic ${Buffer.from(`${proxyauths["username"]}:${proxyauths["password"]}`).toString('base64')}`,
-    })
-    options = {
-      ...options,
-      dispatcher: proxyAgent
+    if (proxy) {
+      const proxyAgent = new ProxyAgent({
+        uri: `http://${proxy[1]}:${proxy[2]}`,
+        token: `Basic ${Buffer.from(`${proxyauths["username"]}:${proxyauths["password"]}`).toString('base64')}`,
+      })
+      options = {
+        ...options,
+        dispatcher: proxyAgent
+      }
     }
-  }
 
-  
-  // CRITICAL FIX: Use while(true) instead of do-while to ensure true infinite loop
-  while (true) {
-    try {
-      const candleData = await getAggregatedCandleData(baseUrl, options)
-      const price = await getPrice(baseUrl, options)
+    
+    // CRITICAL FIX: Use while(true) instead of do-while to ensure true infinite loop
+    while (true) {
+      try {
+        const candleData = await getAggregatedCandleData(baseUrl, options)
+        const price = await getPrice(baseUrl, options)
 
-      if (candleData != null) {
-        const timeframePairs = [
-          ['Fifteen_Min', 'Fifteen_Min_Extend'],
-          ['Thirty_Min', 'Thirty_Min_Extend'],
-          ['One_Hour', 'One_Hour_Extend'],
-          ['Two_Hour', 'Two_Hour_Extend'],
-          ['Four_Hour', 'Four_Hour_Extend'],
-          ['Daily', 'Daily_Extend'],
-          ['Weekly', 'Weekly_Extend']
-        ]
-
-        let globalMinLength = Infinity
-        for (const [regular, extended] of timeframePairs) {
-          if (!candleData[regular] || !candleData[extended]) continue
-
-          const lengths = [
-            candleData[regular].o?.length || 0,
-            candleData[regular].h?.length || 0,
-            candleData[regular].l?.length || 0,
-            candleData[regular].c?.length || 0,
-            candleData[extended].o?.length || 0,
-            candleData[extended].h?.length || 0,
-            candleData[extended].l?.length || 0,
-            candleData[extended].c?.length || 0
+        if (candleData != null) {
+          const timeframePairs = [
+            ['Fifteen_Min', 'Fifteen_Min_Extend'],
+            ['Thirty_Min', 'Thirty_Min_Extend'],
+            ['One_Hour', 'One_Hour_Extend'],
+            ['Two_Hour', 'Two_Hour_Extend'],
+            ['Four_Hour', 'Four_Hour_Extend'],
+            ['Daily', 'Daily_Extend'],
+            ['Weekly', 'Weekly_Extend']
           ]
 
-          const minLength = Math.min(...lengths)
-          globalMinLength = Math.min(globalMinLength, minLength)
+          let globalMinLength = Infinity
+          for (const [regular, extended] of timeframePairs) {
+            if (!candleData[regular] || !candleData[extended]) continue
+
+            const lengths = [
+              candleData[regular].o?.length || 0,
+              candleData[regular].h?.length || 0,
+              candleData[regular].l?.length || 0,
+              candleData[regular].c?.length || 0,
+              candleData[extended].o?.length || 0,
+              candleData[extended].h?.length || 0,
+              candleData[extended].l?.length || 0,
+              candleData[extended].c?.length || 0
+            ]
+
+            const minLength = Math.min(...lengths)
+            globalMinLength = Math.min(globalMinLength, minLength)
+          }
+
+          if (globalMinLength === 0 || globalMinLength === Infinity) {
+            continue
+          }
+
+          for (const [regular, extended] of timeframePairs) {
+            if (!candleData[regular] || !candleData[extended]) continue
+
+            // Take the last (newest) globalMinLength elements
+            candleData[regular].o = candleData[regular].o.slice(-globalMinLength)
+            candleData[regular].h = candleData[regular].h.slice(-globalMinLength)
+            candleData[regular].l = candleData[regular].l.slice(-globalMinLength)
+            candleData[regular].c = candleData[regular].c.slice(-globalMinLength)
+
+            candleData[extended].o = candleData[extended].o.slice(-globalMinLength)
+            candleData[extended].h = candleData[extended].h.slice(-globalMinLength)
+            candleData[extended].l = candleData[extended].l.slice(-globalMinLength)
+            candleData[extended].c = candleData[extended].c.slice(-globalMinLength)
+          }
+
+          // Run all the test functions for each timeframe
+          testfifteen(candleData, price, instrument)
+          testthirtymin(candleData, price, instrument)
+          testonehour(candleData, price, instrument)
+          testtwohour(candleData, price, instrument)
+          testfourhour(candleData, price, instrument)
+          testdaily(candleData, price, instrument)
+          testweekly(candleData, price, instrument)
         }
-
-        if (globalMinLength === 0 || globalMinLength === Infinity) {
-          continue
-        }
-
-        for (const [regular, extended] of timeframePairs) {
-          if (!candleData[regular] || !candleData[extended]) continue
-
-          // Take the last (newest) globalMinLength elements
-          candleData[regular].o = candleData[regular].o.slice(-globalMinLength)
-          candleData[regular].h = candleData[regular].h.slice(-globalMinLength)
-          candleData[regular].l = candleData[regular].l.slice(-globalMinLength)
-          candleData[regular].c = candleData[regular].c.slice(-globalMinLength)
-
-          candleData[extended].o = candleData[extended].o.slice(-globalMinLength)
-          candleData[extended].h = candleData[extended].h.slice(-globalMinLength)
-          candleData[extended].l = candleData[extended].l.slice(-globalMinLength)
-          candleData[extended].c = candleData[extended].c.slice(-globalMinLength)
-        }
-
-        // Run all the test functions for each timeframe
-        testfifteen(candleData, price, instrument)
-        testthirtymin(candleData, price, instrument)
-        testonehour(candleData, price, instrument)
-        testtwohour(candleData, price, instrument)
-        testfourhour(candleData, price, instrument)
-        testdaily(candleData, price, instrument)
-        testweekly(candleData, price, instrument)
+      } catch (error) {
+        console.error(`Error in checkForSignals for ${instrument}:`, error)
+        console.log(`Error encountered but continuing loop for ${instrument}...`);
+        // Don't break the loop - just continue after a delay
       }
-    } catch (error) {
-      console.error(`Error in checkForSignals for ${instrument}:`, error)
-      console.log(`Error encountered but continuing loop for ${instrument}...`);
-      // Don't break the loop - just continue after a delay
+      
+      // Always add a delay between cycles to prevent API rate limiting
+      await new Promise(resolve => setTimeout(resolve, 100)); // 1 second between cycles
     }
     
-    // Always add a delay between cycles to prevent API rate limiting
-    await new Promise(resolve => setTimeout(resolve, 100)); // 1 second between cycles
+    // This line should never be reached
+    console.log(`WARNING: Loop unexpectedly ended for ${instrument}`);
+    return true;
   }
-  
-  // This line should never be reached
-  console.log(`WARNING: Loop unexpectedly ended for ${instrument}`);
-  return true;
 }
 
 /* © 2024 Emraan Adem Ibrahim. See the license terms in the file 'license.txt' which should
