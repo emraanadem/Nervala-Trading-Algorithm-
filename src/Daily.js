@@ -2262,8 +2262,8 @@ class One_Hour_Functions {
     const history = One_Hour_Functions.priceHist
     const highs = One_Hour_Functions.highs
     const lows = One_Hour_Functions.lows
-    const histmax = Math.max(...history)
-    const histmin = Math.min(...history)
+    const histmax = Math.max(...highs)
+    const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
     
     // Ensure we have enough data
@@ -2479,8 +2479,8 @@ class Fifteen_Min_Functions {
     const history = Fifteen_Min_Functions.priceHist
     const highs = Fifteen_Min_Functions.highs
     const lows = Fifteen_Min_Functions.lows
-    const histmax = Math.max(...history)
-    const histmin = Math.min(...history)
+    const histmax = Math.max(...highs)
+    const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
     
     // Ensure we have enough data

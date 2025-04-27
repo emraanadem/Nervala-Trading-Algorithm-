@@ -399,7 +399,7 @@ class Fifteen_Min_Nexus {
       Fifteen_Min_Functions.stoploss()
       Fifteen_Min_Functions.getPrice()
       Fifteen_Min_Nexus.controlBiggerPeriod()
-      if (!Fifteen_Min_Functions.consolidationtwo() && !Fifteen_Min_Functions.consolidation() && !Fifteen_Min_Functions.overall() &&
+      if (!Fifteen_Min_Functions.consolidationtwo() && !Fifteen_Min_Functions.consolidation() && Fifteen_Min_Functions.overall() &&
             !Fifteen_Min_Functions.keylev()) {
         if (Fifteen_Min_Functions.ema()) {
           if (Fifteen_Min_Nexus.controlSmallerPeriod()[0] == true) {
@@ -629,20 +629,20 @@ class Fifteen_Min_Functions {
   /** second consolidation method, meant to strengthen consolidation identification */
   static consolidationtwo () {
     const history = Fifteen_Min_Functions.priceHist
-    const highs = Fifteen_Min_Functions.highs
-    const lows = Fifteen_Min_Functions.lows
+    const highs = Fifteen_Min_Functions.highs 
+    const lows = Fifteen_Min_Functions.lows 
     const histmax = Math.max(...highs)
     const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
     
     // Ensure we have enough data
-    const minDataPoints = 20 // Reduced from 30 to require less data
+    const minDataPoints = 20
     if (history.length < minDataPoints) {
-      return false; // Default to false if not enough data
+      return true; // Default to consolidation if not enough data to determine
     }
     
-    // Normalize all arrays to same length (use recent data)
-    const lookbackPeriod = Math.min(40, history.length) // Reduced from 60 for 15min timeframe
+    // Normalize all arrays to same length (use most recent data)
+    const lookbackPeriod = Math.min(50, history.length)
     const recentHistory = history.slice(-lookbackPeriod)
     const recentHighs = highs.slice(-lookbackPeriod)
     const recentLows = lows.slice(-lookbackPeriod)
@@ -650,7 +650,7 @@ class Fifteen_Min_Functions {
     
     // APPROACH 1: Bollinger Bands width analysis
     const bollingerBands = bolls.calculate({ 
-      period: 14, 
+      period: 20, 
       values: recentHistory, 
       stdDev: 2
     })
@@ -662,14 +662,14 @@ class Fifteen_Min_Functions {
     
     // Narrowing bands indicate consolidation
     const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-    const isTightBands = avgBandWidth < 0.018 // Increased from 0.015 to be more lenient
+    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
     
     // APPROACH 2: True Range (volatility) analysis
     const trValues = tr.calculate({ 
       high: recentHighs, 
       low: recentLows, 
       close: recentClose, 
-      period: 10
+      period: 14 
     })
     
     // Calculate average true range relative to price
@@ -679,7 +679,7 @@ class Fifteen_Min_Functions {
     
     // Decreasing TR indicates consolidation
     const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-    const isLowVolatility = normalizedATR < 0.0075 // Increased from 0.006 to be more lenient
+    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
     
     // APPROACH 3: Price channel/range analysis
     const priceRange = histmax - histmin
@@ -694,8 +694,8 @@ class Fifteen_Min_Functions {
     const relativeStdDev = stdDev / mean
     
     // Narrow range indicates consolidation
-    const isNarrowRange = priceRangePercent < 0.022 // Increased from 0.015 to be more lenient
-    const isLowDeviation = relativeStdDev < 0.01 // Increased from 0.008 to be more lenient
+    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
+    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
     
     // APPROACH 4: Linear regression slope and R-squared analysis
     // Prepare x and y for regression
@@ -708,8 +708,8 @@ class Fifteen_Min_Functions {
     const r2 = regResult.rSquared
     
     // Flat slope and good fit indicate consolidation
-    const isFlatSlope = slope < 0.00012 * mean // Increased from 0.00008 to be more lenient
-    const isPoorFit = r2 < 0.5 // Increased from 0.45 to be more lenient
+    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
+    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
     
     // APPROACH 5: Check for higher highs/lower lows pattern
     let hasDirectionalMovement = false
@@ -717,7 +717,7 @@ class Fifteen_Min_Functions {
     // Check for consecutive higher highs or lower lows (trend indicators)
     let consecutiveHigherHighs = 0
     let consecutiveLowerLows = 0
-    const pattern_window = 4
+    const pattern_window = 5
     
     for (let i = 1; i < pattern_window; i++) {
       if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
@@ -729,7 +729,7 @@ class Fifteen_Min_Functions {
     }
     
     // Strong directional pattern indicates trending, not consolidation
-    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) { // Increased from 2 to be more lenient
+    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
       hasDirectionalMovement = true;
     }
     
@@ -739,10 +739,10 @@ class Fifteen_Min_Functions {
     let consolidationScore = 0;
     let totalFactors = 0;
     
-    // Bollinger factors - weigh these more heavily for 15-min timeframe
-    if (bandWidthShrinking) consolidationScore += 1.5; // Increased weight
-    if (isTightBands) consolidationScore += 1.5; // Increased weight
-    totalFactors += 3; // Adjusted total to match new weights
+    // Bollinger factors
+    if (bandWidthShrinking) consolidationScore++;
+    if (isTightBands) consolidationScore++;
+    totalFactors += 2;
     
     // TR factors
     if (trTrend) consolidationScore++;
@@ -766,8 +766,8 @@ class Fifteen_Min_Functions {
     // Calculate overall probability of consolidation
     const consolidationProbability = consolidationScore / totalFactors;
     
-    // More balanced threshold for 15min timeframe
-    return consolidationProbability >= 0.62; // Decreased from 0.7 to produce more true results
+    // Return true if consolidation probability is above 60%
+    return consolidationProbability >= 0.62;
   }
 
   /** TP variation, helps change TP depending on volatility and price movement depending on whether or not the code has surpassed TP1 and
@@ -2742,20 +2742,20 @@ class Five_Min_Functions {
   /** second consolidation method, meant to strengthen consolidation identification */
   static consolidationtwo () {
     const history = Five_Min_Functions.priceHist
-    const highs = Five_Min_Functions.highs
-    const lows = Five_Min_Functions.lows
+    const highs = Five_Min_Functions.highs 
+    const lows = Five_Min_Functions.lows 
     const histmax = Math.max(...highs)
     const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
     
     // Ensure we have enough data
-    const minDataPoints = 15 // Even fewer data points needed for 5min timeframe
+    const minDataPoints = 20
     if (history.length < minDataPoints) {
-      return false; // Default to false if not enough data
+      return true; // Default to consolidation if not enough data to determine
     }
     
-    // Normalize all arrays to same length (use recent data)
-    const lookbackPeriod = Math.min(30, history.length) // Shorter lookback for 5min
+    // Normalize all arrays to same length (use most recent data)
+    const lookbackPeriod = Math.min(50, history.length)
     const recentHistory = history.slice(-lookbackPeriod)
     const recentHighs = highs.slice(-lookbackPeriod)
     const recentLows = lows.slice(-lookbackPeriod)
@@ -2763,36 +2763,36 @@ class Five_Min_Functions {
     
     // APPROACH 1: Bollinger Bands width analysis
     const bollingerBands = bolls.calculate({ 
-      period: 12, // Shorter period for 5min timeframe
+      period: 20, 
       values: recentHistory, 
       stdDev: 2
     })
     
     // Calculate normalized Bollinger Band width
     const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
-    const recentBandWidths = bandWidths.slice(-4) // Shorter period
+    const recentBandWidths = bandWidths.slice(-5)
     const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
     
     // Narrowing bands indicate consolidation
     const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-    const isTightBands = avgBandWidth < 0.02 // Slightly higher for noisier 5min
+    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
     
     // APPROACH 2: True Range (volatility) analysis
     const trValues = tr.calculate({ 
       high: recentHighs, 
       low: recentLows, 
       close: recentClose, 
-      period: 8 // Shorter period for 5min
+      period: 14 
     })
     
     // Calculate average true range relative to price
-    const recentTR = trValues.slice(-4) // Shorter window
+    const recentTR = trValues.slice(-5)
     const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
     const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
     
     // Decreasing TR indicates consolidation
     const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-    const isLowVolatility = normalizedATR < 0.008 // Higher for noisier 5min
+    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
     
     // APPROACH 3: Price channel/range analysis
     const priceRange = histmax - histmin
@@ -2807,8 +2807,8 @@ class Five_Min_Functions {
     const relativeStdDev = stdDev / mean
     
     // Narrow range indicates consolidation
-    const isNarrowRange = priceRangePercent < 0.025 // Higher for noisier 5min
-    const isLowDeviation = relativeStdDev < 0.011 // Higher for noisier 5min
+    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
+    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
     
     // APPROACH 4: Linear regression slope and R-squared analysis
     // Prepare x and y for regression
@@ -2821,8 +2821,8 @@ class Five_Min_Functions {
     const r2 = regResult.rSquared
     
     // Flat slope and good fit indicate consolidation
-    const isFlatSlope = slope < 0.00015 * mean // Higher for 5min
-    const isPoorFit = r2 < 0.55 // Higher for 5min - more noise
+    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
+    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
     
     // APPROACH 5: Check for higher highs/lower lows pattern
     let hasDirectionalMovement = false
@@ -2830,7 +2830,7 @@ class Five_Min_Functions {
     // Check for consecutive higher highs or lower lows (trend indicators)
     let consecutiveHigherHighs = 0
     let consecutiveLowerLows = 0
-    const pattern_window = 3 // Shorter window for 5min
+    const pattern_window = 5
     
     for (let i = 1; i < pattern_window; i++) {
       if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
@@ -2842,7 +2842,7 @@ class Five_Min_Functions {
     }
     
     // Strong directional pattern indicates trending, not consolidation
-    if (consecutiveHigherHighs >= 2 || consecutiveLowerLows >= 2) {
+    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
       hasDirectionalMovement = true;
     }
     
@@ -2852,10 +2852,10 @@ class Five_Min_Functions {
     let consolidationScore = 0;
     let totalFactors = 0;
     
-    // Bollinger factors - weigh these more heavily for 5-min timeframe
-    if (bandWidthShrinking) consolidationScore += 1.5;
-    if (isTightBands) consolidationScore += 1.5;
-    totalFactors += 3;
+    // Bollinger factors
+    if (bandWidthShrinking) consolidationScore++;
+    if (isTightBands) consolidationScore++;
+    totalFactors += 2;
     
     // TR factors
     if (trTrend) consolidationScore++;
@@ -2879,8 +2879,8 @@ class Five_Min_Functions {
     // Calculate overall probability of consolidation
     const consolidationProbability = consolidationScore / totalFactors;
     
-    // More balanced threshold for 5min timeframe - slightly higher than 15min
-    return consolidationProbability >= 0.60; // Even more lenient for 5min
+    // Return true if consolidation probability is above 60%
+    return consolidationProbability >= 0.6;
   }
 
   static trend () {

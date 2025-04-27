@@ -635,71 +635,129 @@ class Weekly_Functions {
     Weekly_Functions.price = liveprice
   }
 
-  /** Advanced consolidation detection using cycle analysis and adaptive thresholds */
-  static consolidation() {
+  static consolidation () {
+    // Get price data for four-hour timeframe
     const history = Weekly_Functions.priceHist
-    const highs = Weekly_Functions.highs
-    const lows = Weekly_Functions.lows
+    const histLen = history.length
     
-    // Need at least 4 weeks of data
-    if (history.length < 4) return false
+    // Need enough data for analysis
+    if (histLen < 30) return false
     
-    // Get recent data
-    const recentCandles = {
-      closes: history.slice(-4),
-      highs: highs.slice(-4),
-      lows: lows.slice(-4)
-    }
+    // 1. MOMENTUM ANALYSIS - Use RSI convergence to middle band as consolidation signal
+    // Calculate RSI values
+    const rsiValues = rsis.calculate({ period: 14, values: history })
+    const recentRsi = rsiValues.slice(-10)
     
-    // 1. Calculate total range as percentage
-    const highest = Math.max(...recentCandles.highs)
-    const lowest = Math.min(...recentCandles.lows)
-    const avgPrice = recentCandles.closes.reduce((sum, price) => sum + price, 0) / 4
-    const totalRangePercent = ((highest - lowest) / avgPrice) * 100
-    
-    // 2. Calculate weekly movements
-    const weeklyMoves = []
-    for (let i = 1; i < recentCandles.closes.length; i++) {
-      const move = Math.abs(recentCandles.closes[i] - recentCandles.closes[i-1])
-      weeklyMoves.push((move / recentCandles.closes[i]) * 100)
-    }
-    const avgWeeklyMove = weeklyMoves.reduce((sum, move) => sum + move, 0) / weeklyMoves.length
-    
-    // 3. Simple checks for consolidation
-    
-    // Check 1: Range should be between 3-12% for weekly timeframe
-    const hasReasonableRange = totalRangePercent >= 3 && totalRangePercent <= 12
-    
-    // Check 2: Average weekly movement should be under 4%
-    const hasModerateMovement = avgWeeklyMove <= 4
-    
-    // Check 3: Price should not be making consecutive higher highs or lower lows
-    let hasDirectionalBias = true
-    let consecutiveUp = 0
-    let consecutiveDown = 0
-    
-    for (let i = 1; i < recentCandles.closes.length; i++) {
-      if (recentCandles.closes[i] > recentCandles.closes[i-1]) {
-        consecutiveUp++
-        consecutiveDown = 0
-      } else {
-        consecutiveDown++
-        consecutiveUp = 0
+    // Check if RSI is converging to mid-range (indicative of decreasing momentum/consolidation)
+    let rsiMidrangeCount = 0
+    for (const rsi of recentRsi) {
+      if (rsi > 40 && rsi < 60) {
+        rsiMidrangeCount++
       }
     }
     
-    if (consecutiveUp < 3 && consecutiveDown < 3) {
-      hasDirectionalBias = false
+    // If 60% of recent RSI values are in mid-range, that suggests consolidation
+    const rsiConsolidation = rsiMidrangeCount >= 6
+    
+    // 2. PRICE ACTION RANGE ANALYSIS - Check if price is trading in a narrow range
+    // Four-hour timeframe typically has wider ranges than one-hour
+    const recentPrices = history.slice(-20)
+    const maxPrice = Math.max(...recentPrices)
+    const minPrice = Math.min(...recentPrices)
+    const avgPrice = recentPrices.reduce((sum, price) => sum + price, 0) / recentPrices.length
+    
+    // Calculate range as percentage of average price
+    // Adjust threshold for four-hour timeframe (slightly wider range acceptable)
+    const priceRange = (maxPrice - minPrice) / avgPrice
+    const rangeConsolidation = priceRange < 0.03 // Increase from 0.02
+    
+    // 3. BOLLINGER BAND ANALYSIS - Very effective for four-hour timeframe
+    const bollingerBands = bolls.calculate({ 
+      period: 20, 
+      values: history, 
+      stdDev: 2 
+    })
+    
+    // Extract width of Bollinger Bands - narrow bands suggest consolidation
+    const bandWidths = []
+    for (let i = 0; i < bollingerBands.length; i++) {
+      const width = (bollingerBands[i].upper - bollingerBands[i].lower) / bollingerBands[i].middle
+      bandWidths.push(width)
     }
     
-    // Only need 2 out of 3 conditions for weekly consolidation
-    const conditionsMet = [
-      hasReasonableRange,
-      hasModerateMovement,
-      !hasDirectionalBias
-    ].filter(Boolean).length
+    const recentBandWidths = bandWidths.slice(-10)
+    const avgBandWidth = recentBandWidths.reduce((sum, w) => sum + w, 0) / recentBandWidths.length
+    const narrowBands = avgBandWidth < 0.04 // Adjusted for four-hour timeframe
     
-    return conditionsMet >= 2
+    // Check for contracting bands (also indicates consolidation)
+    const bandWidthTrend = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+    
+    // 4. TREND ANALYSIS - Check for high/low variation
+    const highValues = Weekly_Functions.highs 
+    const lowValues = Weekly_Functions.lows 
+    
+    // Ensure we have enough data
+    let directionAnalysis = false
+    if (highValues.length >= 10 && lowValues.length >= 10) {
+      const recentHighs = highValues.slice(-10)
+      const recentLows = lowValues.slice(-10)
+      
+      // Check for consecutive higher highs or lower lows (trend indicators)
+      let consecutiveHigherHighs = 0
+      let consecutiveLowerLows = 0
+      
+      for (let i = 1; i < recentHighs.length; i++) {
+        if (recentHighs[i] > recentHighs[i-1]) consecutiveHigherHighs++
+        if (recentLows[i] < recentLows[i-1]) consecutiveLowerLows++
+      }
+      
+      // If we don't have strong directional movement, that suggests consolidation
+      directionAnalysis = consecutiveHigherHighs < 3 && consecutiveLowerLows < 3
+    }
+    
+    // 5. STANDARD DEVIATION OF RETURNS - Four-hour specific volatility analysis
+    const returns = []
+    for (let i = 1; i < recentPrices.length; i++) {
+      returns.push((recentPrices[i] - recentPrices[i-1]) / recentPrices[i-1])
+    }
+    
+    // Calculate standard deviation of returns
+    const mean = returns.reduce((a, b) => a + b, 0) / returns.length
+    const variance = returns.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / returns.length
+    const stdDev = Math.sqrt(variance)
+    
+    // Low standard deviation indicates consolidation (adjusted for 4H timeframe)
+    const lowVolatility = stdDev < 0.005 // 0.5% for 4H timeframe
+    
+    // 6. Use existing volatility function as additional input (maintain compatibility)
+    const volatilityCheck = Weekly_Functions.volatility() <= 0.618
+    
+    // Combine all factors with different weights for four-hour timeframe
+    let consolidationScore = 0
+    let totalPoints = 0
+    
+    // Primary indicators for 4H timeframe
+    if (rangeConsolidation) consolidationScore += 3
+    totalPoints += 3
+    
+    if (narrowBands || bandWidthTrend) consolidationScore += 3 // Bollinger bands are very effective on 4H
+    totalPoints += 3
+    
+    // Secondary indicators
+    if (volatilityCheck) consolidationScore += 2  // Original volatility check
+    totalPoints += 2
+    
+    if (lowVolatility) consolidationScore += 2    // Standard deviation check
+    totalPoints += 2
+    
+    if (rsiConsolidation) consolidationScore += 2 // RSI midrange
+    totalPoints += 2
+    
+    if (directionAnalysis) consolidationScore += 2 // Lack of strong trend
+    totalPoints += 2
+    
+    // Calculate percentage score (require at least 65% for consolidation)
+    return (consolidationScore / totalPoints) >= 0.65
   }
 
   /** TP variation, helps change TP depending on volatility and price movement depending on whether or not the code has surpassed TP1 and

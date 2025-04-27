@@ -28,14 +28,27 @@ const instruments = [
 console.log(`Will process ${instruments.length} instruments (should be 40)`);
 
 // Configure the worker pool
-const MAX_WORKERS = 40; // Adjust based on system capabilities
+const MAX_WORKERS = instruments.length; // Ensure we have enough workers for all instruments
 const workerPool = new Map(); // Track active workers by instrument
 let activeWorkers = 0;
 
 // Start a worker for a specific instrument
 function startWorkerForInstrument(instrument, accountIndex, proxyIndex) {
+  // Check if a worker is already running for this instrument
+  if (workerPool.has(instrument)) {
+    console.log(`Worker for ${instrument} is already running.`);
+    return null;
+  }
+  
   const account = accounts[accountIndex % accounts.length];
   const proxy = proxies[proxyIndex % proxies.length];
+  
+  if (!account || !proxy) {
+    console.error(`Error starting worker for ${instrument}: Invalid account or proxy`);
+    console.log(`Account index: ${accountIndex}, Proxy index: ${proxyIndex}`);
+    console.log(`Accounts length: ${accounts.length}, Proxies length: ${proxies.length}`);
+    return null;
+  }
   
   
   // Start a worker process for this instrument
@@ -46,6 +59,7 @@ function startWorkerForInstrument(instrument, accountIndex, proxyIndex) {
   // Track the worker
   workerPool.set(instrument, worker);
   activeWorkers++;
+  
   
   // Send the instrument data to worker
   worker.send({
@@ -72,11 +86,26 @@ function startWorkerForInstrument(instrument, accountIndex, proxyIndex) {
     if (global.gc) {
       global.gc();
     }
+    
+    // Automatically restart after a small delay to prevent rapid restart loops
+    setTimeout(() => {
+      if (!workerPool.has(instrument)) {
+        console.log(`Restarting worker for ${instrument} after exit`);
+        const randomIndex = Math.floor(Date.now() / 1000) % accounts.length;
+        startWorkerForInstrument(instrument, randomIndex, randomIndex);
+      }
+    }, 5000);
   });
   
   // Handle errors
   worker.on('error', (error) => {
     console.error(`Worker error for ${instrument}:`, error);
+    
+    // Clean up in case the on('exit') handler doesn't fire
+    if (workerPool.has(instrument)) {
+      workerPool.delete(instrument);
+      activeWorkers--;
+    }
   });
   
   return worker;
@@ -86,29 +115,52 @@ function startWorkerForInstrument(instrument, accountIndex, proxyIndex) {
 function startAllWorkers() {
   console.log(`Starting workers for all ${instruments.length} instruments`);
   
-  // Start a worker for EACH instrument - no MAX_WORKERS limit
+  let successfullyStarted = 0;
+  
+  // Start a worker for EACH instrument
   for (let i = 0; i < instruments.length; i++) {
     const instrument = instruments[i];
-    startWorkerForInstrument(instrument, i, i);
+    const worker = startWorkerForInstrument(instrument, i, i);
+    if (worker) {
+      successfullyStarted++;
+    }
+    
+    // Small delay between starting workers to avoid overwhelming the system
+    if (i < instruments.length - 1) {
+      setTimeout(() => {}, 100);
+    }
   }
+  
+  console.log(`Successfully started ${successfullyStarted}/${instruments.length} workers initially`);
 }
 
 // Start all workers
 startAllWorkers();
 
-// Log status periodically
+// Log status and ensure all workers are running periodically
 setInterval(() => {
   
-  // Check if any workers have died and aren't in the pool anymore
+  // Check which workers are missing
+  const missingInstruments = [];
   for (const instrument of instruments) {
     if (!workerPool.has(instrument)) {
-      console.log(`Missing worker for ${instrument}, restarting...`);
+      missingInstruments.push(instrument);
+    }
+  }
+  
+  // Report missing workers
+  if (missingInstruments.length > 0) {
+    console.log(`Missing workers for ${missingInstruments.length} instruments: ${missingInstruments.join(', ')}`);
+    
+    // Restart missing workers
+    for (const instrument of missingInstruments) {
+      console.log(`Restarting missing worker for ${instrument}`);
       // Get a pseudo-random index for account/proxy rotation
       const randomIndex = Math.floor(Date.now() / 1000) % accounts.length;
       startWorkerForInstrument(instrument, randomIndex, randomIndex);
     }
   }
-}, 60000); // Check every minute
+}, 30000); // Check every 30 seconds (was 1000ms before)
 
 // Handle cleanup when script exits
 process.on('SIGINT', () => {

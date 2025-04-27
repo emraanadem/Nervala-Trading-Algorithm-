@@ -47,7 +47,79 @@
       "riskReward": "1:2",
       "status": "loss",
       "timestamp": "2025-03-29T08:17:10.722Z"
+    },
+    {
+      "pair": "AUD_JPY",
+      "timeframe": "",
+      "direction": "buy",
+      "entry": 90.82283949569546,
+      "takeProfit": 91.543866,
+      "stopLoss": 90.46232624354319,
+      "riskReward": "2.00",
+      "status": "open",
+      "timestamp": "2025-04-22T22:03:38.514Z",
+      "id": 1745359419188
+    },
+    {
+      "pair": "AUD_JPY",
+      "timeframe": "",
+      "direction": "buy",
+      "entry": 90.82283949569546,
+      "takeProfit": 91.543866,
+      "stopLoss": 90.46232624354319,
+      "riskReward": "2.00",
+      "status": "open",
+      "timestamp": "2025-04-22T22:08:37.141Z",
+      "id": 1745359717655
+    },
+    {
+      "pair": "AUD_JPY",
+      "timeframe": "",
+      "direction": "buy",
+      "entry": 90.81899525842987,
+      "takeProfit": 91.54501199999999,
+      "stopLoss": 90.4559868876448,
+      "riskReward": "2.00",
+      "status": "open",
+      "timestamp": "2025-04-22T22:18:11.579Z",
+      "id": 1745360291871
+    },
+    {
+      "id": "algo_1745362072553",
+      "pair": "AUD_USD",
+      "direction": "sell",
+      "entryPrice": "0.63186",
+      "stopLoss": 0.6390957825999999,
+      "takeProfit": 0.6246318214285713,
+      "timeframe": "",
+      "status": "open",
+      "timestamp": "2025-04-22T22:47:52.553Z",
+      "strategy": "FourHour"
+    },
+    {
+      "id": "algo_1745362341626",
+      "pair": "AUD_USD",
+      "direction": "sell",
+      "entryPrice": "0.63189",
+      "stopLoss": 0.6391557825999999,
+      "takeProfit": 0.6246318214285713,
+      "timeframe": "",
+      "status": "open",
+      "timestamp": "2025-04-22T22:52:21.626Z",
+      "strategy": "FourHour"
+    },
+    {
+      "id": "algo_1745362653516",
+      "pair": "AUD_USD",
+      "direction": "sell",
+      "entryPrice": "0.63186",
+      "stopLoss": 0.6390857825999999,
+      "takeProfit": 0.6246318214285713,
+      "timeframe": "",
+      "status": "open",
+      "timestamp": "2025-04-22T22:57:33.516Z",
+      "strategy": "FourHour"
     }
   ],
-  "lastUpdated": "2025-03-29T10:17:10.724Z"
+  "lastUpdated": "2025-04-22T22:57:33.518Z"
 }

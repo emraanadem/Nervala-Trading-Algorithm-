@@ -21,7 +21,6 @@ const findCommonFilesDir = () => {
     return macMT5Path;
   }
   
-  console.warn('MetaTrader 5 Files directory not found at default location. Using current directory.');
   return '.';
 };
 
@@ -47,7 +46,6 @@ class MetaTraderConnector {
             this.connected = true;
             // Start polling for responses
             this.startPolling();
-            console.log('Connected to MT5 (file-based communication)');
             resolve(true);
           } else {
             reject(new Error('MT5 did not respond to ping'));
@@ -97,13 +95,12 @@ class MetaTraderConnector {
           lines.forEach(line => {
             if (line.trim() !== '') {
               this.lastResponse = line.trim();
-              console.log(`Received from MT5: ${this.lastResponse}`);
             }
           });
         }
       }
     } catch (error) {
-      console.error('Error checking responses:', error);
+      console.error(`Error checking for MT5 responses: ${error.message}`);
     }
   }
   
@@ -114,6 +111,7 @@ class MetaTraderConnector {
         fs.writeFileSync(this.commandsFile, command + '\n');
         resolve(true);
       } catch (error) {
+        console.error(`Error writing command to file: ${error.message}`);
         reject(error);
       }
     });
@@ -127,7 +125,6 @@ class MetaTraderConnector {
         return;
       }
       
-      console.log(`Sending to MT5: ${command}`);
       
       // Store current response for comparison
       const currentResponse = this.lastResponse;
@@ -213,7 +210,6 @@ class MetaTraderConnector {
   disconnect() {
     this.stopPolling();
     this.connected = false;
-    console.log('Disconnected from MT5');
   }
 }
 
@@ -223,6 +219,8 @@ const connector = new MetaTraderConnector();
 // Convert to regular async functions
 async function sendSignal(action, symbol, sl, tp, volume, reason, timeframe = "") {
   try {
+    console.log(`[SIGNAL] Received ${action} signal for ${symbol} on ${timeframe} timeframe`);
+    
     const mtConnector = new MetaTraderConnector();
     
     // Map the timeframe format used in the algorithm to the web app format
@@ -245,181 +243,127 @@ async function sendSignal(action, symbol, sl, tp, volume, reason, timeframe = ""
     const normalizedTimeframe = timeframeMap[timeframe] || timeframe;
     
     try {
+      console.log(`[SIGNAL] Attempting to connect to MT5 for ${symbol}`);
       await mtConnector.connect();
+      console.log(`[SIGNAL] Connected to MT5 for ${symbol}`);
     } catch (connectionError) {
-      console.warn(`MetaTrader connection failed: ${connectionError.message}`);
-      console.warn(`Trading signal ${action} for ${symbol} will be logged but not sent to MetaTrader.`);
+      console.error(`[SIGNAL] Failed to connect to MT5: ${connectionError.message}`);
       
       // Log the trading signal that would have been sent
-      console.log(`WOULD SEND: ${action} | ${symbol} | SL:${sl} | TP:${tp} | Volume:${volume} | ${reason || ''}`);
+      console.log(`[SIGNAL] Would have sent ${action} for ${symbol} (SL: ${sl}, TP: ${tp})`);
       
       // Store the trade in our trade store when it's a new trade
       if (action === 'BUY' || action === 'SELL') {
         // In the test functions, symbol is the instrument name and price is passed separately
         // When we get to this function, price isn't available, so we'll use the midpoint between SL and TP
-        // This is just an approximation for storage purposes
-        const slPrice = parseFloat(sl);
-        const tpPrice = parseFloat(tp);
-        
-        // Estimate the entry price based on the stop loss and take profit
-        // This is a reasonable approximation when the actual price isn't available
-        let entryPrice;
-        if (action === 'BUY') {
-          // For a buy, entry would be closer to the stop loss (below entry)
-          entryPrice = slPrice + (tpPrice - slPrice) / 3;
-        } else { // SELL
-          // For a sell, entry would be closer to the stop loss (above entry)
-          entryPrice = slPrice - (slPrice - tpPrice) / 3;
-        }
-        
-        // Calculate risk-reward ratio
-        let riskPips, rewardPips;
-        if (action === 'BUY') {
-          riskPips = Math.abs(entryPrice - slPrice);
-          rewardPips = Math.abs(tpPrice - entryPrice);
-        } else { // SELL
-          riskPips = Math.abs(slPrice - entryPrice);
-          rewardPips = Math.abs(entryPrice - tpPrice);
-        }
-        const riskReward = (rewardPips / riskPips).toFixed(2);
-        
-        // Create and store the trade
-        const trade = {
-          pair: symbol,
-          timeframe: normalizedTimeframe,
-          direction: action.toLowerCase(),
-          entry: entryPrice,
-          takeProfit: tpPrice,
-          stopLoss: slPrice,
-          riskReward: riskReward,
-          status: 'open',
-          timestamp: new Date().toISOString()
-        };
-        
-        // Add to store
-        addTrade(trade);
-        console.log(`Stored new ${action} trade for ${symbol} in timeframe ${normalizedTimeframe}`);
-      }
-      // Update existing trade when it's closed
-      else if (action === 'CLOSE_BUY' || action === 'CLOSE_SELL') {
-        // Assuming 'reason' contains the trade ID here
-        if (reason) {
-          updateTrade(reason, {
-            status: 'closed',
-            closeTime: new Date().toISOString()
-          });
-          console.log(`Updated trade ${reason} status to closed`);
+        try {
+          // Calculate an estimated entry price
+          const slNum = parseFloat(sl);
+          const tpNum = parseFloat(tp);
+          const direction = action === 'BUY' ? 1 : -1;
+          const entryPrice = action === 'BUY' ? 
+            slNum + ((tpNum - slNum) / 2) : 
+            slNum - ((slNum - tpNum) / 2);
+          
+          const trade = {
+            id: `algo_${Date.now()}`,
+            pair: symbol,
+            direction: action === 'BUY' ? 'buy' : 'sell',
+            entryPrice: entryPrice.toFixed(5),
+            stopLoss: sl,
+            takeProfit: tp,
+            timeframe: normalizedTimeframe,
+            status: 'open',
+            timestamp: new Date().toISOString(),
+            strategy: reason
+          };
+          
+          console.log(`[SIGNAL] Adding simulated trade: ${JSON.stringify(trade)}`);
+          // If addTrade function exists, use it
+          if (typeof addTrade === 'function') {
+            addTrade(trade);
+          } else {
+            console.error('[SIGNAL] addTrade function not available');
+          }
+        } catch (storeError) {
+          console.error(`[SIGNAL] Error storing trade: ${storeError.message}`);
         }
       }
       
-      // Return a fake success response to allow the trading strategy to continue
-      return "SIMULATED_RESPONSE";
+      return null;
     }
     
-    let result;
-    if (action === 'BUY') {
-      result = await mtConnector.buy(symbol, volume, sl, tp);
+    let result = null;
+    
+    // Send the action to MetaTrader
+    try {
+      console.log(`[SIGNAL] Sending ${action} command to MT5 for ${symbol}`);
       
-      // Same logic as above to estimate entry price
-      const slPrice = parseFloat(sl);
-      const tpPrice = parseFloat(tp);
-      const entryPrice = slPrice + (tpPrice - slPrice) / 3;
-      
-      // Store trade in our store
-      addTrade({
-        pair: symbol,
-        timeframe: normalizedTimeframe,
-        direction: 'buy',
-        entry: entryPrice,
-        takeProfit: tpPrice,
-        stopLoss: slPrice,
-        riskReward: ((tpPrice - entryPrice) / (entryPrice - slPrice)).toFixed(2),
-        status: 'open',
-        timestamp: new Date().toISOString()
-      });
-    } 
-    else if (action === 'SELL') {
-      result = await mtConnector.sell(symbol, volume, sl, tp);
-      
-      // Same logic as above to estimate entry price
-      const slPrice = parseFloat(sl);
-      const tpPrice = parseFloat(tp);
-      const entryPrice = slPrice - (slPrice - tpPrice) / 3;
-      
-      // Store trade in our store
-      addTrade({
-        pair: symbol,
-        timeframe: normalizedTimeframe,
-        direction: 'sell',
-        entry: entryPrice,
-        takeProfit: tpPrice,
-        stopLoss: slPrice,
-        riskReward: ((entryPrice - tpPrice) / (slPrice - entryPrice)).toFixed(2),
-        status: 'open',
-        timestamp: new Date().toISOString()
-      });
-    } 
-    else if (action === 'CLOSE_BUY' || action === 'CLOSE_SELL') {
-      result = await mtConnector.closePosition(reason); // Using reason as ticket ID
-      
-      // Update trade status in our store
-      if (reason) {
-        updateTrade(reason, {
-          status: 'closed',
-          closeTime: new Date().toISOString()
-        });
+      if (action === 'BUY') {
+        result = await mtConnector.buy(symbol, volume || 0.01, sl, tp);
+      } else if (action === 'SELL') {
+        result = await mtConnector.sell(symbol, volume || 0.01, sl, tp);
+      } else if (action === 'CLOSE') {
+        result = await mtConnector.closePosition(symbol); // In this case, symbol is the ticket
       }
-    } 
-    else if (action === 'MODIFY') {
-      result = await mtConnector.modifyPosition(reason, sl, tp); // Using reason as ticket ID
       
-      // Update trade data in our store
-      if (reason) {
-        updateTrade(reason, {
-          stopLoss: parseFloat(sl),
-          takeProfit: parseFloat(tp)
-        });
+      console.log(`[SIGNAL] MT5 response: ${result}`);
+      
+      // If we get a ticket back, store the trade
+      if (result && result.startsWith('TICKET|')) {
+        const ticket = result.split('|')[1];
+        console.log(`[SIGNAL] Trade executed with ticket: ${ticket}`);
+        
+        // Store in our trade database
+        if (action === 'BUY' || action === 'SELL') {
+          const trade = {
+            id: ticket,
+            pair: symbol,
+            direction: action === 'BUY' ? 'buy' : 'sell',
+            entryPrice: 'MT5', // MT5 will handle the actual execution price
+            stopLoss: sl,
+            takeProfit: tp,
+            timeframe: normalizedTimeframe,
+            status: 'open',
+            timestamp: new Date().toISOString(),
+            strategy: reason
+          };
+          
+          // If addTrade function exists, use it
+          if (typeof addTrade === 'function') {
+            addTrade(trade);
+          } else {
+            console.error('[SIGNAL] addTrade function not available');
+          }
+        }
       }
+    } catch (actionError) {
+      console.error(`[SIGNAL] Error sending ${action} command to MT5: ${actionError.message}`);
+    } finally {
+      // Always disconnect
+      mtConnector.disconnect();
     }
     
-    mtConnector.disconnect();
     return result;
   } catch (error) {
-    console.error('Error sending signal to MT5:', error);
-    // Don't throw, just log and return fake success to prevent crashing the strategy
-    return "ERROR_HANDLED";
+    console.error(`[SIGNAL] Error in sendSignal: ${error.message}`);
+    return null;
   }
 }
 
 async function testConnection() {
   try {
-    console.log('Testing MT5 connection...');
     const mtConnector = new MetaTraderConnector();
-    
     await mtConnector.connect();
-    
-    // Test ping
-    const pingResponse = await mtConnector.ping();
-    console.log('Ping response:', pingResponse);
-    
-    // Get account info
-    try {
-      const accountInfo = await mtConnector.getAccountInfo();
-      console.log('Account info:', accountInfo);
-    } catch (error) {
-      console.log('Failed to get account info:', error.message);
-    }
-    
-    // Disconnect
+    const result = await mtConnector.ping();
     mtConnector.disconnect();
-    return true;
+    return result === 'PONG';
   } catch (error) {
-    console.error('Test error:', error);
+    console.error('MT5 connection test failed:', error);
     return false;
   }
 }
 
-// Export everything at the end
 module.exports = {
   sendSignal,
   testConnection,

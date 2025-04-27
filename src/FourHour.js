@@ -2131,6 +2131,103 @@ class Daily_Functions {
     return biggersupres
   }
 
+    /** Pip difference calculator */
+    static pipdiffy (price, num1) {
+      if (String(price).indexOf('.') == 2) {
+        Daily_Functions.multiplier = 1000
+      } else if (String(price).indexOf('.') == 3) {
+        Daily_Functions.multiplier = 100
+      } else if (String(price).indexOf('.') == 4) {
+        Daily_Functions.multiplier = 10
+      } else if (String(price).indexOf('.') == 5) {
+        Daily_Functions.multiplier = 1
+      } else if (String(price).indexOf('.') == 5) {
+        Daily_Functions.multiplier = 0.1
+      } else if (String(price).indexOf('.') == 6) {
+        Daily_Functions.multiplier = 0.01
+      } else if (String(price).indexOf('.') == 7) {
+        Daily_Functions.multiplier = 0.001
+      } else if (String(price).indexOf('.') == 8) {
+        Daily_Functions.multiplier = 0.0001
+      } else if (String(price).indexOf('.') == 9) {
+        Daily_Functions.multiplier = 0.00001
+      } else if (String(price).indexOf('.') == 10) {
+        Daily_Functions.multiplier = 0.000001
+      } else {
+        Daily_Functions.multiplier = 10000
+      }
+      return num1 * Daily_Functions.multiplier
+    }
+
+  static stoploss () {
+    const highs = Daily_Functions.highs
+    const lows = Daily_Functions.lows
+    const diff = []
+    let totaldiff = 0
+    let finaldiff = 0
+    for (let variables = 0; variables < 30; variables++) {
+      diff.push(Math.abs(highs[highs.length - 1 - variables] - lows[lows.length - 1 - variables]))
+    }
+    for (let variables = 0; variables < diff.length; variables++) {
+      totaldiff += diff[variables]
+    }
+    if (Daily_Functions.volatility() > 0.618) {
+      finaldiff = (totaldiff / 30) * 1.382
+    } else {
+      finaldiff = (totaldiff / 30)
+    }
+    let slceil = 0
+    let slfloor = 0
+    let numbuy = 0
+    let newsl = 0
+    if (Four_Hour_Nexus.pot_buy) {
+      const diffprice = Daily_Functions.price - finaldiff
+      if (!Number.isFinite(Daily_Functions.closesttwo(diffprice)[0])) {
+        slfloor = Daily_Functions.price - (finaldiff * 3.618)
+        newsl = slfloor
+      } else {
+        numbuy = Daily_Functions.closesttwo(diffprice)[0]
+        if (!Number.isFinite(Daily_Functions.closesttwo(numbuy)[0])) {
+          newsl = diffprice - (0.786 * (diffprice - numbuy))
+        } else {
+          slfloor = (Daily_Functions.price - ((Daily_Functions.price - Daily_Functions.closesttwo(numbuy)[0]) * 1.618 * 0.786))
+          newsl = slfloor
+        }
+      }
+      Four_Hour_Nexus.sl = newsl
+    } if (Four_Hour_Nexus.pot_sell) {
+      const diffprice = finaldiff + Daily_Functions.price
+      if (!Number.isFinite(Daily_Functions.closesttwo(diffprice)[1])) {
+        slceil = Daily_Functions.price + (finaldiff * 3.618)
+        newsl = slceil
+      } else {
+        numbuy = Daily_Functions.closesttwo(diffprice)[1]
+        if (!Number.isFinite(Daily_Functions.closesttwo(numbuy)[1])) {
+          newsl = diffprice + (0.786 * (numbuy - diffprice))
+        } else {
+          slceil = (Daily_Functions.price + ((Math.abs(Daily_Functions.price - Daily_Functions.closesttwo(numbuy)[1])) * 1.618 * 0.786))
+          newsl = slceil
+        }
+      }
+      Four_Hour_Nexus.sl = newsl
+    }
+    return finaldiff
+  }
+
+  /** volatility, meant to determine whether or not price movement is too volatile for current parameters */
+  static volatility () {
+    const history = Daily_Functions.priceHist
+    const r = rsis.calculate({ period: 14, values: history })
+    const q = r[r.length - 1]
+    let diff = 0
+    if (q > 50) { diff = q - 0 } else if (q <= 50) { diff = 100 - q }
+    const difference = diff / 100
+    const equation = ((Math.abs((100) * Math.sin(difference)))) / (Math.abs(100 * Math.sin(1.05)))
+    return equation
+  }
+
+  
+
   /* Add Key Part That the Levels Must Repeat 3x */
   static supreslevs () {
     // Get price history data
@@ -2268,6 +2365,33 @@ class Daily_Functions {
     Daily_Functions.finlevs = finalLevs
   }
 
+   /** pip converter */
+   static pipreverse (num, num2) {
+    if (String(num).indexOf('.') == 2) {
+      Daily_Functions.multiplier = 0.001
+    } else if (String(num).indexOf('.') == 3) {
+      Daily_Functions.multiplier = 0.01
+    } else if (String(num).indexOf('.') == 4) {
+      Daily_Functions.multiplier = 0.1
+    } else if (String(num).indexOf('.') == 5) {
+      Daily_Functions.multiplier = 1
+    } else if (String(num).indexOf('.') == 5) {
+      Daily_Functions.multiplier = 10
+    } else if (String(num).indexOf('.') == 6) {
+      Daily_Functions.multiplier = 100
+    } else if (String(num).indexOf('.') == 7) {
+      Daily_Functions.multiplier = 1000
+    } else if (String(num).indexOf('.') == 8) {
+      Daily_Functions.multiplier = 10000
+    } else if (String(num).indexOf('.') == 9) {
+      Daily_Functions.multiplier = 100000
+    } else if (String(num).indexOf('.') == 10) {
+      Daily_Functions.multiplier = 1000000
+    } else { Daily_Functions.multiplier = 0.0001 }
+    num2 *= Daily_Functions.multiplier
+    return (num2)
+  }
+
   static pip (num1, num2) {
     if (String(num1).indexOf('.') == 2) {
       Daily_Functions.multiplier = 1000
@@ -2400,6 +2524,101 @@ class Weekly_Functions {
     const biggersupres = Weekly_Functions.supreslevs()
     return biggersupres
   }
+
+    /** Pip difference calculator */
+    static pipdiffy (price, num1) {
+      if (String(price).indexOf('.') == 2) {
+        Weekly_Functions.multiplier = 1000
+      } else if (String(price).indexOf('.') == 3) {
+        Weekly_Functions.multiplier = 100
+      } else if (String(price).indexOf('.') == 4) {
+        Weekly_Functions.multiplier = 10
+      } else if (String(price).indexOf('.') == 5) {
+        Weekly_Functions.multiplier = 1
+      } else if (String(price).indexOf('.') == 5) {
+        Weekly_Functions.multiplier = 0.1
+      } else if (String(price).indexOf('.') == 6) {
+        Weekly_Functions.multiplier = 0.01
+      } else if (String(price).indexOf('.') == 7) {
+        Weekly_Functions.multiplier = 0.001
+      } else if (String(price).indexOf('.') == 8) {
+        Weekly_Functions.multiplier = 0.0001
+      } else if (String(price).indexOf('.') == 9) {
+        Weekly_Functions.multiplier = 0.00001
+      } else if (String(price).indexOf('.') == 10) {
+        Weekly_Functions.multiplier = 0.000001
+      } else {
+        Weekly_Functions.multiplier = 10000
+      }
+      return num1 * Weekly_Functions.multiplier
+    }
+
+  static stoploss () {
+    const highs = Weekly_Functions.highs
+    const lows = Weekly_Functions.lows
+    const diff = []
+    let totaldiff = 0
+    let finaldiff = 0
+    for (let variables = 0; variables < 30; variables++) {
+      diff.push(Math.abs(highs[highs.length - 1 - variables] - lows[lows.length - 1 - variables]))
+    }
+    for (let variables = 0; variables < diff.length; variables++) {
+      totaldiff += diff[variables]
+    }
+    if (Weekly_Functions.volatility() > 0.618) {
+      finaldiff = (totaldiff / 30) * 1.382
+    } else {
+      finaldiff = (totaldiff / 30)
+    }
+    let slceil = 0
+    let slfloor = 0
+    let numbuy = 0
+    let newsl = 0
+    if (Four_Hour_Nexus.pot_buy) {
+      const diffprice = Weekly_Functions.price - finaldiff
+      if (!Number.isFinite(Weekly_Functions.closesttwo(diffprice)[0])) {
+        slfloor = Weekly_Functions.price - (finaldiff * 3.618)
+        newsl = slfloor
+      } else {
+        numbuy = Weekly_Functions.closesttwo(diffprice)[0]
+        if (!Number.isFinite(Weekly_Functions.closesttwo(numbuy)[0])) {
+          newsl = diffprice - (0.786 * (diffprice - numbuy))
+        } else {
+          slfloor = (Weekly_Functions.price - ((Weekly_Functions.price - Weekly_Functions.closesttwo(numbuy)[0]) * 1.618 * 0.786))
+          newsl = slfloor
+        }
+      }
+      Four_Hour_Nexus.sl = newsl
+    } if (Four_Hour_Nexus.pot_sell) {
+      const diffprice = finaldiff + Weekly_Functions.price
+      if (!Number.isFinite(Weekly_Functions.closesttwo(diffprice)[1])) {
+        slceil = Weekly_Functions.price + (finaldiff * 3.618)
+        newsl = slceil
+      } else {
+        numbuy = Weekly_Functions.closesttwo(diffprice)[1]
+        if (!Number.isFinite(Weekly_Functions.closesttwo(numbuy)[1])) {
+          newsl = diffprice + (0.786 * (numbuy - diffprice))
+        } else {
+          slceil = (Weekly_Functions.price + ((Math.abs(Weekly_Functions.price - Weekly_Functions.closesttwo(numbuy)[1])) * 1.618 * 0.786))
+          newsl = slceil
+        }
+      }
+      Four_Hour_Nexus.sl = newsl
+    }
+    return finaldiff
+  }
+
+    /** volatility, meant to determine whether or not price movement is too volatile for current parameters */
+    static volatility () {
+      const history = Weekly_Functions.priceHist
+      const r = rsis.calculate({ period: 14, values: history })
+      const q = r[r.length - 1]
+      let diff = 0
+      if (q > 50) { diff = q - 0 } else if (q <= 50) { diff = 100 - q }
+      const difference = diff / 100
+      const equation = ((Math.abs((100) * Math.sin(difference)))) / (Math.abs(100 * Math.sin(1.05)))
+      return equation
+    }
 
   /* Add Key Part That the Levels Must Repeat 3x */
   static supreslevs () {
@@ -2536,6 +2755,33 @@ class Weekly_Functions {
     Weekly_Functions.support = support
     Weekly_Functions.resistance = resistance
     Weekly_Functions.finlevs = finalLevs
+  }
+
+   /** pip converter */
+   static pipreverse (num, num2) {
+    if (String(num).indexOf('.') == 2) {
+      Weekly_Functions.multiplier = 0.001
+    } else if (String(num).indexOf('.') == 3) {
+      Weekly_Functions.multiplier = 0.01
+    } else if (String(num).indexOf('.') == 4) {
+      Weekly_Functions.multiplier = 0.1
+    } else if (String(num).indexOf('.') == 5) {
+      Weekly_Functions.multiplier = 1
+    } else if (String(num).indexOf('.') == 5) {
+      Weekly_Functions.multiplier = 10
+    } else if (String(num).indexOf('.') == 6) {
+      Weekly_Functions.multiplier = 100
+    } else if (String(num).indexOf('.') == 7) {
+      Weekly_Functions.multiplier = 1000
+    } else if (String(num).indexOf('.') == 8) {
+      Weekly_Functions.multiplier = 10000
+    } else if (String(num).indexOf('.') == 9) {
+      Weekly_Functions.multiplier = 100000
+    } else if (String(num).indexOf('.') == 10) {
+      Weekly_Functions.multiplier = 1000000
+    } else { Weekly_Functions.multiplier = 0.0001 }
+    num2 *= Weekly_Functions.multiplier
+    return (num2)
   }
 
   static pip (num1, num2) {

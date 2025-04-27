@@ -649,172 +649,148 @@ class Two_Hour_Functions {
   }
 
   /** second consolidation method, meant to strengthen consolidation identification */
-  static consolidationtwo () {
-    const history = Two_Hour_Functions.priceHist
-    const highs = Two_Hour_Functions.highs
-    const lows = Two_Hour_Functions.lows
-    
-    // Need minimum 24 periods (2 days) of data
-    if (history.length < 24) return false
-    
-    // Get recent data - use last 24 candles (2 days for 2-hour timeframe)
-    const recentCandles = {
-      closes: history.slice(-24),
-      highs: highs.slice(-24),
-      lows: lows.slice(-24)
-    }
-    
-    // Calculate key price statistics
-    const highest = Math.max(...recentCandles.highs)
-    const lowest = Math.min(...recentCandles.lows)
-    const avgPrice = recentCandles.closes.reduce((sum, price) => sum + price, 0) / recentCandles.closes.length
-    
-    // Calculate range as percentage of average price
-    const rangePercent = ((highest - lowest) / avgPrice) * 100
-    
-    // Calculate volatility metrics
-    const closeStdDev = Two_Hour_Functions.calculateStdDev(recentCandles.closes)
-    const stdDevPercent = (closeStdDev / avgPrice) * 100
-    
-    // Calculate linear regression to detect trend
-    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0
-    for (let i = 0; i < recentCandles.closes.length; i++) {
-      sumX += i
-      sumY += recentCandles.closes[i]
-      sumXY += i * recentCandles.closes[i]
-      sumX2 += i * i
-    }
-    const n = recentCandles.closes.length
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX)
-    const normalizedSlope = (slope / avgPrice) * 100
-    
-    // Analyze consecutive moves in the same direction
-    let maxConsecutiveUp = 0
-    let maxConsecutiveDown = 0
-    let currentConsecutiveUp = 0
-    let currentConsecutiveDown = 0
-    
-    for (let i = 1; i < recentCandles.closes.length; i++) {
-      if (recentCandles.closes[i] > recentCandles.closes[i-1]) {
-        currentConsecutiveUp++
-        currentConsecutiveDown = 0
-        if (currentConsecutiveUp > maxConsecutiveUp) {
-          maxConsecutiveUp = currentConsecutiveUp
-        }
-      } else if (recentCandles.closes[i] < recentCandles.closes[i-1]) {
-        currentConsecutiveDown++
-        currentConsecutiveUp = 0
-        if (currentConsecutiveDown > maxConsecutiveDown) {
-          maxConsecutiveDown = currentConsecutiveDown
-        }
-      }
-    }
-    
-    // Calculate price changes
-    const changes = []
-    for (let i = 1; i < recentCandles.closes.length; i++) {
-      const change = Math.abs(recentCandles.closes[i] - recentCandles.closes[i-1])
-      changes.push((change / recentCandles.closes[i-1]) * 100)
-    }
-    
-    const avgChange = changes.reduce((sum, change) => sum + change, 0) / changes.length
-    const maxChange = Math.max(...changes)
-    
-    // Count direction changes (reversals)
-    let upCandles = 0
-    let downCandles = 0
-    let directionChanges = 0
-    let prevDirection = null
-    
-    for (let i = 1; i < recentCandles.closes.length; i++) {
-      const currentDirection = recentCandles.closes[i] > recentCandles.closes[i-1] ? 'up' : 
-                              recentCandles.closes[i] < recentCandles.closes[i-1] ? 'down' : 'same'
-      
-      if (currentDirection === 'up') upCandles++
-      if (currentDirection === 'down') downCandles++
-      
-      if (prevDirection && currentDirection !== prevDirection && currentDirection !== 'same') {
-        directionChanges++
-      }
-      
-      if (currentDirection !== 'same') {
-        prevDirection = currentDirection
-      }
-    }
-    
-    // Calculate how often price tests the boundaries
-    let bounceCount = 0
-    const highBoundary = highest - (highest - lowest) * 0.2
-    const lowBoundary = lowest + (highest - lowest) * 0.2
-    
-    for (let i = 0; i < recentCandles.highs.length; i++) {
-      if (recentCandles.highs[i] >= highBoundary) {
-        bounceCount++
-      }
-      if (recentCandles.lows[i] <= lowBoundary) {
-        bounceCount++
-      }
-    }
-    
-    // Get instrument-specific info
-    const pair = Two_Hour_Nexus.pair || ''
-    const isVolatileInstrument = pair.includes('JPY') || pair.includes('GBP') || 
-                               pair.includes('XAU') || pair.includes('XAG')
-    
-    // BALANCED PARAMETERS FOR TWO-HOUR TIMEFRAME
-    
-    // 1. Range check - careful calibration for 2-hour candles
-    // Typical 2-hour consolidation is 0.4-1.2% for majors, higher for volatile pairs
-    const rangeCheck = isVolatileInstrument ? 
-                     (rangePercent >= 0.5 && rangePercent <= 1.8) :
-                     (rangePercent >= 0.35 && rangePercent <= 1.1)
-    
-    // 2. Volatility check - standard deviation relative to range
-    const volatilityCheck = isVolatileInstrument ?
-                          (stdDevPercent <= 0.65) :
-                          (stdDevPercent <= 0.45)
-    
-    // 3. Trend check - looks for relatively flat slope
-    const trendCheck = Math.abs(normalizedSlope) <= 0.06
-    
-    // 4. Max consecutive moves - shorter runs indicate choppy consolidation
-    const consecutiveMoveCheck = maxConsecutiveUp <= 5 && maxConsecutiveDown <= 5
-    
-    // 5. Price change variation - consolidation has more moderate changes
-    const changeCheck = isVolatileInstrument ?
-                      (avgChange >= 0.12 && avgChange <= 0.5) :
-                      (avgChange >= 0.08 && avgChange <= 0.3)
-    
-    // 6. Direction changes - consolidation shows frequent reversals
-    const directionChangeCheck = directionChanges >= 6
-    
-    // 7. Boundary tests - consolidation tends to test and respect boundaries
-    const boundaryCheck = bounceCount >= 5 && bounceCount <= 14
-    
-    // 8. Up/down candle balance - consolidation is more balanced
-    const candelBalanceCheck = Math.abs(upCandles - downCandles) <= 8
-    
-    // Count how many conditions are met
-    const conditions = [
-      rangeCheck,
-      volatilityCheck,
-      trendCheck,
-      consecutiveMoveCheck,
-      changeCheck,
-      directionChangeCheck,
-      boundaryCheck,
-      candelBalanceCheck
-    ]
-    
-    const conditionsMet = conditions.filter(Boolean).length
-    
-    // Balanced threshold that creates natural variation
-    // Requiring ~60% of conditions to be met gives good balance
-    const threshold = isVolatileInstrument ? 5 : 4
-    
-    // Return result based on market conditions
-    return conditionsMet >= threshold
+ static consolidationtwo () {
+  const history = Two_Hour_Functions.priceHist
+  const highs = Two_Hour_Functions.highs 
+  const lows = Two_Hour_Functions.lows 
+  const histmax = Math.max(...highs)
+  const histmin = Math.min(...lows)
+  const histdiff = histmax - histmin
+  
+  // Ensure we have enough data
+  const minDataPoints = 20
+  if (history.length < minDataPoints) {
+    return true; // Default to consolidation if not enough data to determine
   }
+  
+  // Normalize all arrays to same length (use most recent data)
+  const lookbackPeriod = Math.min(50, history.length)
+  const recentHistory = history.slice(-lookbackPeriod)
+  const recentHighs = highs.slice(-lookbackPeriod)
+  const recentLows = lows.slice(-lookbackPeriod)
+  const recentClose = history.slice(-lookbackPeriod)
+  
+  // APPROACH 1: Bollinger Bands width analysis
+  const bollingerBands = bolls.calculate({ 
+    period: 20, 
+    values: recentHistory, 
+    stdDev: 2
+  })
+  
+  // Calculate normalized Bollinger Band width
+  const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
+  const recentBandWidths = bandWidths.slice(-5)
+  const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
+  
+  // Narrowing bands indicate consolidation
+  const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+  const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+  
+  // APPROACH 2: True Range (volatility) analysis
+  const trValues = tr.calculate({ 
+    high: recentHighs, 
+    low: recentLows, 
+    close: recentClose, 
+    period: 14 
+  })
+  
+  // Calculate average true range relative to price
+  const recentTR = trValues.slice(-5)
+  const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
+  const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+  
+  // Decreasing TR indicates consolidation
+  const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
+  const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+  
+  // APPROACH 3: Price channel/range analysis
+  const priceRange = histmax - histmin
+  const priceRangePercent = priceRange / histmin
+  
+  // Calculate standard deviation of closing prices
+  const sum = recentHistory.reduce((a, b) => a + b, 0)
+  const mean = sum / recentHistory.length
+  const stdDev = Math.sqrt(
+    recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
+  )
+  const relativeStdDev = stdDev / mean
+  
+  // Narrow range indicates consolidation
+  const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
+  const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+  
+  // APPROACH 4: Linear regression slope and R-squared analysis
+  // Prepare x and y for regression
+  const x = Array.from({ length: recentHistory.length }, (_, i) => i)
+  const y = recentHistory
+  
+  // Calculate linear regression
+  const regResult = new regression.SimpleLinearRegression(x, y)
+  const slope = Math.abs(regResult.slope)
+  const r2 = regResult.rSquared
+  
+  // Flat slope and good fit indicate consolidation
+  const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
+  const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+  
+  // APPROACH 5: Check for higher highs/lower lows pattern
+  let hasDirectionalMovement = false
+  
+  // Check for consecutive higher highs or lower lows (trend indicators)
+  let consecutiveHigherHighs = 0
+  let consecutiveLowerLows = 0
+  const pattern_window = 5
+  
+  for (let i = 1; i < pattern_window; i++) {
+    if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
+      consecutiveHigherHighs++;
+    }
+    if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
+      consecutiveLowerLows++;
+    }
+  }
+  
+  // Strong directional pattern indicates trending, not consolidation
+  if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+    hasDirectionalMovement = true;
+  }
+  
+  // Combine all factors to decide if the market is consolidating
+  // Use a scoring system where more indicators agreeing increases confidence
+  
+  let consolidationScore = 0;
+  let totalFactors = 0;
+  
+  // Bollinger factors
+  if (bandWidthShrinking) consolidationScore++;
+  if (isTightBands) consolidationScore++;
+  totalFactors += 2;
+  
+  // TR factors
+  if (trTrend) consolidationScore++;
+  if (isLowVolatility) consolidationScore++;
+  totalFactors += 2;
+  
+  // Range factors
+  if (isNarrowRange) consolidationScore++;
+  if (isLowDeviation) consolidationScore++;
+  totalFactors += 2;
+  
+  // Regression factors
+  if (isFlatSlope) consolidationScore++;
+  if (isPoorFit) consolidationScore++;
+  totalFactors += 2;
+  
+  // Direction factor (negative score if directional)
+  if (!hasDirectionalMovement) consolidationScore++;
+  totalFactors += 1;
+  
+  // Calculate overall probability of consolidation
+  const consolidationProbability = consolidationScore / totalFactors;
+  
+  // Return true if consolidation probability is above 60%
+  return consolidationProbability >= 0.6;
+}
 
   /** TP variation, helps change TP depending on volatility and price movement depending on whether or not the code has surpassed TP1 and
      * is about to hit TP2
@@ -1907,130 +1883,145 @@ class Four_Hour_Functions {
   /** second consolidation method, meant to strengthen consolidation identification */
   static consolidationtwo () {
     const history = Four_Hour_Functions.priceHist
-    const highs = Four_Hour_Functions.highs
-    const lows = Four_Hour_Functions.lows
+    const highs = Four_Hour_Functions.highs 
+    const lows = Four_Hour_Functions.lows 
+    const histmax = Math.max(...highs)
+    const histmin = Math.min(...lows)
+    const histdiff = histmax - histmin
     
-    // Need minimum 24 periods (2 days) of data
-    if (history.length < 24) return false
-    
-    // Get recent data - use last 24 candles (2 days for 2-hour timeframe)
-    const recentCandles = {
-      closes: history.slice(-24),
-      highs: highs.slice(-24),
-      lows: lows.slice(-24)
+    // Ensure we have enough data
+    const minDataPoints = 20
+    if (history.length < minDataPoints) {
+      return true; // Default to consolidation if not enough data to determine
     }
     
-    // Calculate key price statistics
-    const highest = Math.max(...recentCandles.highs)
-    const lowest = Math.min(...recentCandles.lows)
-    const avgPrice = recentCandles.closes.reduce((sum, price) => sum + price, 0) / recentCandles.closes.length
+    // Normalize all arrays to same length (use most recent data)
+    const lookbackPeriod = Math.min(50, history.length)
+    const recentHistory = history.slice(-lookbackPeriod)
+    const recentHighs = highs.slice(-lookbackPeriod)
+    const recentLows = lows.slice(-lookbackPeriod)
+    const recentClose = history.slice(-lookbackPeriod)
     
-    // Calculate range as percentage of average price
-    const rangePercent = ((highest - lowest) / avgPrice) * 100
+    // APPROACH 1: Bollinger Bands width analysis
+    const bollingerBands = bolls.calculate({ 
+      period: 20, 
+      values: recentHistory, 
+      stdDev: 2
+    })
     
-    // Calculate volatility metrics
-    const closeStdDev = Four_Hour_Functions.calculateStdDev(recentCandles.closes)
-    const stdDevPercent = (closeStdDev / avgPrice) * 100
+    // Calculate normalized Bollinger Band width
+    const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
+    const recentBandWidths = bandWidths.slice(-5)
+    const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
     
-    // Analyze price movements - count direction changes
-    let upCandles = 0
-    let downCandles = 0
-    let sideCandles = 0
+    // Narrowing bands indicate consolidation
+    const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
     
-    for (let i = 1; i < recentCandles.closes.length; i++) {
-      const diff = recentCandles.closes[i] - recentCandles.closes[i-1]
-      if (diff > 0) {
-        upCandles++
-      } else if (diff < 0) {
-        downCandles++
-      } else {
-        sideCandles++
+    // APPROACH 2: True Range (volatility) analysis
+    const trValues = tr.calculate({ 
+      high: recentHighs, 
+      low: recentLows, 
+      close: recentClose, 
+      period: 14 
+    })
+    
+    // Calculate average true range relative to price
+    const recentTR = trValues.slice(-5)
+    const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
+    const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+    
+    // Decreasing TR indicates consolidation
+    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
+    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+    
+    // APPROACH 3: Price channel/range analysis
+    const priceRange = histmax - histmin
+    const priceRangePercent = priceRange / histmin
+    
+    // Calculate standard deviation of closing prices
+    const sum = recentHistory.reduce((a, b) => a + b, 0)
+    const mean = sum / recentHistory.length
+    const stdDev = Math.sqrt(
+      recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
+    )
+    const relativeStdDev = stdDev / mean
+    
+    // Narrow range indicates consolidation
+    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
+    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+    
+    // APPROACH 4: Linear regression slope and R-squared analysis
+    // Prepare x and y for regression
+    const x = Array.from({ length: recentHistory.length }, (_, i) => i)
+    const y = recentHistory
+    
+    // Calculate linear regression
+    const regResult = new regression.SimpleLinearRegression(x, y)
+    const slope = Math.abs(regResult.slope)
+    const r2 = regResult.rSquared
+    
+    // Flat slope and good fit indicate consolidation
+    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
+    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+    
+    // APPROACH 5: Check for higher highs/lower lows pattern
+    let hasDirectionalMovement = false
+    
+    // Check for consecutive higher highs or lower lows (trend indicators)
+    let consecutiveHigherHighs = 0
+    let consecutiveLowerLows = 0
+    const pattern_window = 5
+    
+    for (let i = 1; i < pattern_window; i++) {
+      if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
+        consecutiveHigherHighs++;
+      }
+      if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
+        consecutiveLowerLows++;
       }
     }
     
-    // Calculate price velocity and changes
-    const changes = []
-    for (let i = 1; i < recentCandles.closes.length; i++) {
-      const change = Math.abs(recentCandles.closes[i] - recentCandles.closes[i-1])
-      changes.push((change / recentCandles.closes[i-1]) * 100)
+    // Strong directional pattern indicates trending, not consolidation
+    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+      hasDirectionalMovement = true;
     }
     
-    // Calculate price momentum metrics
-    const avgChange = changes.reduce((sum, change) => sum + change, 0) / changes.length
-    const maxChange = Math.max(...changes)
+    // Combine all factors to decide if the market is consolidating
+    // Use a scoring system where more indicators agreeing increases confidence
     
-    // Use momentum to find trend strength - calculate directional strength
-    const dirStrength = Math.abs(upCandles - downCandles) / (upCandles + downCandles + 0.001) // Avoid division by zero
+    let consolidationScore = 0;
+    let totalFactors = 0;
     
-    // Look for choppiness using a counting method
-    let directionChanges = 0
-    let prevDirection = null
+    // Bollinger factors
+    if (bandWidthShrinking) consolidationScore++;
+    if (isTightBands) consolidationScore++;
+    totalFactors += 2;
     
-    for (let i = 1; i < recentCandles.closes.length; i++) {
-      const currentDirection = recentCandles.closes[i] > recentCandles.closes[i-1] ? 'up' : 
-                              recentCandles.closes[i] < recentCandles.closes[i-1] ? 'down' : 'side'
-                              
-      if (prevDirection && currentDirection !== prevDirection && currentDirection !== 'side') {
-        directionChanges++
-      }
-      
-      if (currentDirection !== 'side') {
-        prevDirection = currentDirection
-      }
-    }
+    // TR factors
+    if (trTrend) consolidationScore++;
+    if (isLowVolatility) consolidationScore++;
+    totalFactors += 2;
     
-    // Identify price clusters - periods where price stays within a tight range
-    const changeThreshold = avgChange * 0.6 // Increased from 0.5 to 0.6
-    let clusterCount = 0
+    // Range factors
+    if (isNarrowRange) consolidationScore++;
+    if (isLowDeviation) consolidationScore++;
+    totalFactors += 2;
     
-    for (let i = 0; i < changes.length; i++) {
-      if (changes[i] <= changeThreshold) {
-        clusterCount++
-      }
-    }
+    // Regression factors
+    if (isFlatSlope) consolidationScore++;
+    if (isPoorFit) consolidationScore++;
+    totalFactors += 2;
     
-    // Calculate normalized metrics - these will be universal across all instruments
-    const normalizedRange = rangePercent / Math.sqrt(24) // Scale by square root of candle count
-    const normalizedStdDev = stdDevPercent / Math.sqrt(24)
-    const normalizedDirStrength = dirStrength * 100
-    const normalizedDirectionChanges = (directionChanges / 23) * 100 // 23 is max possible changes in 24 candles
-    const normalizedClusterRatio = (clusterCount / changes.length) * 100
+    // Direction factor (negative score if directional)
+    if (!hasDirectionalMovement) consolidationScore++;
+    totalFactors += 1;
     
-    // CONSOLIDATION INDICATORS - adjusted for two-hour timeframe
+    // Calculate overall probability of consolidation
+    const consolidationProbability = consolidationScore / totalFactors;
     
-    // 1. Range should be appropriate for 2-hour timeframe (more liberal bounds)
-    const rangeAppropriate = normalizedRange >= 0.8 && normalizedRange <= 9.0 // Widened from 1.5-7.0
-    
-    // 2. Volatility should be controlled but allows for more movement
-    const volatilityControlled = normalizedStdDev <= 4.5 // Increased from 3.0
-    
-    // 3. Direction strength should be relatively balanced (not trending strongly)
-    const balancedDirection = normalizedDirStrength <= 45 // Increased from 35
-    
-    // 4. Should have sufficient direction changes (choppy price action)
-    const sufficientChanges = normalizedDirectionChanges >= 20 // Decreased from 30
-    
-    // 5. Should have price clustering (periods of low volatility)
-    const hasClustering = normalizedClusterRatio >= 15 // Decreased from 20
-    
-    // 6. No single large price moves (spikes) that dominate the range
-    const noLargeSpikes = maxChange <= (rangePercent * 0.65) // Increased from 0.5
-    
-    // Create boolean array of condition results
-    const consolidationSignals = [
-      rangeAppropriate,
-      volatilityControlled,
-      balancedDirection,
-      sufficientChanges,
-      hasClustering,
-      noLargeSpikes
-    ]
-    
-    // Count the total signals that indicate consolidation
-    const totalSignals = consolidationSignals.filter(Boolean).length
-    
-    // Reduced threshold to detect more consolidation patterns
-    return totalSignals >= 3 // Changed from 4 to 3
+    // Return true if consolidation probability is above 60%
+    return consolidationProbability >= 0.6;
   }
 
   /** fibonacci levels to be added to the program...
@@ -3847,148 +3838,149 @@ class Fifteen_Min_Functions {
     Fifteen_Min_Functions.extendLow = dataset.Fifteen_Min_Extend.l
   }
 
-  static consolidationtwo () {
-    const history = Fifteen_Min_Functions.priceHist
-    const highs = Fifteen_Min_Functions.highs
-    const lows = Fifteen_Min_Functions.lows
-    const histmax = Math.max(...highs)
-    const histmin = Math.min(...lows)
-    const histdiff = histmax - histmin
-    
-    // Ensure we have enough data
-    const minDataPoints = 20
-    if (history.length < minDataPoints) {
-      return true; // Default to consolidation if not enough data to determine
-    }
-    
-    // Normalize all arrays to same length (use most recent data)
-    const lookbackPeriod = Math.min(50, history.length)
-    const recentHistory = history.slice(-lookbackPeriod)
-    const recentHighs = highs.slice(-lookbackPeriod)
-    const recentLows = lows.slice(-lookbackPeriod)
-    const recentClose = history.slice(-lookbackPeriod)
-    
-    // APPROACH 1: Bollinger Bands width analysis
-    const bollingerBands = bolls.calculate({ 
-      period: 20, 
-      values: recentHistory, 
-      stdDev: 2
-    })
-    
-    // Calculate normalized Bollinger Band width
-    const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
-    const recentBandWidths = bandWidths.slice(-5)
-    const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
-    
-    // Narrowing bands indicate consolidation
-    const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
-    
-    // APPROACH 2: True Range (volatility) analysis
-    const trValues = tr.calculate({ 
-      high: recentHighs, 
-      low: recentLows, 
-      close: recentClose, 
-      period: 14 
-    })
-    
-    // Calculate average true range relative to price
-    const recentTR = trValues.slice(-5)
-    const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
-    const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
-    
-    // Decreasing TR indicates consolidation
-    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
-    
-    // APPROACH 3: Price channel/range analysis
-    const priceRange = histmax - histmin
-    const priceRangePercent = priceRange / histmin
-    
-    // Calculate standard deviation of closing prices
-    const sum = recentHistory.reduce((a, b) => a + b, 0)
-    const mean = sum / recentHistory.length
-    const stdDev = Math.sqrt(
-      recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
-    )
-    const relativeStdDev = stdDev / mean
-    
-    // Narrow range indicates consolidation
-    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
-    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
-    
-    // APPROACH 4: Linear regression slope and R-squared analysis
-    // Prepare x and y for regression
-    const x = Array.from({ length: recentHistory.length }, (_, i) => i)
-    const y = recentHistory
-    
-    // Calculate linear regression
-    const regResult = new regression.SimpleLinearRegression(x, y)
-    const slope = Math.abs(regResult.slope)
-    const r2 = regResult.rSquared
-    
-    // Flat slope and good fit indicate consolidation
-    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
-    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
-    
-    // APPROACH 5: Check for higher highs/lower lows pattern
-    let hasDirectionalMovement = false
-    
-    // Check for consecutive higher highs or lower lows (trend indicators)
-    let consecutiveHigherHighs = 0
-    let consecutiveLowerLows = 0
-    const pattern_window = 5
-    
-    for (let i = 1; i < pattern_window; i++) {
-      if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
-        consecutiveHigherHighs++;
-      }
-      if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
-        consecutiveLowerLows++;
-      }
-    }
-    
-    // Strong directional pattern indicates trending, not consolidation
-    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
-      hasDirectionalMovement = true;
-    }
-    
-    // Combine all factors to decide if the market is consolidating
-    // Use a scoring system where more indicators agreeing increases confidence
-    
-    let consolidationScore = 0;
-    let totalFactors = 0;
-    
-    // Bollinger factors
-    if (bandWidthShrinking) consolidationScore++;
-    if (isTightBands) consolidationScore++;
-    totalFactors += 2;
-    
-    // TR factors
-    if (trTrend) consolidationScore++;
-    if (isLowVolatility) consolidationScore++;
-    totalFactors += 2;
-    
-    // Range factors
-    if (isNarrowRange) consolidationScore++;
-    if (isLowDeviation) consolidationScore++;
-    totalFactors += 2;
-    
-    // Regression factors
-    if (isFlatSlope) consolidationScore++;
-    if (isPoorFit) consolidationScore++;
-    totalFactors += 2;
-    
-    // Direction factor (negative score if directional)
-    if (!hasDirectionalMovement) consolidationScore++;
-    totalFactors += 1;
-    
-    // Calculate overall probability of consolidation
-    const consolidationProbability = consolidationScore / totalFactors;
-    
-    // Return true if consolidation probability is above 60%
-    return consolidationProbability >= 0.6;
+ /** second consolidation method, meant to strengthen consolidation identification */
+ static consolidationtwo () {
+  const history = Fifteen_Min_Functions.priceHist
+  const highs = Fifteen_Min_Functions.highs 
+  const lows = Fifteen_Min_Functions.lows 
+  const histmax = Math.max(...highs)
+  const histmin = Math.min(...lows)
+  const histdiff = histmax - histmin
+  
+  // Ensure we have enough data
+  const minDataPoints = 20
+  if (history.length < minDataPoints) {
+    return true; // Default to consolidation if not enough data to determine
   }
+  
+  // Normalize all arrays to same length (use most recent data)
+  const lookbackPeriod = Math.min(50, history.length)
+  const recentHistory = history.slice(-lookbackPeriod)
+  const recentHighs = highs.slice(-lookbackPeriod)
+  const recentLows = lows.slice(-lookbackPeriod)
+  const recentClose = history.slice(-lookbackPeriod)
+  
+  // APPROACH 1: Bollinger Bands width analysis
+  const bollingerBands = bolls.calculate({ 
+    period: 20, 
+    values: recentHistory, 
+    stdDev: 2
+  })
+  
+  // Calculate normalized Bollinger Band width
+  const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
+  const recentBandWidths = bandWidths.slice(-5)
+  const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
+  
+  // Narrowing bands indicate consolidation
+  const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
+  const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+  
+  // APPROACH 2: True Range (volatility) analysis
+  const trValues = tr.calculate({ 
+    high: recentHighs, 
+    low: recentLows, 
+    close: recentClose, 
+    period: 14 
+  })
+  
+  // Calculate average true range relative to price
+  const recentTR = trValues.slice(-5)
+  const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
+  const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+  
+  // Decreasing TR indicates consolidation
+  const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
+  const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+  
+  // APPROACH 3: Price channel/range analysis
+  const priceRange = histmax - histmin
+  const priceRangePercent = priceRange / histmin
+  
+  // Calculate standard deviation of closing prices
+  const sum = recentHistory.reduce((a, b) => a + b, 0)
+  const mean = sum / recentHistory.length
+  const stdDev = Math.sqrt(
+    recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
+  )
+  const relativeStdDev = stdDev / mean
+  
+  // Narrow range indicates consolidation
+  const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
+  const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+  
+  // APPROACH 4: Linear regression slope and R-squared analysis
+  // Prepare x and y for regression
+  const x = Array.from({ length: recentHistory.length }, (_, i) => i)
+  const y = recentHistory
+  
+  // Calculate linear regression
+  const regResult = new regression.SimpleLinearRegression(x, y)
+  const slope = Math.abs(regResult.slope)
+  const r2 = regResult.rSquared
+  
+  // Flat slope and good fit indicate consolidation
+  const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
+  const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+  
+  // APPROACH 5: Check for higher highs/lower lows pattern
+  let hasDirectionalMovement = false
+  
+  // Check for consecutive higher highs or lower lows (trend indicators)
+  let consecutiveHigherHighs = 0
+  let consecutiveLowerLows = 0
+  const pattern_window = 5
+  
+  for (let i = 1; i < pattern_window; i++) {
+    if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
+      consecutiveHigherHighs++;
+    }
+    if (recentLows[recentLows.length - i] < recentLows[recentLows.length - i - 1]) {
+      consecutiveLowerLows++;
+    }
+  }
+  
+  // Strong directional pattern indicates trending, not consolidation
+  if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+    hasDirectionalMovement = true;
+  }
+  
+  // Combine all factors to decide if the market is consolidating
+  // Use a scoring system where more indicators agreeing increases confidence
+  
+  let consolidationScore = 0;
+  let totalFactors = 0;
+  
+  // Bollinger factors
+  if (bandWidthShrinking) consolidationScore++;
+  if (isTightBands) consolidationScore++;
+  totalFactors += 2;
+  
+  // TR factors
+  if (trTrend) consolidationScore++;
+  if (isLowVolatility) consolidationScore++;
+  totalFactors += 2;
+  
+  // Range factors
+  if (isNarrowRange) consolidationScore++;
+  if (isLowDeviation) consolidationScore++;
+  totalFactors += 2;
+  
+  // Regression factors
+  if (isFlatSlope) consolidationScore++;
+  if (isPoorFit) consolidationScore++;
+  totalFactors += 2;
+  
+  // Direction factor (negative score if directional)
+  if (!hasDirectionalMovement) consolidationScore++;
+  totalFactors += 1;
+  
+  // Calculate overall probability of consolidation
+  const consolidationProbability = consolidationScore / totalFactors;
+  
+  // Return true if consolidation probability is above 60%
+  return consolidationProbability >= 0.6;
+}
 
   static trend () {
     const history = Fifteen_Min_Functions.priceHist

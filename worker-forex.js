@@ -5,7 +5,6 @@ process.on('message', async (data) => {
   const { instrument, account, proxy, proxyauth } = data;
   
   // Log the instrument being processed
-  
   try {
     // CRITICAL FIX: Remove the await - we DON'T want to wait for this to complete
     // since it's an infinite loop that will never resolve
