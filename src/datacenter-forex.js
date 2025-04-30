@@ -51,19 +51,8 @@ async function getCandleData (baseUrl, options, timescaleLabel, instrument) {
       candleData[`${timescaleLabel[1]}_Extend`].h = data.candles.map((x) => parseFloat(x.mid.h))
       candleData[`${timescaleLabel[1]}_Extend`].l = data.candles.map((x) => parseFloat(x.mid.l))
       candleData[`${timescaleLabel[1]}_Extend`].c = data.candles.map((x) => parseFloat(x.mid.c))
-      
       return candleData
     } catch (error) {
-      console.error(`Error fetching ${timescaleLabel[1]} for ${instrument}: ${error.message}`);
-      
-      retryCount++;
-      if (retryCount <= maxRetries) {
-        console.log(`Retrying (${retryCount}/${maxRetries}) for ${timescaleLabel[1]}...`);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
-      } else {
-        console.error(`Failed to fetch ${timescaleLabel[1]} data after ${maxRetries} attempts`);
-        throw error; // Propagate the error to the caller
-      }
     }
   }
 }
