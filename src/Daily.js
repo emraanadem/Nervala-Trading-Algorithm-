@@ -639,18 +639,25 @@ class Daily_Functions {
     const history = Daily_Functions.priceHist
     const highs = Daily_Functions.highs 
     const lows = Daily_Functions.lows 
+    
+    // Ensure we have valid arrays before proceeding
+    if (!history || !highs || !lows || 
+        history.length === 0 || highs.length === 0 || lows.length === 0) {
+      return false; // Return false if we don't have valid data
+    }
+    
     const histmax = Math.max(...highs)
     const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
     
-    // Ensure we have enough data
-    const minDataPoints = 20
+    // Ensure we have enough data - daily timeframe needs more data points
+    const minDataPoints = 30
     if (history.length < minDataPoints) {
-      return true; // Default to consolidation if not enough data to determine
+      return true; // For daily timeframe, default to true if not enough data
     }
     
     // Normalize all arrays to same length (use most recent data)
-    const lookbackPeriod = Math.min(50, history.length)
+    const lookbackPeriod = Math.min(60, history.length)
     const recentHistory = history.slice(-lookbackPeriod)
     const recentHighs = highs.slice(-lookbackPeriod)
     const recentLows = lows.slice(-lookbackPeriod)
@@ -665,12 +672,12 @@ class Daily_Functions {
     
     // Calculate normalized Bollinger Band width
     const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
-    const recentBandWidths = bandWidths.slice(-5)
+    const recentBandWidths = bandWidths.slice(-10) // Use more data points for daily
     const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
     
-    // Narrowing bands indicate consolidation
+    // Narrowing bands indicate consolidation - more lenient for daily
     const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+    const isTightBands = avgBandWidth < 0.03 // 3% for daily timeframe (higher than smaller timeframes)
     
     // APPROACH 2: True Range (volatility) analysis
     const trValues = tr.calculate({ 
@@ -681,13 +688,13 @@ class Daily_Functions {
     })
     
     // Calculate average true range relative to price
-    const recentTR = trValues.slice(-5)
+    const recentTR = trValues.slice(-10) // More data for daily
     const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
     const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
     
     // Decreasing TR indicates consolidation
     const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+    const isLowVolatility = normalizedATR < 0.012 // Higher for daily timeframe
     
     // APPROACH 3: Price channel/range analysis
     const priceRange = histmax - histmin
@@ -701,9 +708,9 @@ class Daily_Functions {
     )
     const relativeStdDev = stdDev / mean
     
-    // Narrow range indicates consolidation
-    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
-    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+    // Narrow range indicates consolidation - adjusted for daily
+    const isNarrowRange = priceRangePercent < 0.04 // 4% range threshold for daily
+    const isLowDeviation = relativeStdDev < 0.015 // 1.5% std dev threshold for daily
     
     // APPROACH 4: Linear regression slope and R-squared analysis
     // Prepare x and y for regression
@@ -716,8 +723,8 @@ class Daily_Functions {
     const r2 = regResult.rSquared
     
     // Flat slope and good fit indicate consolidation
-    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
-    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+    const isFlatSlope = slope < 0.00015 * mean // Small slope relative to price
+    const isPoorFit = r2 < 0.6 // Lower threshold for daily timeframe
     
     // APPROACH 5: Check for higher highs/lower lows pattern
     let hasDirectionalMovement = false
@@ -725,7 +732,7 @@ class Daily_Functions {
     // Check for consecutive higher highs or lower lows (trend indicators)
     let consecutiveHigherHighs = 0
     let consecutiveLowerLows = 0
-    const pattern_window = 5
+    const pattern_window = 7 // Wider window for daily
     
     for (let i = 1; i < pattern_window; i++) {
       if (recentHighs[recentHighs.length - i] > recentHighs[recentHighs.length - i - 1]) {
@@ -737,7 +744,7 @@ class Daily_Functions {
     }
     
     // Strong directional pattern indicates trending, not consolidation
-    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+    if (consecutiveHigherHighs >= 5 || consecutiveLowerLows >= 5) { // Higher threshold for daily
       hasDirectionalMovement = true;
     }
     
@@ -774,8 +781,8 @@ class Daily_Functions {
     // Calculate overall probability of consolidation
     const consolidationProbability = consolidationScore / totalFactors;
     
-    // Return true if consolidation probability is above 60%
-    return consolidationProbability >= 0.6;
+    // Return true if consolidation probability is above 55% - more lenient for daily
+    return consolidationProbability >= 0.55;
   }
 
   static consolidation() {
@@ -1274,12 +1281,13 @@ class Daily_Functions {
     // Detect if price is near a key level from any timeframe
     const keyLevelProximity = keyLevels.some(level => {
       const distance = Math.abs(price - level) / price
-      return distance < 0.0015 // 0.15% distance threshold - reduced to be less strict
+      return distance < 0.002 // 0.2% distance threshold - more balanced
     })
     
     // If no similar price points found or too few for analysis
-    if (studylist.length < 5) {
-      return !keyLevelProximity // If near key level, avoid trading (false)
+    if (studylist.length < 8) { // More balanced requirement
+      // If we have some data points and we're not at a key level, allow trading
+      return studylist.length >= 5 && !keyLevelProximity 
     }
     
     // Perform detailed analysis of historical behavior at similar price levels
@@ -1292,8 +1300,21 @@ class Daily_Functions {
       keyLevels
     )
     
-    // Modified to allow more trades: either analysis is positive OR price isn't near key levels with enough data
-    return result || (!keyLevelProximity && studylist.length >= 8)
+    // More balanced approach:
+    // 1. If analysis is positive, allow trading
+    // 2. If we have many data points and not near a key level, allow trading
+    // 3. If volatility is low-medium (not too high) and we have some data, allow trading
+    
+    if (result) return true; // Analysis result is positive
+    
+    // Check if we have sufficient data and not near a key level
+    if (!keyLevelProximity && studylist.length >= 12) return true;
+    
+    // Check volatility - if it's in a reasonable range, potentially allow trading
+    const isReasonableVolatility = volatility >= 0.02 && volatility <= 0.07;
+    
+    // Final condition
+    return isReasonableVolatility && !keyLevelProximity && studylist.length >= 10;
   }
 
   /** Do past Analysis to see if this is a good trade, based on static overall() method */
@@ -2723,3 +2744,4 @@ function testdaily (data, price, instrument) {
 module.exports = {
   testdaily
 };
+    

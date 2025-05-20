@@ -631,14 +631,21 @@ class Fifteen_Min_Functions {
     const history = Fifteen_Min_Functions.priceHist
     const highs = Fifteen_Min_Functions.highs 
     const lows = Fifteen_Min_Functions.lows 
+    
+    // Ensure we have valid arrays before proceeding
+    if (!history || !highs || !lows || 
+        history.length === 0 || highs.length === 0 || lows.length === 0) {
+      return false;
+    }
+    
     const histmax = Math.max(...highs)
     const histmin = Math.min(...lows)
     const histdiff = histmax - histmin
     
-    // Ensure we have enough data
-    const minDataPoints = 20
+    // Ensure we have enough data - stricter requirement
+    const minDataPoints = 25
     if (history.length < minDataPoints) {
-      return true; // Default to consolidation if not enough data to determine
+      return false; // Return false if not enough data to determine
     }
     
     // Normalize all arrays to same length (use most recent data)
@@ -655,6 +662,11 @@ class Fifteen_Min_Functions {
       stdDev: 2
     })
     
+    // Check if we have enough bollinger band data
+    if (bollingerBands.length < 10) {
+      return false;
+    }
+    
     // Calculate normalized Bollinger Band width
     const bandWidths = bollingerBands.map(band => (band.upper - band.lower) / band.middle)
     const recentBandWidths = bandWidths.slice(-5)
@@ -662,7 +674,7 @@ class Fifteen_Min_Functions {
     
     // Narrowing bands indicate consolidation
     const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+    const isTightBands = avgBandWidth < 0.018 // Tighter threshold
     
     // APPROACH 2: True Range (volatility) analysis
     const trValues = tr.calculate({ 
@@ -672,49 +684,78 @@ class Fifteen_Min_Functions {
       period: 14 
     })
     
+    // Check if we have enough TR data
+    if (trValues.length < 5) {
+      return false;
+    }
+    
     // Calculate average true range relative to price
     const recentTR = trValues.slice(-5)
     const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
-    const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
+    const normalizedTR = avgTR / recentHistory[recentHistory.length - 1]
     
-    // Decreasing TR indicates consolidation
+    // Decreasing volatility indicates consolidation
     const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+    const isLowVolatility = normalizedTR < 0.006 // Stricter threshold
     
-    // APPROACH 3: Price channel/range analysis
-    const priceRange = histmax - histmin
-    const priceRangePercent = priceRange / histmin
+    // APPROACH 3: Price range analysis
+    // Calculate recent price range as percentage of price
+    const rangePercent = (Math.max(...recentHighs) - Math.min(...recentLows)) / 
+                        recentHistory[recentHistory.length - 1]
     
-    // Calculate standard deviation of closing prices
+    const isNarrowRange = rangePercent < 0.018 // Stricter threshold
+    
+    // Calculate standard deviation of close prices
     const sum = recentHistory.reduce((a, b) => a + b, 0)
     const mean = sum / recentHistory.length
-    const stdDev = Math.sqrt(
-      recentHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentHistory.length
-    )
-    const relativeStdDev = stdDev / mean
+    const squaredDiffs = recentHistory.map(value => Math.pow(value - mean, 2))
+    const avgSquaredDiff = squaredDiffs.reduce((a, b) => a + b, 0) / squaredDiffs.length
+    const stdDev = Math.sqrt(avgSquaredDiff)
+    const coefficientOfVariation = stdDev / mean
     
-    // Narrow range indicates consolidation
-    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
-    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+    const isLowDeviation = coefficientOfVariation < 0.009 // Stricter threshold
     
-    // APPROACH 4: Linear regression slope and R-squared analysis
-    // Prepare x and y for regression
-    const x = Array.from({ length: recentHistory.length }, (_, i) => i)
-    const y = recentHistory
+    // APPROACH 4: Linear regression analysis
+    // Calculate regression slope and R-squared
+    let xValues = []
+    for (let i = 0; i < recentHistory.length; i++) {
+      xValues.push(i)
+    }
     
-    // Calculate linear regression
-    const regResult = new regression.SimpleLinearRegression(x, y)
-    const slope = Math.abs(regResult.slope)
-    const r2 = regResult.rSquared
+    // Simple linear regression calculation
+    const xMean = xValues.reduce((a, b) => a + b, 0) / xValues.length
+    const yMean = recentHistory.reduce((a, b) => a + b, 0) / recentHistory.length
     
-    // Flat slope and good fit indicate consolidation
-    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
-    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+    let numerator = 0
+    let denominator = 0
     
-    // APPROACH 5: Check for higher highs/lower lows pattern
+    for (let i = 0; i < xValues.length; i++) {
+      numerator += (xValues[i] - xMean) * (recentHistory[i] - yMean)
+      denominator += Math.pow(xValues[i] - xMean, 2)
+    }
+    
+    const slope = denominator ? numerator / denominator : 0
+    const yIntercept = yMean - slope * xMean
+    
+    // Calculate R-squared
+    let ssTotal = 0
+    let ssResiduals = 0
+    
+    for (let i = 0; i < recentHistory.length; i++) {
+      const predictedY = slope * xValues[i] + yIntercept
+      ssResiduals += Math.pow(recentHistory[i] - predictedY, 2)
+      ssTotal += Math.pow(recentHistory[i] - yMean, 2)
+    }
+    
+    const rSquared = ssTotal ? 1 - (ssResiduals / ssTotal) : 0
+    
+    // Flat slope and poor fit indicate consolidation/random walk
+    const isFlatSlope = Math.abs(slope) < 0.000008 * mean // Stricter threshold
+    const isPoorFit = rSquared < 0.35 // Stricter threshold
+    
+    // APPROACH 5: Detect directional patterns
+    // Consecutive higher highs or lower lows indicate trending, not consolidation
     let hasDirectionalMovement = false
-    
-    // Check for consecutive higher highs or lower lows (trend indicators)
     let consecutiveHigherHighs = 0
     let consecutiveLowerLows = 0
     const pattern_window = 5
@@ -732,6 +773,18 @@ class Fifteen_Min_Functions {
     if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
       hasDirectionalMovement = true;
     }
+    
+    // APPROACH 6: Check for price acceleration
+    let acceleration = 0;
+    for (let i = 2; i < Math.min(5, recentHistory.length); i++) {
+      const firstDiff = recentHistory[recentHistory.length - i + 1] - recentHistory[recentHistory.length - i];
+      const secondDiff = recentHistory[recentHistory.length - i + 2] - recentHistory[recentHistory.length - i + 1];
+      acceleration += Math.abs(secondDiff - firstDiff);
+    }
+    acceleration = acceleration / 3 / mean;
+    
+    // Acceleration indicates trending, not consolidation
+    const isLowAcceleration = acceleration < 0.0008;
     
     // Combine all factors to decide if the market is consolidating
     // Use a scoring system where more indicators agreeing increases confidence
@@ -759,15 +812,16 @@ class Fifteen_Min_Functions {
     if (isPoorFit) consolidationScore++;
     totalFactors += 2;
     
-    // Direction factor (negative score if directional)
+    // Direction factors
     if (!hasDirectionalMovement) consolidationScore++;
-    totalFactors += 1;
+    if (isLowAcceleration) consolidationScore++;
+    totalFactors += 2;
     
     // Calculate overall probability of consolidation
     const consolidationProbability = consolidationScore / totalFactors;
     
-    // Return true if consolidation probability is above 60%
-    return consolidationProbability >= 0.62;
+    // Stricter threshold for determining consolidation
+    return consolidationProbability >= 0.65;
   }
 
   /** TP variation, helps change TP depending on volatility and price movement depending on whether or not the code has surpassed TP1 and
@@ -913,10 +967,15 @@ class Fifteen_Min_Functions {
     const extendedLows = Four_Hour_Functions.extendLow 
     const price = Four_Hour_Functions.price
     
+    // Return false if we don't have enough data to analyze
+    if (!extendedhistory || extendedhistory.length < 30) {
+      return false;
+    }
+    
     // Define support/resistance levels from multiple timeframes for more robust rejection zones
-    const onehourLevels = One_Hour_Functions.finlevs
-    const fifteenMinLevels = Fifteen_Min_Nexus.finlevs
-    const fourHourLevels = Four_Hour_Functions.finlevs
+    const onehourLevels = One_Hour_Functions.finlevs || []
+    const fifteenMinLevels = Fifteen_Min_Nexus.finlevs || []
+    const fourHourLevels = Four_Hour_Functions.finlevs || []
     const keyLevels = [...onehourLevels, ...fifteenMinLevels, ...fourHourLevels]
     
     // Calculate volatility to adjust buffer size dynamically
@@ -927,7 +986,7 @@ class Fifteen_Min_Functions {
     const max = Math.max(...extendedhistory)
     const min = Math.min(...extendedhistory)
     const priceRange = max - min
-    const buffer = priceRange * Math.max(0.03, Math.min(0.08, volatility))
+    const buffer = priceRange * Math.max(0.02, Math.min(0.07, volatility))
     
     // Define range around current price to look for similar price levels
     const lower = price - buffer
@@ -943,15 +1002,20 @@ class Fifteen_Min_Functions {
       }
     }
     
-    // Detect if price is near a key level from any timeframe
-    const keyLevelProximity = keyLevels.some(level => {
+    // Detect if price is near a key level from any timeframe (adjusted threshold)
+    let keyLevelProximity = false
+    for (const level of keyLevels) {
       const distance = Math.abs(price - level) / price
-      return distance < 0.0015 // 0.15% distance threshold - reduced to be less strict
-    })
+      if (distance < 0.0012) { // Tighter threshold to allow more trades
+        keyLevelProximity = true;
+        break;
+      }
+    }
     
     // If no similar price points found or too few for analysis
-    if (studylist.length < 5) {
-      return !keyLevelProximity // If near key level, avoid trading (false)
+    if (studylist.length < 4) {
+      // More likely to return true if we don't have enough data points
+      return !keyLevelProximity; 
     }
     
     // Perform detailed analysis of historical behavior at similar price levels
@@ -964,8 +1028,27 @@ class Fifteen_Min_Functions {
       keyLevels
     )
     
-    // Modified to allow more trades: either analysis is positive OR price isn't near key levels with enough data
-    return result || (!keyLevelProximity && studylist.length >= 8)
+    // Check if price is at extreme levels (high or low) in recent history
+    const recentHighLow = recentPrices.slice(-30);
+    const isAtExtremeLevel = price > (max - (priceRange * 0.15)) || price < (min + (priceRange * 0.15));
+    
+    // Technical indicators from other timeframes
+    const hourlyTrend = One_Hour_Functions.trend ? One_Hour_Functions.trend() : null;
+    
+    // More nuanced decision making
+    if (result) {
+      // Analysis is positive - high confidence
+      return true;
+    } else if (!keyLevelProximity && studylist.length >= 8) {
+      // Enough data points and not near key level - moderate confidence
+      return true;
+    } else if (!isAtExtremeLevel && hourlyTrend !== null && studylist.length >= 5) {
+      // Not at extreme price levels and not near key level - lower confidence
+      return true;
+    }
+    
+    // Default to false for any other case
+    return false;
   }
 
   /** Do past Analysis to see if this is a good trade, based on static overall() method */
@@ -1264,8 +1347,8 @@ class Fifteen_Min_Functions {
     const history = Four_Hour_Functions.priceHist
     const histLen = history.length
     
-    // Need enough data for analysis
-    if (histLen < 30) return false
+    // Need enough data for analysis - return false if not enough data for proper analysis
+    if (histLen < 20) return false
     
     // SECTION 1: PRICE STRUCTURE ANALYSIS
     // Sample recent prices (more weight on recent activity)
@@ -1353,15 +1436,15 @@ class Fifteen_Min_Functions {
     const atr = sumTrueRange / (recentPrices.length - 1)
     const normalizedAtr = atr / avgPrice
     
-    // CRITICAL CONDITION: Disqualify if market shows clear trending behavior
+    // Balanced condition: Reject if strong directional trend is present
     if (maxConsecutive >= 5) {
-      return false // Trending market with 5+ consecutive moves in same direction
+      return false
     }
     
-    // CRITICAL CONDITION: Disqualify if recent volatility is significantly higher than historical
-    const volatilityExpanding = normalizedAtr > 0.0025 && recentRange > olderRange * 1.3
+    // Balanced condition: Reject on high volatility expansion
+    const volatilityExpanding = normalizedAtr > 0.003 && recentRange > olderRange * 1.4
     if (volatilityExpanding) {
-      return false // Expanding volatility suggests breakout or trend formation
+      return false
     }
     
     // SECTION 5: PRICE SPIKES ANALYSIS
@@ -1372,24 +1455,23 @@ class Fifteen_Min_Functions {
     
     let spikeCount = 0
     for (const change of changes) {
-      if (Math.abs(change) > stdDevChanges * 2.5) {
+      // Balanced spike detection threshold 
+      if (Math.abs(change) > stdDevChanges * 2.8) {
         spikeCount++
       }
     }
     
-    // Too many spikes suggest volatility, not consolidation
-    if (spikeCount > 2) {
+    // Balanced spike count threshold
+    if (spikeCount > 3) {
       return false
     }
     
     // SECTION 6: DECISION FRAMEWORK
-    // Combined criteria with strict thresholds
-    
-    // Core consolidation conditions
-    const narrowRange = recentRange < 0.012 // Very strict: 1.2% range maximum
-    const stableRange = Math.abs(recentRange - olderRange) / olderRange < 0.3 // Range stability
-    const lowVolatility = normalizedAtr < 0.002 // Strict volatility threshold
-    const goodCycleStrength = normCorrelation > 0.4 // Strong cyclic behavior
+    // Balanced consolidation conditions
+    const narrowRange = recentRange < 0.016
+    const stableRange = Math.abs(recentRange - olderRange) / olderRange < 0.45
+    const lowVolatility = normalizedAtr < 0.0025
+    const goodCycleStrength = normCorrelation > 0.32
     
     // Count how many conditions are met
     let conditionsMet = 0
@@ -1398,17 +1480,17 @@ class Fifteen_Min_Functions {
     if (lowVolatility) conditionsMet++ 
     if (goodCycleStrength) conditionsMet++
     
-    // Additional context-specific conditions
-    const consistentStructure = maxConsecutive <= 3 // No more than 3 consecutive moves same direction
-    const limitedSpikes = spikeCount <= 1 // At most 1 price spike
+    // Additional context-specific conditions with balanced thresholds
+    const consistentStructure = maxConsecutive <= 4
+    const limitedSpikes = spikeCount <= 2
     
     if (consistentStructure) conditionsMet++
     if (limitedSpikes) conditionsMet++
     
-    // Set an adaptive threshold based on overall volatility
-    const requiredConditions = normalizedAtr < 0.0015 ? 4 : 5
+    // Balanced threshold based on overall volatility
+    const requiredConditions = normalizedAtr < 0.0015 ? 3 : 4
     
-    // Final decision with high bar for consolidation
+    // Final balanced decision
     return conditionsMet >= requiredConditions;
   }
 
@@ -2096,6 +2178,12 @@ class Four_Hour_Functions {
     const extendedLows = Four_Hour_Functions.extendLow 
     const price = Four_Hour_Functions.price
     
+    // Return false if we don't have enough data to analyze
+    if (!extendedhistory || extendedhistory.length < 30) {
+      return false;
+    }
+    
+    // Define support/resistance levels from multiple timeframes for more robust rejection zones
     // Define support/resistance levels from multiple timeframes for more robust rejection zones
     const onehourLevels = One_Hour_Functions.finlevs
     const fifteenMinLevels = Fifteen_Min_Nexus.finlevs

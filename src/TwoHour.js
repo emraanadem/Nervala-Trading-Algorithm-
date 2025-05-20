@@ -660,7 +660,8 @@ class Two_Hour_Functions {
   // Ensure we have enough data
   const minDataPoints = 20
   if (history.length < minDataPoints) {
-    return true; // Default to consolidation if not enough data to determine
+    // Return false instead of defaulting to true when insufficient data
+    return false;
   }
   
   // Normalize all arrays to same length (use most recent data)
@@ -682,9 +683,9 @@ class Two_Hour_Functions {
   const recentBandWidths = bandWidths.slice(-5)
   const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
   
-  // Narrowing bands indicate consolidation
+  // Narrowing bands indicate consolidation - stricter threshold for 2h timeframe
   const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-  const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+  const isTightBands = avgBandWidth < 0.015 // Tighter bands threshold (was 0.02)
   
   // APPROACH 2: True Range (volatility) analysis
   const trValues = tr.calculate({ 
@@ -699,9 +700,9 @@ class Two_Hour_Functions {
   const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
   const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
   
-  // Decreasing TR indicates consolidation
-  const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-  const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+  // Decreasing TR indicates consolidation - stricter threshold
+  const trTrend = recentTR[recentTR.length - 1] < recentTR[0] * 0.9 // Must be 10% lower
+  const isLowVolatility = normalizedATR < 0.006 // Stricter low volatility threshold (was 0.008)
   
   // APPROACH 3: Price channel/range analysis
   const priceRange = histmax - histmin
@@ -715,12 +716,11 @@ class Two_Hour_Functions {
   )
   const relativeStdDev = stdDev / mean
   
-  // Narrow range indicates consolidation
-  const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
-  const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+  // Narrow range indicates consolidation - stricter thresholds
+  const isNarrowRange = priceRangePercent < 0.015 // Tighter range threshold (was 0.02)
+  const isLowDeviation = relativeStdDev < 0.008 // Stricter deviation threshold (was 0.01)
   
   // APPROACH 4: Linear regression slope and R-squared analysis
-  // Prepare x and y for regression
   const x = Array.from({ length: recentHistory.length }, (_, i) => i)
   const y = recentHistory
   
@@ -730,8 +730,8 @@ class Two_Hour_Functions {
   const r2 = regResult.rSquared
   
   // Flat slope and good fit indicate consolidation
-  const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
-  const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+  const isFlatSlope = slope < 0.00008 * mean // Stricter slope threshold (was 0.0001)
+  const isPoorFit = r2 < 0.45 // Stricter fit threshold (was 0.5)
   
   // APPROACH 5: Check for higher highs/lower lows pattern
   let hasDirectionalMovement = false
@@ -751,7 +751,7 @@ class Two_Hour_Functions {
   }
   
   // Strong directional pattern indicates trending, not consolidation
-  if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+  if (consecutiveHigherHighs >= 2 || consecutiveLowerLows >= 2) { // Stricter pattern detection (was 3)
     hasDirectionalMovement = true;
   }
   
@@ -788,8 +788,8 @@ class Two_Hour_Functions {
   // Calculate overall probability of consolidation
   const consolidationProbability = consolidationScore / totalFactors;
   
-  // Return true if consolidation probability is above 60%
-  return consolidationProbability >= 0.6;
+  // Return true if consolidation probability is above 70% (was 60%)
+  return consolidationProbability >= 0.70;
 }
 
   /** TP variation, helps change TP depending on volatility and price movement depending on whether or not the code has surpassed TP1 and
@@ -1892,7 +1892,8 @@ class Four_Hour_Functions {
     // Ensure we have enough data
     const minDataPoints = 20
     if (history.length < minDataPoints) {
-      return true; // Default to consolidation if not enough data to determine
+      // Return false instead of defaulting to true when insufficient data
+      return false;
     }
     
     // Normalize all arrays to same length (use most recent data)
@@ -1914,9 +1915,9 @@ class Four_Hour_Functions {
     const recentBandWidths = bandWidths.slice(-5)
     const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
     
-    // Narrowing bands indicate consolidation
+    // Narrowing bands indicate consolidation - stricter threshold for 2h timeframe
     const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+    const isTightBands = avgBandWidth < 0.015 // Tighter bands threshold (was 0.02)
     
     // APPROACH 2: True Range (volatility) analysis
     const trValues = tr.calculate({ 
@@ -1931,9 +1932,9 @@ class Four_Hour_Functions {
     const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
     const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
     
-    // Decreasing TR indicates consolidation
-    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+    // Decreasing TR indicates consolidation - stricter threshold
+    const trTrend = recentTR[recentTR.length - 1] < recentTR[0] * 0.9 // Must be 10% lower
+    const isLowVolatility = normalizedATR < 0.006 // Stricter low volatility threshold (was 0.008)
     
     // APPROACH 3: Price channel/range analysis
     const priceRange = histmax - histmin
@@ -1947,12 +1948,11 @@ class Four_Hour_Functions {
     )
     const relativeStdDev = stdDev / mean
     
-    // Narrow range indicates consolidation
-    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
-    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+    // Narrow range indicates consolidation - stricter thresholds
+    const isNarrowRange = priceRangePercent < 0.015 // Tighter range threshold (was 0.02)
+    const isLowDeviation = relativeStdDev < 0.008 // Stricter deviation threshold (was 0.01)
     
     // APPROACH 4: Linear regression slope and R-squared analysis
-    // Prepare x and y for regression
     const x = Array.from({ length: recentHistory.length }, (_, i) => i)
     const y = recentHistory
     
@@ -1962,8 +1962,8 @@ class Four_Hour_Functions {
     const r2 = regResult.rSquared
     
     // Flat slope and good fit indicate consolidation
-    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
-    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+    const isFlatSlope = slope < 0.00008 * mean // Stricter slope threshold (was 0.0001)
+    const isPoorFit = r2 < 0.45 // Stricter fit threshold (was 0.5)
     
     // APPROACH 5: Check for higher highs/lower lows pattern
     let hasDirectionalMovement = false
@@ -1983,7 +1983,7 @@ class Four_Hour_Functions {
     }
     
     // Strong directional pattern indicates trending, not consolidation
-    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+    if (consecutiveHigherHighs >= 2 || consecutiveLowerLows >= 2) { // Stricter pattern detection (was 3)
       hasDirectionalMovement = true;
     }
     
@@ -2020,8 +2020,8 @@ class Four_Hour_Functions {
     // Calculate overall probability of consolidation
     const consolidationProbability = consolidationScore / totalFactors;
     
-    // Return true if consolidation probability is above 60%
-    return consolidationProbability >= 0.6;
+    // Return true if consolidation probability is above 70% (was 60%)
+    return consolidationProbability >= 0.70;
   }
 
   /** fibonacci levels to be added to the program...
@@ -3626,7 +3626,8 @@ class Thirty_Min_Functions {
     // Ensure we have enough data
     const minDataPoints = 20
     if (history.length < minDataPoints) {
-      return true; // Default to consolidation if not enough data to determine
+      // Return false instead of defaulting to true when insufficient data
+      return false;
     }
     
     // Normalize all arrays to same length (use most recent data)
@@ -3648,9 +3649,9 @@ class Thirty_Min_Functions {
     const recentBandWidths = bandWidths.slice(-5)
     const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
     
-    // Narrowing bands indicate consolidation
+    // Narrowing bands indicate consolidation - stricter threshold for 2h timeframe
     const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-    const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+    const isTightBands = avgBandWidth < 0.015 // Tighter bands threshold (was 0.02)
     
     // APPROACH 2: True Range (volatility) analysis
     const trValues = tr.calculate({ 
@@ -3665,9 +3666,9 @@ class Thirty_Min_Functions {
     const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
     const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
     
-    // Decreasing TR indicates consolidation
-    const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-    const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+    // Decreasing TR indicates consolidation - stricter threshold
+    const trTrend = recentTR[recentTR.length - 1] < recentTR[0] * 0.9 // Must be 10% lower
+    const isLowVolatility = normalizedATR < 0.006 // Stricter low volatility threshold (was 0.008)
     
     // APPROACH 3: Price channel/range analysis
     const priceRange = histmax - histmin
@@ -3681,12 +3682,11 @@ class Thirty_Min_Functions {
     )
     const relativeStdDev = stdDev / mean
     
-    // Narrow range indicates consolidation
-    const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
-    const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+    // Narrow range indicates consolidation - stricter thresholds
+    const isNarrowRange = priceRangePercent < 0.015 // Tighter range threshold (was 0.02)
+    const isLowDeviation = relativeStdDev < 0.008 // Stricter deviation threshold (was 0.01)
     
     // APPROACH 4: Linear regression slope and R-squared analysis
-    // Prepare x and y for regression
     const x = Array.from({ length: recentHistory.length }, (_, i) => i)
     const y = recentHistory
     
@@ -3696,8 +3696,8 @@ class Thirty_Min_Functions {
     const r2 = regResult.rSquared
     
     // Flat slope and good fit indicate consolidation
-    const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
-    const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+    const isFlatSlope = slope < 0.00008 * mean // Stricter slope threshold (was 0.0001)
+    const isPoorFit = r2 < 0.45 // Stricter fit threshold (was 0.5)
     
     // APPROACH 5: Check for higher highs/lower lows pattern
     let hasDirectionalMovement = false
@@ -3717,7 +3717,7 @@ class Thirty_Min_Functions {
     }
     
     // Strong directional pattern indicates trending, not consolidation
-    if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+    if (consecutiveHigherHighs >= 2 || consecutiveLowerLows >= 2) { // Stricter pattern detection (was 3)
       hasDirectionalMovement = true;
     }
     
@@ -3754,8 +3754,8 @@ class Thirty_Min_Functions {
     // Calculate overall probability of consolidation
     const consolidationProbability = consolidationScore / totalFactors;
     
-    // Return true if consolidation probability is above 60%
-    return consolidationProbability >= 0.6;
+    // Return true if consolidation probability is above 70% (was 60%)
+    return consolidationProbability >= 0.70;
   }
 
   static trend () {
@@ -3850,7 +3850,8 @@ class Fifteen_Min_Functions {
   // Ensure we have enough data
   const minDataPoints = 20
   if (history.length < minDataPoints) {
-    return true; // Default to consolidation if not enough data to determine
+    // Return false instead of defaulting to true when insufficient data
+    return false;
   }
   
   // Normalize all arrays to same length (use most recent data)
@@ -3872,9 +3873,9 @@ class Fifteen_Min_Functions {
   const recentBandWidths = bandWidths.slice(-5)
   const avgBandWidth = recentBandWidths.reduce((sum, width) => sum + width, 0) / recentBandWidths.length
   
-  // Narrowing bands indicate consolidation
+  // Narrowing bands indicate consolidation - stricter threshold for 2h timeframe
   const bandWidthShrinking = recentBandWidths[recentBandWidths.length - 1] < recentBandWidths[0]
-  const isTightBands = avgBandWidth < 0.02 // Tight bands threshold
+  const isTightBands = avgBandWidth < 0.015 // Tighter bands threshold (was 0.02)
   
   // APPROACH 2: True Range (volatility) analysis
   const trValues = tr.calculate({ 
@@ -3889,9 +3890,9 @@ class Fifteen_Min_Functions {
   const avgTR = recentTR.reduce((sum, val) => sum + val, 0) / recentTR.length
   const normalizedATR = avgTR / recentHistory[recentHistory.length - 1]
   
-  // Decreasing TR indicates consolidation
-  const trTrend = recentTR[recentTR.length - 1] < recentTR[0]
-  const isLowVolatility = normalizedATR < 0.008 // Low volatility threshold
+  // Decreasing TR indicates consolidation - stricter threshold
+  const trTrend = recentTR[recentTR.length - 1] < recentTR[0] * 0.9 // Must be 10% lower
+  const isLowVolatility = normalizedATR < 0.006 // Stricter low volatility threshold (was 0.008)
   
   // APPROACH 3: Price channel/range analysis
   const priceRange = histmax - histmin
@@ -3905,12 +3906,11 @@ class Fifteen_Min_Functions {
   )
   const relativeStdDev = stdDev / mean
   
-  // Narrow range indicates consolidation
-  const isNarrowRange = priceRangePercent < 0.02 // 2% range threshold
-  const isLowDeviation = relativeStdDev < 0.01 // 1% std dev threshold
+  // Narrow range indicates consolidation - stricter thresholds
+  const isNarrowRange = priceRangePercent < 0.015 // Tighter range threshold (was 0.02)
+  const isLowDeviation = relativeStdDev < 0.008 // Stricter deviation threshold (was 0.01)
   
   // APPROACH 4: Linear regression slope and R-squared analysis
-  // Prepare x and y for regression
   const x = Array.from({ length: recentHistory.length }, (_, i) => i)
   const y = recentHistory
   
@@ -3920,8 +3920,8 @@ class Fifteen_Min_Functions {
   const r2 = regResult.rSquared
   
   // Flat slope and good fit indicate consolidation
-  const isFlatSlope = slope < 0.0001 * mean // Extremely small slope relative to price
-  const isPoorFit = r2 < 0.5 // Indicates non-directional (sideways) movement
+  const isFlatSlope = slope < 0.00008 * mean // Stricter slope threshold (was 0.0001)
+  const isPoorFit = r2 < 0.45 // Stricter fit threshold (was 0.5)
   
   // APPROACH 5: Check for higher highs/lower lows pattern
   let hasDirectionalMovement = false
@@ -3941,7 +3941,7 @@ class Fifteen_Min_Functions {
   }
   
   // Strong directional pattern indicates trending, not consolidation
-  if (consecutiveHigherHighs >= 3 || consecutiveLowerLows >= 3) {
+  if (consecutiveHigherHighs >= 2 || consecutiveLowerLows >= 2) { // Stricter pattern detection (was 3)
     hasDirectionalMovement = true;
   }
   
@@ -3978,8 +3978,8 @@ class Fifteen_Min_Functions {
   // Calculate overall probability of consolidation
   const consolidationProbability = consolidationScore / totalFactors;
   
-  // Return true if consolidation probability is above 60%
-  return consolidationProbability >= 0.6;
+  // Return true if consolidation probability is above 70% (was 60%)
+  return consolidationProbability >= 0.70;
 }
 
   static trend () {

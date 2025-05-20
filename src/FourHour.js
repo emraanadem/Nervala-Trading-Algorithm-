@@ -919,17 +919,26 @@ class Four_Hour_Functions {
     const extendedHighs = Four_Hour_Functions.extendHigh 
     const extendedLows = Four_Hour_Functions.extendLow 
     
-    // Basic validation - need enough data
-    if (history.length < 20 || extendHist.length < 40) {
+    // Stricter data requirements for 4H
+    if (history.length < 30 || extendHist.length < 60) {
       return false
     }
     
-    // Get key levels from support/resistance detection
+    // Calculate some basic metrics to establish baseline rejection
+    const recentVolatility = Four_Hour_Functions.calculateStdDev(history.slice(-20)) / 
+                            (history.slice(-20).reduce((sum, p) => sum + p, 0) / 20)
+    
+    // Early rejection: If volatility is too high, don't trade
+    if (recentVolatility > 0.012) {
+      return false
+    }
+    
+    // Get key levels with proper emphasis on higher timeframes
     const fourHourLevels = Four_Hour_Functions.finlevs || []
     const dailyLevels = Daily_Functions.finlevs || []
     const weeklyLevels = Array.isArray(Weekly_Functions.finlevs) ? Weekly_Functions.finlevs : []
     
-    // Combine levels from different timeframes
+    // Weight higher timeframes more heavily for 4H analysis
     const keyLevels = [...weeklyLevels, ...dailyLevels, ...fourHourLevels]
     
     // Calculate price range
@@ -937,107 +946,150 @@ class Four_Hour_Functions {
     const extendLow = Math.min(...extendedLows)
     const priceRange = extendHigh - extendLow
     
-    // Simple check if price is near any key level
-    // This is the most important factor for trading decisions
+    // Check if price is near key levels - important factor
     let nearKeyLevel = false
-    const volatility = Four_Hour_Functions.volatility() * 2.5 // Using a much larger volatility buffer
+    let keyLevelStrength = 0
+    const volatilityBuffer = Four_Hour_Functions.volatility() * 3.0
     
     for (const level of keyLevels) {
-      if (Math.abs(price - level) < volatility) {
+      const distancePercent = Math.abs(price - level) / price
+      if (distancePercent < 0.004) { // 0.4% proximity for 4H
         nearKeyLevel = true
-          break
+        keyLevelStrength = 1 - (distancePercent / 0.004) // 1 = very close, 0 = at threshold
+        break
+      }
+    }
+    
+    // Stronger rejection if very close to multiple key levels
+    if (keyLevelStrength > 0.8) {
+      let multipleKeyLevels = 0
+      for (const level of keyLevels) {
+        const distancePercent = Math.abs(price - level) / price
+        if (distancePercent < 0.005) {
+          multipleKeyLevels++;
         }
       }
+      
+      if (multipleKeyLevels >= 2) {
+        return false; // Reject if very close to multiple key levels
+      }
+    }
     
-    // Get some technical indicators
+    // Get technical indicators specifically calibrated for 4H
     const rsi = Four_Hour_Functions.rsi()
     const trend = Four_Hour_Functions.trend()
     const macd = Four_Hour_Functions.macd()
+    const roc = Four_Hour_Functions.roc()
     
-    // Calculate a simple analysis score
-    const analysisScore = Four_Hour_Functions.simpleAnalysis(extendHist, priceRange, extendedHighs, extendedLows)
+    // If all indicators disagree, likely not a good setup
+    if ((rsi && !trend && !macd && !roc) || 
+        (!rsi && trend && !macd && !roc) || 
+        (!rsi && !trend && macd && !roc) ||
+        (!rsi && !trend && !macd && roc)) {
+      return false; // Only one indicator agrees - not enough
+    }
     
-    // Different ways to qualify for a trade
-    // 1. Near key level and good analysis
-    // 2. Strong technical signals (at least 2 of 3)
-    // 3. Very strong analysis alone
+    // Calculate more detailed analysis with strict parameters
+    const analysisScore = Four_Hour_Functions.simpleAnalysis(
+      extendHist.slice(-40),
+      priceRange,
+      extendedHighs.slice(-40),
+      extendedLows.slice(-40)
+    )
     
-    const hasKeyLevelSetup = nearKeyLevel && analysisScore > 0.4
-    const hasTechnicalSetup = (rsi && trend) || (rsi && macd) || (trend && macd)
-    const hasStrongAnalysis = analysisScore > 0.7
+    // Check for consolidation - don't trade in unclear markets
+    if (Four_Hour_Functions.consolidationtwo()) {
+      if (analysisScore < 0.7) { // Must have very strong signal to trade in consolidation
+        return false;
+      }
+    }
     
-    // Add some randomness to avoid completely predictable results
-    // 10% chance to flip the result
-    const randomFactor = Math.random() < 0.1 ? true : false
+    // Create multiple distinct qualification paths
+    const hasKeyLevelSetup = nearKeyLevel && analysisScore > 0.5 && 
+                           ((rsi && trend) || (macd && roc))
+                           
+    const hasTechnicalSetup = (rsi && trend && macd) && analysisScore > 0.4
     
-    // Determine final result - aim for ~30% true rate
-    const result = hasKeyLevelSetup || hasTechnicalSetup || hasStrongAnalysis
+    const hasStrongAnalysis = analysisScore > 0.75 && (rsi || trend) && (macd || roc)
     
-    // Apply randomization if needed
-    return randomFactor ? !result : result
+    // Add some natural variation based on price position
+    const pricePositionInRange = (price - extendLow) / (extendHigh - extendLow)
+    const middleRangeDiscount = Math.abs(pricePositionInRange - 0.5) < 0.2 ? 0.7 : 1.0
+    
+    // Calculate final score
+    let finalScore = 0
+    if (hasKeyLevelSetup) finalScore += 0.6
+    if (hasTechnicalSetup) finalScore += 0.5
+    if (hasStrongAnalysis) finalScore += 0.7
+    
+    // Apply position discount (less likely to trade in middle of range)
+    finalScore *= middleRangeDiscount
+    
+    // Apply small randomization (8% random factor)
+    const randomFactor = Math.random() < 0.08 ? -0.2 : 0.1
+    finalScore += randomFactor
+    
+    // Return true only if final score exceeds threshold
+    // This will ensure much less frequent true returns
+    return finalScore >= 0.65;
   }
 
   // New simpler analysis function
   static simpleAnalysis(extendedHistory, priceRange, extendedHighs, extendedLows) {
     const price = Four_Hour_Functions.price
     
-    // Find recent price patterns (last 20 candles)
-    const recentHistory = extendedHistory.slice(-20)
-    const recentHighs = extendedHighs.slice(-20)
-    const recentLows = extendedLows.slice(-20)
+    // Find recent price patterns - use more bars for 4H timeframe
+    const recentHistory = extendedHistory.slice(-25) // Increased from 20
+    const recentHighs = extendedHighs.slice(-25)
+    const recentLows = extendedLows.slice(-25)
     
-    // Calculate recent volatility
+    // Calculate recent volatility - adjusted sensitivity for 4H
     let volatility = 0
     for (let i = 1; i < recentHistory.length; i++) {
       volatility += Math.abs(recentHistory[i] - recentHistory[i-1]) / recentHistory[i-1]
     }
     volatility = volatility / (recentHistory.length - 1)
     
-    // Check for price rejection patterns
+    // Price pattern analysis - last 3 candles (12 hours)
     const lastPrice = recentHistory[recentHistory.length - 1]
     const secondLastPrice = recentHistory[recentHistory.length - 2]
     const thirdLastPrice = recentHistory[recentHistory.length - 3]
     
-    // Look for potential reversal candles
+    // Candle pattern analysis - more meaningful for 4H
     const lastCandleRange = recentHighs[recentHighs.length - 1] - recentLows[recentLows.length - 1]
-    const avgCandleRange = priceRange / extendedHistory.length * 10 // Approximate average
+    const avgCandleRange = priceRange / extendedHistory.length * 12 // Adjusted multiplier
     
-    // Score different aspects
-    let score = 0.5 // Start with neutral score
+    // Start with neutral score
+    let score = 0.5
     
-    // 1. Volatility check - lower volatility is better for finding good setups
-    if (volatility < 0.005) {
-      score += 0.15
-    } else if (volatility > 0.01) {
-      score -= 0.1
+    // 1. Volatility check - adjusted thresholds for 4H
+    if (volatility < 0.004) { // Lower threshold for 4H
+      score += 0.18 // Increased weight
+    } else if (volatility > 0.012) { // Higher threshold for 4H
+      score -= 0.12
     }
     
-    // 2. Recent price action
-    // Check for potential reversal or continuation pattern
+    // 2. Recent price action - 4H patterns are more meaningful
     const isReversal = (lastPrice > secondLastPrice && secondLastPrice < thirdLastPrice) || 
-                       (lastPrice < secondLastPrice && secondLastPrice > thirdLastPrice)
+                    (lastPrice < secondLastPrice && secondLastPrice > thirdLastPrice)
     
     if (isReversal) {
-      score += 0.15
+      score += 0.18 // Increased weight for 4H
     }
     
-    // 3. Candle size check
-    // Looking for stronger/larger candles that could signal a move
-    if (lastCandleRange > avgCandleRange * 1.5) {
-      score += 0.1
+    // 3. Candle size check - 4H candles more significant
+    if (lastCandleRange > avgCandleRange * 1.7) { // Increased threshold
+      score += 0.12 // Increased weight
     }
     
-    // 4. Distance from moving average
-    // Calculate a simple 10-period moving average
+    // 4. Moving average analysis - 4H has stronger MA influence
     const sma10 = recentHistory.slice(-10).reduce((sum, price) => sum + price, 0) / 10
     const priceDistanceFromSMA = Math.abs(lastPrice - sma10) / sma10
     
-    if (priceDistanceFromSMA < 0.003) {
-      // Price near MA could be support/resistance
-      score += 0.1
-    } else if (priceDistanceFromSMA > 0.01) {
-      // Price far from MA might be overextended
-      score += 0.05
+    if (priceDistanceFromSMA < 0.002) { // Tighter threshold for 4H
+      score += 0.12 // Increased weight
+    } else if (priceDistanceFromSMA > 0.015) { // Higher threshold for 4H
+      score += 0.08 // Increased impact
     }
     
     // 5. Check for higher highs or lower lows (trend strength)
@@ -1049,16 +1101,16 @@ class Four_Hour_Functions {
       if (recentLows[i] < recentLows[i-1]) lowerLows++
     }
     
-    // Strong trend in either direction
-    if (higherHighs > 7 || lowerLows > 7) {
-      score += 0.1
+    // Strong trend in either direction - 4H trends are more meaningful
+    if (higherHighs > 6 || lowerLows > 6) { // Lower threshold for 4H
+      score += 0.15 // Increased weight
     }
     
     // Add market-specific bias
     const instrument = Four_Hour_Nexus.pair
-    if (instrument && instrument.includes('JPY')) {
-      // JPY pairs often have good setups
-      score += 0.05
+    if (instrument && (instrument.includes('JPY') || instrument.includes('GBP'))) {
+      // These pairs often show clearer patterns on 4H
+      score += 0.08 // Increased weight
     }
     
     // Ensure the score stays between 0 and 1
