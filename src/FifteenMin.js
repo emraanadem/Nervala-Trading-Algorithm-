@@ -399,7 +399,7 @@ class Fifteen_Min_Nexus {
       Fifteen_Min_Functions.stoploss()
       Fifteen_Min_Functions.getPrice()
       Fifteen_Min_Nexus.controlBiggerPeriod()
-      if (!Fifteen_Min_Functions.consolidationtwo() && !Fifteen_Min_Functions.consolidation() && Fifteen_Min_Functions.overall() &&
+      if (!Fifteen_Min_Functions.consolidation() && Fifteen_Min_Functions.overall() &&
             !Fifteen_Min_Functions.keylev()) {
         if (Fifteen_Min_Functions.ema()) {
           if (Fifteen_Min_Nexus.controlSmallerPeriod()[0] == true) {

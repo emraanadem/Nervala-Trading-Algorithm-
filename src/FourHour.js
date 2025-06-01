@@ -400,7 +400,7 @@ class Four_Hour_Nexus {
       Four_Hour_Functions.supreslevs()
       Four_Hour_Nexus.controlSmallerPeriod()
       Four_Hour_Nexus.controlBiggerPeriod()
-      if (!Four_Hour_Functions.consolidationtwo() && Four_Hour_Functions.overall() && !Four_Hour_Functions.consolidation() &&
+      if (Four_Hour_Functions.overall() && !Four_Hour_Functions.consolidation() &&
             !Four_Hour_Functions.keylev()) {
         if (Four_Hour_Functions.ema()) {
           if (Four_Hour_Nexus.controlSmallerPeriod()[0] == true) {

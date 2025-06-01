@@ -438,7 +438,7 @@ class Two_Hour_Nexus {
       Two_Hour_Functions.supreslevs()
       Two_Hour_Nexus.controlSmallerPeriod()
       Two_Hour_Nexus.controlBiggerPeriod()
-      if (!Two_Hour_Functions.consolidationtwo() && Two_Hour_Functions.overall() && !Two_Hour_Functions.consolidation() &&
+      if (Two_Hour_Functions.overall() && !Two_Hour_Functions.consolidation() &&
             !Two_Hour_Functions.keylev()) {
         if (Two_Hour_Functions.ema()) {
           if (Two_Hour_Nexus.controlSmallerPeriod()[0] == true) {

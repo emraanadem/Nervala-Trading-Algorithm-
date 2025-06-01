@@ -434,7 +434,7 @@ class Thirty_Min_Nexus {
       Thirty_Min_Nexus.controlSmallerPeriod()
       Thirty_Min_Nexus.controlBiggerPeriod()
       Thirty_Min_Functions.recentHist()
-      if (!Thirty_Min_Functions.consolidationtwo() && Thirty_Min_Functions.overall() && !Thirty_Min_Functions.consolidation() &&
+      if (Thirty_Min_Functions.overall() && !Thirty_Min_Functions.consolidation() &&
             !Thirty_Min_Functions.keylev()) {
         if (Thirty_Min_Functions.ema()) {
           if (Thirty_Min_Nexus.controlSmallerPeriod()[0] == true) {

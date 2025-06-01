@@ -401,7 +401,7 @@ class Weekly_Nexus {
       Weekly_Nexus.controlSmallerPeriod()
       Weekly_Functions.stoploss()
       Weekly_Functions.getPrice()
-      if (!Weekly_Functions.consolidationtwo() && Weekly_Functions.overall() && !Weekly_Functions.consolidation() &&
+      if (Weekly_Functions.overall() && !Weekly_Functions.consolidation() &&
             !Weekly_Functions.keylev()) {
         if (Weekly_Functions.ema()) {
           if (Weekly_Nexus.controlSmallerPeriod()[0] == true) {

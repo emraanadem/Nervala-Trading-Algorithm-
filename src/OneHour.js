@@ -407,7 +407,7 @@ class One_Hour_Nexus {
       Four_Hour_Functions.supreslevs()
       One_Hour_Nexus.controlSmallerPeriod()
       One_Hour_Nexus.controlBiggerPeriod()
-      if (!One_Hour_Functions.consolidationtwo() && One_Hour_Functions.overall() && !One_Hour_Functions.consolidation() &&
+      if (One_Hour_Functions.overall() && !One_Hour_Functions.consolidation() &&
             !One_Hour_Functions.keylev()) {
         if (One_Hour_Functions.ema()) {
           if (One_Hour_Nexus.controlSmallerPeriod()[0] == true) {

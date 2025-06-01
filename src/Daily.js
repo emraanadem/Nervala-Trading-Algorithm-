@@ -421,7 +421,7 @@ class Daily_Nexus {
       Daily_Functions.getPrice()
       Daily_Nexus.controlSmallerPeriod()
       Daily_Nexus.controlBiggerPeriod()
-      if (!Daily_Functions.consolidationtwo() && Daily_Functions.overall() && !Daily_Functions.consolidation() &&
+      if (Daily_Functions.overall() && !Daily_Functions.consolidation() &&
             !Daily_Functions.keylev()) {
         if (Daily_Functions.ema()) {
           if (Daily_Nexus.controlSmallerPeriod()[0] == true) {
